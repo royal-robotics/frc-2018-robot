@@ -7,11 +7,18 @@
 ### IntelliJ ###
 out/
 
+# User-specific stuff:
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+
+# Gradle:
+.idea/**/libraries
+
 #File-based project format
 *.iws
 
 ### Gradle ###
-.gradle
+.gradle/
 /build/
 
 #Ignore Gradle GUI config
