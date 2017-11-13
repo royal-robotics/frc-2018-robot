@@ -1,9 +1,9 @@
-#Setting Up Your Development Environment
+# Setting Up Your Development Environment
 1. [Install the JDK 8](http://www.oracle.com/technetwork/pt/java/javase/downloads/jdk8-downloads-2133151.html)
 2. [Set your JAVA_HOME environment variable](https://confluence.atlassian.com/doc/setting-the-java_home-variable-in-windows-8895.html)
 3. [Install IntelliJ IDEA Community Edition](https://www.jetbrains.com/idea/download/)
 
-#Building and Deploying
+# Building and Deploying
 1. Clone this repository.
 2. Open IntelliJ, click open project, navigate and click on the folder you cloned the repository into.
 3. Click View -> Tool Window -> Project, and ensure the project explorer pane is open.
