@@ -1,10 +1,14 @@
 package frc.team2522.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
     @Override
-    public void robotInit() { }
+    public void robotInit() {
+        SmartDashboard.putString("test/getRobotValue", "Hello, here's a number: " + (new java.util.Random()).nextInt());
+    }
 
     @Override
     public void disabledInit() { }
@@ -18,11 +22,8 @@ public class Robot extends IterativeRobot {
     @Override
     public void testInit() { }
 
-
     @Override
-    public void disabledPeriodic() {
-        System.out.println("hello world");
-    }
+    public void disabledPeriodic() { }
     
     @Override
     public void autonomousPeriodic() { }
