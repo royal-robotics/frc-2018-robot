@@ -92,7 +92,7 @@ function createWindow() {
 app.on('ready', async () => {
     createWindow();
     
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
     var ip = await roborio.getIPAsync();
     console.log(ip);
     mainWindow.webContents.send('ip-found', ip);

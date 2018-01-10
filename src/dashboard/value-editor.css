@@ -1,0 +1,7 @@
+.value {
+    width: 50%;
+}
+
+.value .close {
+    color: red;
+}
