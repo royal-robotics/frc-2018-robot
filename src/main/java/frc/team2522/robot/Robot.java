@@ -9,8 +9,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
-
-<<<<<<< HEAD
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
 
@@ -20,9 +18,7 @@ public class Robot extends IterativeRobot {
     VictorSP rightDrive2 = new VictorSP(3);
 
     public RobotDrive myDrive = new RobotDrive(leftDrive1, leftDrive2, rightDrive1, rightDrive2);
-=======
     Servo servo = new Servo(0);
->>>>>>> connection-and-tunable-ui
 
     @Override
     public void robotInit() {
@@ -53,17 +49,15 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-<<<<<<< HEAD
         double leftPower = leftStick.getRawAxis(3);
         double rightPower = rightDrive1.get();
 
         //myDrive.tankDrive(leftPower, rightPower);
         myDrive.tankDrive(leftStick, rightStick, /*squaredInputs*/ true);
-=======
+
         double angle = SmartDashboard.getNumber("Servo/angle", 0);
         System.out.println(angle);
         servo.setAngle(angle);
->>>>>>> connection-and-tunable-ui
     }
 
     @Override
