@@ -1,5 +1,8 @@
 var NetworkTables;
 (function (NetworkTables) {
+    if(noElectron)
+        return;
+
     let keys = {}, connectionListeners = [], connected = false, globalListeners = [], keyListeners = {}, robotAddress = '127.0.0.1';
     ipc.send('ready');
     ipc.on('connected', (ev, con) => {

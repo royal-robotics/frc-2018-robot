@@ -4,15 +4,42 @@
 <head>
     <meta charset="utf-8">
     <title>FRC 2522 Dashboard</title>
+
+    <!-- CSS Libraries -->
+    <link rel="stylesheet" type="text/css" href="bower_components\bootstrap\dist\css\bootstrap.css">
+
+    <!-- JS Libraries -->
+    <script>if (typeof require !== typeof undefined) window.$ = window.jQuery = require("./bower_components/jquery/dist/jquery.min.js");</script>
+    <script src="bower_components\jquery\dist\jquery.js"></script>
+    <script src="bower_components\bootstrap\dist\js\bootstrap.min.js"></script>
+    
+    <!-- Dashboard CSS -->
     <link href="css/style.css" rel="stylesheet">
+
+    <!-- Interface to comunicate with node.js/electron -->
+    <script src="tryIPC.js"></script>
+    
+    <!-- SmartDashboard Interface -->
+    <script src="networktables/networktables.js"></script>
+
+    <!-- Dashboard JS -->
+    <script src="ui.js"></script>
+    <script src="tabs.js"></script>
+    <!-- <script src="value-editor.js"></script> -->
+    <script src="connection-ui/connection.js"></script>
+    
 </head>
 
 <body>
-    <div id="test"></div>
-    
-    <script src="tryIPC.js"></script><!-- Interface to comunicate with node.js/electron -->
-    <script src="networktables/networktables.js"></script><!-- SmartDashboard Interface -->
-    <script src="ui.js"></script>
+    <h1>Royal Robotics FRC 2522 - Dashboard 2018</h1>
+    <div id="connection-container"></div>
+
+    <ul id="tabs" class="nav nav-tabs">
+        <li class="active"><a name="partials/home">Home</a></li>
+        <li><a name="partials/value-editor">Value Editor</a></li>
+    </ul>
+
+    <div id="main"></div>
 </body>
 
 </html>
