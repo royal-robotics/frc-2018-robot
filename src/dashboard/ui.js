@@ -1,5 +1,4 @@
-// Sets function to be called on NetworkTables connect (usually not necessary).
-// NetworkTables.addWsConnectionListener(onNetworkTablesConnection, true);
+
 
 // Sets function to be called when robot dis/connects
 if(!noElectron) {
@@ -8,6 +7,7 @@ if(!noElectron) {
         options.async = true;
     });
 
+
     // NetworkTables.addRobotConnectionListener((connected) => {
     //     if(connected)
     //         console.log("Connected!");
@@ -15,9 +15,9 @@ if(!noElectron) {
     //         console.log("Disconnected");
     // }, true);
 
-    NetworkTables.addKeyListener('/SmartDashboard/test/getRobotValue', (key, value) => {
-        document.getElementById("test").innerHTML = value;
-    });
+    // NetworkTables.addKeyListener('/SmartDashboard/test/getRobotValue', (key, value) => {
+    //     document.getElementById("test").innerHTML = value;
+    // });
     
     ipc.on("ip-found", (ev, mesg) => {
         console.log("ip-found: " + mesg)
