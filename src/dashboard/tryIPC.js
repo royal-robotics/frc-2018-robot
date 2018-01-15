@@ -6,7 +6,3 @@ try {
 catch (e) {
     noElectron = true;
 }
-
-$(document).ready(function() {
-    console.log("hello wolrd!");
-});

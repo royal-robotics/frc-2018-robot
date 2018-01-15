@@ -25,9 +25,9 @@ function createWindow() {
         // If the Window is ready than send the connection status to it
         if (ready) {
             mainWindow.webContents.send('connected', con);
-        }
-        else
+        } else {
             connected = () => mainWindow.webContents.send('connected', con);
+        }
     });
     // When the script starts running in the window set the ready variable
     ipc.on('ready', (ev, mesg) => {
@@ -89,14 +89,13 @@ function createWindow() {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', async () => {
+app.on('ready', () => setTimeout(async () => {
     createWindow();
-    
     mainWindow.webContents.openDevTools();
     var ip = await roborio.getIPAsync();
     console.log(ip);
     mainWindow.webContents.send('ip-found', ip);
-});
+}, 0)); // Set a timeout of 0 on this task to fix deadlock issues
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
