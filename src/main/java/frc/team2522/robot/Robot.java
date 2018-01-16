@@ -1,27 +1,27 @@
 package frc.team2522.robot;
 
 import java.lang.*;
-import com.kauailabs.navx.frc.AHRS;
+import java.util.*;
+
+import frc.team2522.robot.autonomous.*;
+import frc.team2522.robot.subsystems.*;
+
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.*;
+
+import com.kauailabs.navx.frc.AHRS;
 
 public class Robot extends IterativeRobot {
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
 
-    VictorSP leftDrive1 = new VictorSP(0);
-    VictorSP leftDrive2 = new VictorSP(1);
-    VictorSP rightDrive1 = new VictorSP(2);
-    VictorSP rightDrive2 = new VictorSP(3);
-
-    SpeedControllerGroup leftMotors = new SpeedControllerGroup(leftDrive1, leftDrive2);
-    SpeedControllerGroup rightMotors = new SpeedControllerGroup(rightDrive1, rightDrive2);
-    DifferentialDrive driveControl = new DifferentialDrive(leftMotors, rightMotors);
+    Drivebase drivebase = new Drivebase();
 
     Servo servo = new Servo(9);
 
     AHRS gyro = new AHRS(SPI.Port.kMXP);
+
+    AutoController autoController;
 
     @Override
     public void robotInit() {
@@ -40,10 +40,16 @@ public class Robot extends IterativeRobot {
     public void disabledPeriodic() { }
 
     @Override
-    public void autonomousInit() { }
+    public void autonomousInit() {
+        List<AutoStep> autoSteps = new ArrayList<>();
+        autoSteps.add(new AutoDrive(drivebase));
+        autoController = new AutoController(autoSteps);
+    }
 
     @Override
-    public void autonomousPeriodic() { }
+    public void autonomousPeriodic() {
+        autoController.periodic();
+    }
 
     @Override
     public void teleopInit() { }
@@ -52,7 +58,7 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         double leftPower = leftStick.getY(GenericHID.Hand.kLeft);
         double rightPower = rightStick.getY(GenericHID.Hand.kRight);
-        driveControl.tankDrive(leftPower, rightPower,true);
+        drivebase.setPower(leftPower, rightPower);
 
         double angle = SmartDashboard.getNumber("Servo/angle", 0);
         servo.setAngle(angle);
