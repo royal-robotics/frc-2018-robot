@@ -1,3 +1,4 @@
+// Create the NetworkTables interface
 var NetworkTables;
 (function (NetworkTables) {
     if(noElectron)

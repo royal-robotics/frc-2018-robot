@@ -1,3 +1,4 @@
+// Tab logic
 $(document).ready(function() {
     $("#tabs > li").each(function(index) {
         this.onclick = () => loadTab(this);

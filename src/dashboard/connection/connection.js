@@ -1,5 +1,6 @@
+// Connection logic
 $(document).ready(function() {
-    $("#connection-container").load("connection-ui/connection.html", () => {
+    $("#connection-container").load("connection/connection.html", () => {
         NetworkTables.addRobotConnectionListener(connectionStatus, /*Call Immediately*/ true);
     });
 });

@@ -1,3 +1,4 @@
+// Finding roborio logic
 const exec = require('child_process').exec;
 
 function execPromise(command) {
@@ -17,11 +18,11 @@ exports.getIPAsync = async () => {
         // If Roborio is found
         let ipList = discoverRoborio.match(/\d{1,3}\.\d{1,3}.\d{1,3}.\d{1,3}/g)
         if(ipList.length != 1) {
-            return;
+            return undefined;
         }
         return ipList[0];
     }, function(err) {
         // If Roborio is not found
-        return err;
+        return undefined;
     });
 }

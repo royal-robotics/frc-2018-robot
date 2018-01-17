@@ -5,17 +5,17 @@ const wpilib_NT = require("wpilib-nt-client");
 const client = new wpilib_NT.Client();
 const roborio = require("./roborio");
 
-// Module to control application life.
+// Module to control application life
 const app = electron.app;
 
-// Module to create native browser window.
+// Module to create native browser window
 const BrowserWindow = electron.BrowserWindow;
 
 // Module for receiving messages from the BrowserWindow
 const ipc = electron.ipcMain;
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+// Keep a global reference of the window object. If you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected
 let mainWindow;
 
 let connected, ready = false;
@@ -29,35 +29,41 @@ function createWindow() {
             connected = () => mainWindow.webContents.send('connected', con);
         }
     });
+
     // When the script starts running in the window set the ready variable
     ipc.on('ready', (ev, mesg) => {
         ready = true;
-        // Send connection message to the window if if the message is ready
-        if (connected)
+        // Send connection message to the window if the message is ready
+        if (connected) {
             connected();
+        }
     });
-    // When the user chooses the address of the bot than try to connect
+
+    // When the user chooses the address of the bot then try to connect
     ipc.on('connect', (ev, address, port) => {
         let callback = (connected, err) => {
             mainWindow.webContents.send('connected', connected);
         };
         if (port) {
             client.start(callback, address, port);
-        }
-        else {
+        } else {
             client.start(callback, address);
         }
     });
+
     ipc.on('add', (ev, mesg) => {
         client.Assign(mesg.val, mesg.key, (mesg.flags & 1) === 1);
     });
+
     ipc.on('update', (ev, mesg) => {
         client.Update(mesg.id, mesg.val);
     });
+
     // Listens to the changes coming from the client
     client.addListener((key, val, valType, mesgType, id, flags) => {
         mainWindow.webContents.send(mesgType, { key, val, valType, id, flags });
     });
+
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 1366,
@@ -67,10 +73,13 @@ function createWindow() {
         // The window is closed until the python server is ready
         show: false
     });
+
     // Move window to top (left) of screen.
     mainWindow.setPosition(0, 0);
+
     // Load window.
     mainWindow.loadURL(`file://${__dirname}/index.html`);
+
     // Once the python server is ready, load window contents.
     mainWindow.once('ready-to-show', function () {
         mainWindow.show();
@@ -78,6 +87,7 @@ function createWindow() {
 
     // Remove menu
     mainWindow.setMenu(null);
+
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
         // Dereference the window object, usually you would store windows
@@ -93,8 +103,9 @@ app.on('ready', () => setTimeout(async () => {
     createWindow();
     mainWindow.webContents.openDevTools();
     var ip = await roborio.getIPAsync();
-    console.log(ip);
-    mainWindow.webContents.send('ip-found', ip);
+    if (ip !== undefined) {
+        mainWindow.webContents.send('ip-found', ip);
+    }
 }, 0)); // Set a timeout of 0 on this task to fix deadlock issues
 
 // Quit when all windows are closed.
