@@ -2,6 +2,9 @@
 $(document).ready(function() {
     $("#connection-container").load("connection/connection.html", () => {
         NetworkTables.addRobotConnectionListener(connectionStatus, /*Call Immediately*/ true);
+        var connected = NetworkTables.isRobotConnected();
+        ipc.send('attempt-connect');
+        console.log(connected);
     });
 });
 

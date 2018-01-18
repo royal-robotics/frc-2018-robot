@@ -50,7 +50,13 @@ function createWindow() {
             client.start(callback, address);
         }
     });
-
+    ipc.on('attempt-connect',(ev,mesg) =>{
+       var ip = roborio.getIPAsync(); 
+       //console.log(ip);
+        if (ip !== undefined) {
+            mainWindow.webContents.send('ip-found', ip);
+        }
+    });
     ipc.on('add', (ev, mesg) => {
         client.Assign(mesg.val, mesg.key, (mesg.flags & 1) === 1);
     });
@@ -99,13 +105,9 @@ function createWindow() {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', () => setTimeout(async () => {
+app.on('ready', () => setTimeout(() => {
     createWindow();
     mainWindow.webContents.openDevTools();
-    var ip = await roborio.getIPAsync();
-    if (ip !== undefined) {
-        mainWindow.webContents.send('ip-found', ip);
-    }
 }, 0)); // Set a timeout of 0 on this task to fix deadlock issues
 
 // Quit when all windows are closed.
