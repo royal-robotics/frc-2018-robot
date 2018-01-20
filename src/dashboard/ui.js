@@ -6,7 +6,7 @@ if(!noElectron) {
     });
     
     ipc.on("ip-found", (ev, mesg) => {
-        console.log("ip-found: " + mesg)
+        console.log("ip-found");
         ipc.send('connect', mesg);
     });
 }

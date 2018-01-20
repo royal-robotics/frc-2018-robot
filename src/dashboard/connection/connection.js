@@ -1,6 +1,13 @@
 // Connection logic
+function attemptConnection(){
+    var connected = NetworkTables.isRobotConnected();
+    ipc.send('attempt-connect');
+    console.log(connected);
+}
+
 $(document).ready(function() {
     $("#connection-container").load("connection/connection.html", () => {
+        setInterval(attemptConnection, 10000)
         NetworkTables.addRobotConnectionListener(connectionStatus, /*Call Immediately*/ true);
     });
 });
