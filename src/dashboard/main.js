@@ -50,13 +50,14 @@ function createWindow() {
             client.start(callback, address);
         }
     });
+
     ipc.on('attempt-connect',(ev,mesg) =>{
-       var ip = roborio.getIPAsync(); 
-       //console.log(ip);
+        var ip = roborio.getIPAsync();
         if (ip !== undefined) {
             mainWindow.webContents.send('ip-found', ip);
         }
     });
+
     ipc.on('add', (ev, mesg) => {
         client.Assign(mesg.val, mesg.key, (mesg.flags & 1) === 1);
     });
