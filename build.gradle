@@ -1,8 +1,14 @@
+
+
 plugins {
     id "java"
     id "eclipse"
     id "idea"
-    id "jaci.openrio.gradle.GradleRIO" version "2018.01.07"
+    id "jaci.openrio.gradle.GradleRIO" version "2018.01.11"
+}
+
+repositories {
+    mavenCentral()
 }
 
 def TEAM = 2522
@@ -27,9 +33,13 @@ deploy {
 // and NavX.
 dependencies {
     compile wpilib()
+    compile pathfinder()
     compile ctre()
     compile navx()
     compile openrio.powerup.matchData()
+
+    testCompile 'junit:junit:4.12'
+    compile 'junit:junit:4.12'
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
@@ -42,4 +52,12 @@ jar {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.4'
+}
+
+sourceSets {
+    test {
+        java {
+            srcDirs = ["src/java/tests"]
+        }
+    }
 }

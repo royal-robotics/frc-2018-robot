@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj.smartdashboard.*;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import jaci.pathfinder.*;
+import jaci.pathfinder.modifiers.TankModifier;
+
 public class Robot extends IterativeRobot {
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
@@ -23,8 +26,44 @@ public class Robot extends IterativeRobot {
 
     AutoController autoController;
 
+    Trajectory left;
+    Trajectory right;
+    private void generateMotionProfile() {
+
+        //MAX ROBOT VELOCITY IS 175 inches/second
+        //MAX ROBOT ACCELERATION IS 333.33 inches/second^2
+
+        double wheelbase_width = 31.25;
+
+        Waypoint[] points = new Waypoint[] {
+                new Waypoint(0, 0, Pathfinder.d2r(90)),
+                new Waypoint(-200, 250, Pathfinder.d2r(135)),
+                new Waypoint(0, 500, Pathfinder.d2r (90)),
+        };
+
+        Trajectory.Config config = new Trajectory.Config(
+                Trajectory.FitMethod.HERMITE_CUBIC,
+                Trajectory.Config.SAMPLES_HIGH, //???
+                0.01, //10ms
+                150,
+                150,
+                600.0);
+
+
+        Trajectory trajectory = Pathfinder.generate(points, config);
+
+        // Wheelbase Width = 0.5m
+        TankModifier modifier = new TankModifier(trajectory).modify(wheelbase_width);
+
+        // Do something with the new Trajectories...
+        left = modifier.getLeftTrajectory();
+        right = modifier.getRightTrajectory();
+    }
+
     @Override
     public void robotInit() {
+        //generateMotionProfile();
+
         gyro.reset();
         SmartDashboard.putNumber("Servo/angle", 0);
 
@@ -39,16 +78,37 @@ public class Robot extends IterativeRobot {
     @Override
     public void disabledPeriodic() { }
 
+    long autoStartTime;
     @Override
     public void autonomousInit() {
-        List<AutoStep> autoSteps = new ArrayList<>();
-        autoSteps.add(new AutoDrive(drivebase));
-        autoController = new AutoController(autoSteps);
+//        List<AutoStep> autoSteps = new ArrayList<>();
+//        autoSteps.add(new AutoDrive(drivebase));
+//        autoController = new AutoController(autoSteps);
+
+        autoStartTime = System.nanoTime();
     }
 
     @Override
     public void autonomousPeriodic() {
-        autoController.periodic();
+//        autoController.periodic();
+
+        long diffTime = System.nanoTime() - autoStartTime;
+
+        double diffMilliSeconds = ((double)diffTime) / 1000000;
+
+        int seg = ((int) Math.round(diffMilliSeconds)) / 10;
+//        System.out.printf("seg number: %d, left-length: %d\n", seg, left.length());
+        if(seg < left.length() - 1) {
+            double leftVel = left.get(seg).velocity; //inches/second
+            double rightVel = right.get(seg).velocity; //inches/second
+
+            double leftPower = leftVel / 175;
+            double rightPower = rightVel / 175;
+
+            drivebase.setPower(-leftPower, -rightPower);
+        } else {
+            drivebase.setPower(0, 0);
+        }
     }
 
     @Override

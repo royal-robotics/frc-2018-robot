@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/frc-2018-robot.iml" filepath="$PROJECT_DIR$/frc-2018-robot.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/frc-2018-robot_main.iml" filepath="$PROJECT_DIR$/.idea/modules/frc-2018-robot_main.iml" group="frc-2018-robot" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frc-2018-robot_test.iml" filepath="$PROJECT_DIR$/.idea/modules/frc-2018-robot_test.iml" group="frc-2018-robot" />
     </modules>
   </component>
 </project>
