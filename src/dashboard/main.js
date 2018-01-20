@@ -32,6 +32,7 @@ function createWindow() {
 
     // When the script starts running in the window set the ready variable
     ipc.on('ready', (ev, mesg) => {
+        console.log("ready");
         ready = true;
         // Send connection message to the window if the message is ready
         if (connected) {
@@ -41,6 +42,7 @@ function createWindow() {
 
     // When the user chooses the address of the bot then try to connect
     ipc.on('connect', (ev, address, port) => {
+        console.log("connect");
         let callback = (connected, err) => {
             mainWindow.webContents.send('connected', connected);
         };
@@ -52,17 +54,33 @@ function createWindow() {
     });
 
     ipc.on('attempt-connect',(ev,mesg) =>{
-        var ip = roborio.getIPAsync();
-        if (ip !== undefined) {
-            mainWindow.webContents.send('ip-found', ip);
-        }
+        console.log("attempt-connect");
+        var results;
+        var process = roborio.getIPAsync(results);
+        process.once("exit", (code, signal) => setTimeout(() => {
+            console.log(results);
+            if (results !== undefined) {
+                // If Roborio is found
+                let ipList = results.match(/\d{1,3}\.\d{1,3}.\d{1,3}.\d{1,3}/g)
+                if(ipList == null || ipList.length != 1) {
+                    console.log("Error getting ip");
+                    return undefined;
+                }
+                mainWindow.webContents.send('ip-found', ipList[0]);
+                console.log(ipList[0])
+            }
+            console.log("Roborio not found");
+            // If Roborio is not found
+        }, 5000));
     });
 
     ipc.on('add', (ev, mesg) => {
+        console.log("add");
         client.Assign(mesg.val, mesg.key, (mesg.flags & 1) === 1);
     });
 
     ipc.on('update', (ev, mesg) => {
+        console.log("update");
         client.Update(mesg.id, mesg.val);
     });
 
