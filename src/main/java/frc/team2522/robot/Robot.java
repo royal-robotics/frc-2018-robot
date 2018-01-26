@@ -1,15 +1,15 @@
 package frc.team2522.robot;
 
-import java.lang.*;
-import java.util.*;
+import edu.wpi.first.wpilibj.*;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.kauailabs.navx.frc.AHRS;
 
 import frc.team2522.robot.autonomous.*;
 import frc.team2522.robot.subsystems.*;
-
-import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.smartdashboard.*;
-
-import com.kauailabs.navx.frc.AHRS;
 
 import jaci.pathfinder.*;
 import jaci.pathfinder.modifiers.TankModifier;
@@ -22,12 +22,15 @@ public class Robot extends IterativeRobot {
 
     Servo servo = new Servo(9);
 
+    DoubleSolenoid solenoid = new DoubleSolenoid(3, 4);
+
     AHRS gyro = new AHRS(SPI.Port.kMXP);
 
     AutoController autoController;
 
     Trajectory left;
     Trajectory right;
+
     private void generateMotionProfile() {
 
         //MAX ROBOT VELOCITY IS 175 inches/second
@@ -38,7 +41,7 @@ public class Robot extends IterativeRobot {
         Waypoint[] points = new Waypoint[] {
                 new Waypoint(0, 0, Pathfinder.d2r(90)),
                 new Waypoint(-200, 250, Pathfinder.d2r(135)),
-                new Waypoint(0, 500, Pathfinder.d2r (90)),
+                new Waypoint(0, 500, Pathfinder.d2r(90)),
         };
 
         Trajectory.Config config = new Trajectory.Config(
@@ -79,6 +82,7 @@ public class Robot extends IterativeRobot {
     public void disabledPeriodic() { }
 
     long autoStartTime;
+
     @Override
     public void autonomousInit() {
 //        List<AutoStep> autoSteps = new ArrayList<>();
@@ -94,11 +98,11 @@ public class Robot extends IterativeRobot {
 
         long diffTime = System.nanoTime() - autoStartTime;
 
-        double diffMilliSeconds = ((double)diffTime) / 1000000;
+        double diffMilliSeconds = ((double) diffTime) / 1000000;
 
         int seg = ((int) Math.round(diffMilliSeconds)) / 10;
 //        System.out.printf("seg number: %d, left-length: %d\n", seg, left.length());
-        if(seg < left.length() - 1) {
+        if (seg < left.length() - 1) {
             double leftVel = left.get(seg).velocity; //inches/second
             double rightVel = right.get(seg).velocity; //inches/second
 
@@ -122,5 +126,11 @@ public class Robot extends IterativeRobot {
 
         double angle = SmartDashboard.getNumber("Servo/angle", 0);
         servo.setAngle(angle);
+
+        if (leftStick.getRawButton(1)) {
+            solenoid.set(DoubleSolenoid.Value.kForward);
+        } else {
+            solenoid.set(DoubleSolenoid.Value.kReverse);
+        }
     }
 }
