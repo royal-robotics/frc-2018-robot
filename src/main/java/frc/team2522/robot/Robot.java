@@ -15,6 +15,8 @@ import jaci.pathfinder.*;
 import jaci.pathfinder.modifiers.TankModifier;
 
 public class Robot extends IterativeRobot {
+    TalonSRX motorcontroller = new TalonSRX(1);
+
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
 
@@ -22,7 +24,17 @@ public class Robot extends IterativeRobot {
 
     Servo servo = new Servo(9);
 
-    DoubleSolenoid solenoid = new DoubleSolenoid(3, 4);
+    //DoubleSolenoid solenoid = new DoubleSolenoid(3, 4);
+
+    DoubleSolenoid dsolenoid2 = new DoubleSolenoid(2,5);
+
+    DoubleSolenoid solenoid3 = new DoubleSolenoid(1,6);
+
+    DoubleSolenoid solenoid4 = new DoubleSolenoid(7, 0);
+
+    Solenoid solenoid = new Solenoid(3);
+
+    Solenoid solenoid2 = new Solenoid(4);
 
     AHRS gyro = new AHRS(SPI.Port.kMXP);
 
@@ -120,6 +132,8 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
+        motorcontroller.set(ControlMode.PercentOutput, leftStick.getY(GenericHID.Hand.kLeft));
+
         double leftPower = leftStick.getY(GenericHID.Hand.kLeft);
         double rightPower = rightStick.getY(GenericHID.Hand.kRight);
         drivebase.setPower(leftPower, rightPower);
@@ -128,9 +142,32 @@ public class Robot extends IterativeRobot {
         servo.setAngle(angle);
 
         if (leftStick.getRawButton(1)) {
-            solenoid.set(DoubleSolenoid.Value.kForward);
+            solenoid.set(true);
         } else {
-            solenoid.set(DoubleSolenoid.Value.kReverse);
+            solenoid.set(false);
+        }
+        if (leftStick.getRawButton(2)) {
+            solenoid2.set(true);
+        }else{
+            solenoid2.set(false);
+        }
+
+        if (leftStick.getRawButton(1)) {
+            dsolenoid2.set(DoubleSolenoid.Value.kForward);
+        } else {
+            dsolenoid2.set(DoubleSolenoid.Value.kReverse);
+        }
+
+        if (leftStick.getRawButton(1)) {
+            solenoid3.set(DoubleSolenoid.Value.kForward);
+        } else {
+            solenoid3.set(DoubleSolenoid.Value.kReverse);
+        }
+
+        if (leftStick.getRawButton(1)) {
+            solenoid4.set(DoubleSolenoid.Value.kForward);
+        } else {
+            solenoid4.set(DoubleSolenoid.Value.kReverse);
         }
     }
 }
