@@ -13,7 +13,8 @@ function execCommand(command) {
 }
 
 exports.getIP = () => {
-    let result = execCommand("cd.. & cd.. & gradlew discoverRoborio");
+    let buffer = execCommand("cd.. & cd.. & gradlew discoverRoborio");
+    var result = buffer.toString();
     console.log(result);
 
     if (result !== undefined) {

@@ -1,5 +1,6 @@
 // Value editor logic
 var tunables = []; //TODO: Make this private to this module
+var subtypes = {"Drive": "Velocity", "Arm": "Position"}; 
 
 $(document).ready(() => {
     //Setup tunable listeners, makes sure we have all the tunables and their current values
@@ -9,6 +10,9 @@ $(document).ready(() => {
             return;
 
         let keyShort = key.substr(stSmartDashboard.length);
+        var keyPart = keyShort.split("/");
+        subtypes[keyPart[0]] = keyPart[1];
+        console.log(subtypes);
         if(isNew && tunables[keyShort] !== undefined)
             console.log("Warning: new tunable value already defined");
         
