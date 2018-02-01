@@ -2,7 +2,13 @@
 var tunables = []; //TODO: Make this private to this module
 var subtypes = {"Drive": "Velocity", "Arm": "Position"}; 
 
+function filterchange(){
+    var selected = $("#filter").val();
+    console.log(selected);
+}
 $(document).ready(() => {
+    console.log("test");
+    $("#filter").on("change", filterchange);
     //Setup tunable listeners, makes sure we have all the tunables and their current values
     NetworkTables.addGlobalListener((key, value, isNew) => {
         const stSmartDashboard = "/SmartDashboard/";
@@ -24,6 +30,16 @@ $(document).ready(() => {
 function updateTunablesList(){
     //Clearing and reinserting all the DOM elements isn't great, it's fast enough it works for now though
     $("#value-list").empty();
+    var filter = $("#filter");
+    var options = ""
+    for(var key in subtypes){
+        console.log(key);
+        options = options + " <option class='tunable-value' value='" + key + "'>" + key + "</option>";
+    }
+    console.log(options);
+    filter.html(options); 
+    var selected = filter.val();
+    console.log(selected);
     for(let key in tunables) {
         let value = tunables[key];
         let type = typeof(value);

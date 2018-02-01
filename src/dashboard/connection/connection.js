@@ -1,8 +1,11 @@
 // Connection logic
 function attemptConnection(){
     var connected = NetworkTables.isRobotConnected();
-    ipc.send('attempt-connect');
-    console.log(connected);
+    if(connected == false)
+    {
+        ipc.send('attempt-connect');
+        console.log(connected);
+    }
 }
 
 $(document).ready(function() {
