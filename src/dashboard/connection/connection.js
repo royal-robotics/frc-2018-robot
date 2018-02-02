@@ -1,5 +1,5 @@
 // Connection logic
-function attemptConnection(){
+function attemptConnection() {
     var connected = NetworkTables.isRobotConnected();
     if(connected == false)
     {
@@ -8,7 +8,7 @@ function attemptConnection(){
     }
 }
 
-$(document).ready(function() {
+$(() => {
     $("#connection-container").load("connection/connection.html", () => {
         setInterval(attemptConnection, 10000)
         NetworkTables.addRobotConnectionListener(connectionStatus, /*Call Immediately*/ true);
