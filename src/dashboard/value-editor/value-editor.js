@@ -20,27 +20,32 @@ $(() => {
             console.log("Warning: new tunable value already defined");
         
         tunables[keyShort] = value;
-        updateTunablesList();
+        updateTunablesList(true);
     }, /*call immediately with all tunables*/true);
 });
 
 function filterchange() {
     var selected = $("#filter").val();
     console.log(selected);
+    tunables = [];
+    tunables.push(subtypes [selected]);
+    updateTunablesList(false);
 }
 
-function updateTunablesList() {
+function updateTunablesList(changefilter) {
     //Clearing and reinserting all the DOM elements isn't great, it's fast enough it works for now though
     $("#value-list").empty();
-    var filter = $("#filter");
-    var options = ""
-    for(var key in subtypes){
-        console.log(key);
-        options = options + " <option class='tunable-value' value='" + key + "'>" + key + "</option>";
+    if (changefilter){
+        var filter = $("#filter");
+        var options = ""
+        for(var key in subtypes){
+            console.log(key);
+            options = options + " <option class='tunable-value' value='" + key + "'>" + key + "</option>";
+        }
+        console.log(options);
+        filter.html(options); 
     }
-    console.log(options);
-    filter.html(options); 
-    var selected = filter.val();
+    var selected = $("#filter").val();
     console.log(selected);
     for(let key in tunables) {
         let value = tunables[key];
