@@ -53,12 +53,15 @@ function createWindow() {
         }
     });
 
-    ipc.on('attempt-connect',(ev,mesg) =>{
-        console.log("attempt-connect");
+    ipc.on('attempt-connect',(ev,mesg) => {
         var ip = roborio.getIP();
-        if (ip !== undefined) {
-            mainWindow.webContents.send('ip-found', ip);
-        }
+        console.log("Attempt-Connect: Found IP: " + ip);
+        let callback = (connected, err) => {
+            console.log("connected: " + connected);
+            console.log("err: " + err);
+            mainWindow.webContents.send('connected', connected);
+        };
+        client.start(callback, ip);
     });
 
     ipc.on('add', (ev, mesg) => {
