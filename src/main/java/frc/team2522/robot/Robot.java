@@ -1,11 +1,21 @@
 package frc.team2522.robot;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Robot extends IterativeRobot {
+    Joystick controller = new Joystick(0);
+
+    SpeedControllerGroup leftMotors = new SpeedControllerGroup(new VictorSP(0), new VictorSP(1));
+    SpeedControllerGroup rightMotors = new SpeedControllerGroup(new VictorSP(2), new VictorSP(3));
+    DifferentialDrive driveControl = new DifferentialDrive(leftMotors, rightMotors);
+
+    DoubleSolenoid gearPushout = new DoubleSolenoid(0, 0, 7);
+    DoubleSolenoid gearDrapes = new DoubleSolenoid(1, 3, 4);
 
     @Override
     public void robotInit() {
+        System.out.println("ROBOT INIT");
 
     }
 
@@ -17,7 +27,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
-
+        gearPushout.set(DoubleSolenoid.Value.kReverse);
     }
 
     @Override
@@ -26,10 +36,24 @@ public class Robot extends IterativeRobot {
     }
 
     @Override
-    public void teleopInit() { }
+    public void teleopInit() {
+        gearPushout.set(DoubleSolenoid.Value.kReverse);
+        gearDrapes.set(DoubleSolenoid.Value.kForward);
+    }
 
     @Override
     public void teleopPeriodic() {
+        driveControl.tankDrive(controller.getRawAxis(1), controller.getRawAxis(5));
+        gearPushout.set(DoubleSolenoid.Value.kReverse);
+        boolean getRawButton = controller.getRawButton (1);
+        boolean drapesGetRawButton = controller.getRawButton (4);
+        if (getRawButton) {
+            gearPushout.set(DoubleSolenoid.Value.kForward);
+        }
+        if (drapesGetRawButton) {
+            gearDrapes.set(DoubleSolenoid.Value.kForward);
+        }
+
 
     }
 }
