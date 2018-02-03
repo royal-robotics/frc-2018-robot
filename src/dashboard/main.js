@@ -55,13 +55,15 @@ function createWindow() {
 
     ipc.on('attempt-connect',(ev,mesg) => {
         var ip = roborio.getIP();
-        console.log("Attempt-Connect: Found IP: " + ip);
-        let callback = (connected, err) => {
-            console.log("connected: " + connected);
-            console.log("err: " + err);
-            mainWindow.webContents.send('connected', connected);
-        };
-        client.start(callback, ip);
+        if (ip !== undefined) {
+            console.log("Attempt-Connect: Found IP: " + ip);
+            let callback = (connected, err) => {
+                console.log("connected: " + connected);
+                console.log("err: " + err);
+                mainWindow.webContents.send('connected', connected);
+            };
+            client.start(callback, ip);
+        } 
     });
 
     ipc.on('add', (ev, mesg) => {

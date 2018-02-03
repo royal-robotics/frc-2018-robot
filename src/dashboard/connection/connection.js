@@ -7,7 +7,7 @@ function checkConnection() {
 $(() => {
     $("#connection-container").load("connection/connection.html", () => {
         checkConnection();
-        setInterval(checkConnection, 1000)
+        setInterval(checkConnection, 10000)
         NetworkTables.addRobotConnectionListener(connectionStatus, /*Call Immediately*/ true);
     });
 });
