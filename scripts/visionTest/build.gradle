@@ -1,0 +1,38 @@
+plugins {
+    id "java"
+    id "jaci.openrio.gradle.GradleRIO" version "2018.01.11"
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    flatDir {
+       dirs 'libs'
+   }
+}
+
+dependencies {
+    // compile wpilib()
+    // compile pathfinder()
+    // compile ctre()
+    // compile navx()
+    // compile openrio.powerup.matchData()
+    
+    compile name: 'opencv-320'
+    //C:\Everything\Royal Robotics\FRC-2018\frc-2018-robot\scripts\visionTest
+    //compile files('../../../opencv/build/java/x64/opencv_java320.dll')
+}
+
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes(
+            'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+            'Main-Class': 'VisionTest.Main'
+        )
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.4'
+}
