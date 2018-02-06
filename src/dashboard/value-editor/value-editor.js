@@ -3,7 +3,6 @@ var tunables = []; //TODO: Make this private to this module
 var subtypes = {"Drive": "Velocity", "Arm": "Position"}; 
 
 $(() => {
-    console.log("test");
     $("#filter").on("change", filterchange);
 
     //Setup tunable listeners, makes sure we have all the tunables and their current values
@@ -15,7 +14,6 @@ $(() => {
         let keyShort = key.substr(stSmartDashboard.length);
         var keyPart = keyShort.split("/");
         subtypes[keyPart[0]] = keyPart[1];
-        console.log(subtypes);
         if(isNew && tunables[keyShort] !== undefined)
             console.log("Warning: new tunable value already defined");
         
@@ -26,9 +24,8 @@ $(() => {
 
 function filterchange() {
     var selected = $("#filter").val();
-    console.log(selected);
     tunables = [];
-    tunables.push(subtypes [selected]);
+    tunables.push(subtypes[selected]);
     updateTunablesList(false);
 }
 
@@ -42,11 +39,8 @@ function updateTunablesList(changefilter) {
             console.log(key);
             options = options + " <option class='tunable-value' value='" + key + "'>" + key + "</option>";
         }
-        console.log(options);
         filter.html(options); 
     }
-    var selected = $("#filter").val();
-    console.log(selected);
     for(let key in tunables) {
         let value = tunables[key];
         let type = typeof(value);

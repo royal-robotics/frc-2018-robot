@@ -1,7 +1,8 @@
 // Connection logic
 function checkConnection() {
-    if(!NetworkTables.isRobotConnected())
+    if(!NetworkTables.isRobotConnected()) {
         ipc.send('attempt-connect');
+    }
 }
 
 $(() => {
