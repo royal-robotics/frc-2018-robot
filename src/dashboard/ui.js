@@ -4,8 +4,4 @@ if(!noElectron) {
     $.ajaxPrefilter(function( options, original_Options, jqXHR ) {
         options.async = true;
     });
-
-    ipc.on('connected', (ev, mesg) => {
-        console.log("Connected!?!  " + mesg);
-    });
 }

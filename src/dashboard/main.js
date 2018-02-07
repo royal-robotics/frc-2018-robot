@@ -54,8 +54,7 @@ function createWindow() {
     });
 
     ipc.on('attempt-connect',(ev,mesg) => {
-        var ip = roborio.getIP();
-        if (ip !== undefined) {
+        roborio.getIP().then(function(ip) {
             console.log("Attempt-Connect: Found IP: " + ip);
             let callback = (connected, err) => {
                 console.log("connected: " + connected);
@@ -63,7 +62,10 @@ function createWindow() {
                 mainWindow.webContents.send('connected', connected);
             };
             client.start(callback, ip);
-        } 
+        }, function(errorMessage) {
+            console.log("Error getting IP: " + errorMessage);
+            mainWindow.webContents.send('connected', false);
+        });
     });
 
     ipc.on('add', (ev, mesg) => {

@@ -1,6 +1,6 @@
 // Value editor logic
 var tunables = []; //TODO: Make this private to this module
-var subtypes = {"Drive": "Velocity", "Arm": "Position"}; 
+var subtypes = {};
 
 $(() => {
     $("#filter").on("change", filterchange);
@@ -32,7 +32,7 @@ function filterchange() {
 function updateTunablesList(changefilter) {
     //Clearing and reinserting all the DOM elements isn't great, it's fast enough it works for now though
     $("#value-list").empty();
-    if (changefilter){
+    if (changefilter) {
         var filter = $("#filter");
         var options = ""
         for(var key in subtypes){
