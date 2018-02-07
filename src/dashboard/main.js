@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron = require("electron");
 const wpilib_NT = require("wpilib-nt-client");
 const client = new wpilib_NT.Client();
-const roborio = require("./roborio");
+const roborio = require("./mainProcess/roborio");
 
 // Module to control application life
 const app = electron.app;
@@ -55,7 +55,6 @@ function createWindow() {
 
     ipc.on('attempt-connect',(ev,mesg) => {
         roborio.getIP().then(function(ip) {
-            console.log("Attempt-Connect: Found IP: " + ip);
             let callback = (connected, err) => {
                 console.log("connected: " + connected);
                 console.log("err: " + err);
@@ -63,7 +62,6 @@ function createWindow() {
             };
             client.start(callback, ip);
         }, function(errorMessage) {
-            console.log("Error getting IP: " + errorMessage);
             mainWindow.webContents.send('connected', false);
         });
     });

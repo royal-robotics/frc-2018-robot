@@ -13,19 +13,18 @@
     <script src="bower_components\bootstrap\dist\js\bootstrap.min.js"></script>
     
     <!-- Dashboard CSS -->
-    <link href="css/style.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
 
     <!-- Interface to comunicate with node.js/electron -->
-    <script src="tryIPC.js"></script>
+    <script src="mainProcess/tryIPC.js"></script>
     
     <!-- SmartDashboard Interface -->
-    <script src="networktables/networktables.js"></script>
+    <script src="rendererProcess/networktables/networktables.js"></script>
 
     <!-- Dashboard JS -->
-    <script src="ui.js"></script>
-    <script src="tabs.js"></script>
-    <!--<script src="value-editor/value-editor.js"></script>-->
-    <script src="connection/connection.js"></script>
+    <script src="rendererProcess/ui.js"></script>
+    <script src="rendererProcess/tabs.js"></script>
+    <script src="rendererProcess/connection/connection.js"></script>
 </head>
 
 <body>
@@ -34,7 +33,7 @@
 
     <ul id="tabs" class="nav nav-tabs">
         <li class="active"><a name="home">Home</a></li>
-        <li><a name="value-editor/value-editor">Value Editor</a></li>
+        <li><a name="value-editor">Value Editor</a></li>
     </ul>
 
     <div id="main"></div>

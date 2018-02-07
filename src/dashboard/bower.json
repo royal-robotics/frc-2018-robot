@@ -1,8 +1,10 @@
 {
   "name": "FRC 2522 Dashboard",
-  "main": "ui.js",
+  "main": "rendererProcess/ui.js",
   "authors": [
-    "Connor Blomquist"
+    "Connor Blomquist",
+    "Jonathan Phippen",
+    "Suah Choi"
   ],
   "homepage": "https://github.com/royal-robotics/frc-2018-robot",
   "ignore": [
