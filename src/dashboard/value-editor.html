@@ -1,0 +1,25 @@
+<link href="rendererProcess/value-editor/value-editor.css" rel="stylesheet">
+<script src="rendererProcess/value-editor/value-editor.js"></script>
+<!-- ***** Hidden Templates ***** -->
+<div name="template" style="display: none;">    
+    <div id="tunable-string" class="tunable">
+        <span class="tunable-key"></span>
+        <input type="text" class="tunable-value" />
+        <button class="close">&times;</button>
+    </div>
+    <div id="tunable-number" class="tunable">
+        <span class="tunable-key"></span>
+        <input type="number" class="tunable-value" />
+        <button class="close">&times;</button>
+    </div>
+    <div id="tunable-boolean" class="tunable">
+        <span class="tunable-key"></span>
+        <input type="checkbox" data-toggle="toggle" class="tunable-value" />
+        <button class="close">&times;</button>
+    </div>
+</div>
+<!-- ******************** -->
+<h2>value-editor</h2>
+<select id="filter" class="tunable tunable-value">
+</select>      
+<div id="value-list"></div>
