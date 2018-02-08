@@ -11,8 +11,9 @@ public class Robot extends IterativeRobot {
     DifferentialDrive driveControl = new DifferentialDrive(leftMotors, rightMotors);
 
     DoubleSolenoid gearPushout = new DoubleSolenoid(0, 0, 7);
-    boolean previousButtonValue = false;
-
+    boolean previousButtonValueA = false;
+    boolean previousButtonValueB = false;
+    boolean isAutoDrivingMode = false;
     @Override
     public void robotInit() {
         System.out.println("ROBOT INIT");
@@ -41,11 +42,11 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        driveControl.tankDrive(controller.getRawAxis(1), controller.getRawAxis(5));
+//        driveControl.tankDrive(controller.getRawAxis(1), controller.getRawAxis(5));
 
-        boolean getRawButton = controller.getRawButton(1);
+        boolean buttonValueA = controller.getRawButton(1);
 
-        if (getRawButton == true && previousButtonValue == false) {
+       if (buttonValueA == true && previousButtonValueA == false) {
             if (gearPushout.get() == DoubleSolenoid.Value.kReverse) {
                 gearPushout.set(DoubleSolenoid.Value.kForward);
             } else {
@@ -53,6 +54,23 @@ public class Robot extends IterativeRobot {
            }
         }
 
-        previousButtonValue = getRawButton;
+        previousButtonValueA = buttonValueA;
+
+        boolean buttonValueB = controller.getRawButton (2);
+
+        if (buttonValueB && !previousButtonValueB) {
+            isAutoDrivingMode = !isAutoDrivingMode;
+
+        }
+        if (isAutoDrivingMode) {
+            driveControl.tankDrive(10,10);
+        } else {
+            driveControl.tankDrive(controller.getRawAxis(1), controller.getRawAxis(5));
+        }
+        previousButtonValueB = buttonValueB;
     }
+
+
+
 }
+
