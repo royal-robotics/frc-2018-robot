@@ -12,8 +12,18 @@ $(() => {
             return;
 
         let keyShort = key.substr(stSmartDashboard.length);
-        var keyPart = keyShort.split("/");
-        subtypes[keyPart[0]] = keyPart[1];
+        var keySplit = keyShort.indexOf("/");
+        var keyPart1 = keyShort.substr(0,keySplit);
+        var keyPart2 = keyShort.substr(keySplit + 1);
+        var hasKey = subtypes.hasOwnProperty(keyPart1);
+        if(hasKey) {
+            var oldValue = subtypes[keyPart1];
+            oldValue.push(keyPart2);
+            subtypes[keyPart1] = oldValue;
+        } else {
+            subtypes[keyPart1] = [keyPart2];
+        }
+        console.log(subtypes);
         if(isNew && tunables[keyShort] !== undefined)
             console.log("Warning: new tunable value already defined");
         
@@ -23,9 +33,6 @@ $(() => {
 });
 
 function filterchange() {
-    var selected = $("#filter").val();
-    tunables = [];
-    tunables.push(subtypes[selected]);
     updateTunablesList(false);
 }
 
@@ -41,38 +48,46 @@ function updateTunablesList(changefilter) {
         }
         filter.html(options); 
     }
+    var selected = $("#filter").val();
+    var selectedValue = subtypes[selected];
+    var mappedValue = selectedValue.map(function(value) {
+        return selected + "/" + value;
+    });
     for(let key in tunables) {
-        let value = tunables[key];
-        let type = typeof(value);
-
-        var div = null;
-        switch(type) {
-            case "string":
-                div = $("#tunable-string").clone();
-                let inputSt = div.find(".tunable-value");
-                inputSt.change(function() { console.log($(this).val())});
-                inputSt.attr("value", value);
-                break;
-            case "number":
-                div = $("#tunable-number").clone();
-                let inputNu = div.find(".tunable-value");
-                inputNu.change(function() {
-                    console.log($(this).val());
-                    console.log("/SmartDashboard/" + key);
-                    NetworkTables.putValue("/SmartDashboard/" + key, parseFloat($(this).val()));
-                });
-                inputNu.attr("value", value);
-                break;
-            case "boolean":
-                div = $("#tunable-boolean").clone();
-                let inputBo = div.find(".tunable-value");
-                value ? inputBo.attr("checked", "") : inputBo.removeAttr("checked");
-                inputBo.change(function() { console.log($(this).prop("checked")); });
-                break;
+        var filtered = mappedValue.includes(key);
+        if (filtered) {
+            let value = tunables[key];
+            let type = typeof(value);
+    
+            var div = null;
+            switch(type) {
+                case "string":
+                    div = $("#tunable-string").clone();
+                    let inputSt = div.find(".tunable-value");
+                    inputSt.change(function() { console.log($(this).val())});
+                    inputSt.attr("value", value);
+                    break;
+                case "number":
+                    div = $("#tunable-number").clone();
+                    let inputNu = div.find(".tunable-value");
+                    inputNu.change(function() {
+                        console.log($(this).val());
+                        console.log("/SmartDashboard/" + key);
+                        NetworkTables.putValue("/SmartDashboard/" + key, parseFloat($(this).val()));
+                    });
+                    inputNu.attr("value", value);
+                    break;
+                case "boolean":
+                    div = $("#tunable-boolean").clone();
+                    let inputBo = div.find(".tunable-value");
+                    value ? inputBo.attr("checked", "") : inputBo.removeAttr("checked");
+                    inputBo.change(function() { console.log($(this).prop("checked")); });
+                    break;
+            }
+            
+            div.id = key; //consider prefixing this id with a unique identifier
+            div.find(".tunable-key").append(document.createTextNode(key));
+            $("#value-list").append(div);
         }
-        
-        div.id = key; //consider prefixing this id with a unique identifier
-        div.find(".tunable-key").append(document.createTextNode(key));
-        $("#value-list").append(div);
     }
 }
