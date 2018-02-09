@@ -1,26 +1,14 @@
 package frc.team2522.robot;
 
-import edu.wpi.cscore.MjpegServer;
-import edu.wpi.cscore.VideoMode;
-import javafx.scene.Camera;
-import org.opencv.core.*;
-import org.opencv.imgproc.*;
+import frc.team2522.robot.camera.CameraPipeline;
 
-import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.CvSource;
 import edu.wpi.first.wpilibj.*;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.kauailabs.navx.frc.AHRS;
 
-import frc.team2522.robot.autonomous.*;
 import frc.team2522.robot.subsystems.*;
-
-import jaci.pathfinder.*;
-import jaci.pathfinder.modifiers.TankModifier;
 
 public class Robot extends IterativeRobot {
     TalonSRX motorcontroller = new TalonSRX(1);
@@ -36,7 +24,7 @@ public class Robot extends IterativeRobot {
 //    Mat source = new Mat();
 //    Mat output = new Mat();
 
-    CameraPipeline camera = new CameraPipeline();
+    CameraPipeline camera = new CameraPipeline(leftStick);
 
     @Override
     public void robotInit() {
