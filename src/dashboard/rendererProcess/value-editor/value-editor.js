@@ -13,7 +13,7 @@ $(() => {
 
         let keyShort = key.substr(stSmartDashboard.length);
         var keySplit = keyShort.indexOf("/");
-        var keyPart1 = keyShort.substr(0,keySplit);
+        var keyPart1 = keyShort.substr(0, keySplit);
         var keyPart2 = keyShort.substr(keySplit + 1);
         var hasKey = subtypes.hasOwnProperty(keyPart1);
         if(hasKey) {
@@ -23,6 +23,7 @@ $(() => {
         } else {
             subtypes[keyPart1] = [keyPart2];
         }
+
         console.log(subtypes);
         if(isNew && tunables[keyShort] !== undefined)
             console.log("Warning: new tunable value already defined");
@@ -48,6 +49,7 @@ function updateTunablesList(changefilter) {
         }
         filter.html(options); 
     }
+
     var selected = $("#filter").val();
     var selectedValue = subtypes[selected];
     var mappedValue = selectedValue.map(function(value) {

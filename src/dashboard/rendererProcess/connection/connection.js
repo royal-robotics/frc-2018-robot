@@ -8,7 +8,8 @@ function checkConnection() {
 
 $(() => {
     $("#connection-container").load("rendererProcess/connection/connection.html", () => {
-        NetworkTables.addRobotConnectionListener(connectionStatus, /*Call Immediately*/ true);
+        // Don't call immediately because that causes a double connection check that can lock the connection code
+        NetworkTables.addRobotConnectionListener(connectionStatus, false);
     });
 });
 

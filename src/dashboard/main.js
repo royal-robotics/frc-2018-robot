@@ -84,7 +84,10 @@ function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 1366,
+        //width: 1500,
         height: 570,
+        //height: 626,
+        //fullscreen: true,
         // 1366x570 is a good standard height, but you may want to change this to fit your DriverStation's screen better.
         // It's best if the dashboard takes up as much space as possible without covering the DriverStation application.
         // The window is closed until the python server is ready
@@ -118,7 +121,7 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 app.on('ready', () => setTimeout(() => {
     createWindow();
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
 }, 0)); // Set a timeout of 0 on this task to fix deadlock issues
 
 // Quit when all windows are closed.
