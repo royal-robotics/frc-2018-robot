@@ -32,30 +32,45 @@ public class DriveController {
     Drivebase drivebase;
 
     long nsStart;
-    private Timer timer = new Timer();
+    private Timer timer;
 
     int cSegments;
     TrajectoryControl leftControl;
     TrajectoryControl rightControl;
 
+    DriveData ddL;
+    DriveData ddR;
+
     public DriveController(Drivebase db, DriveData ddL, DriveData ddR) {
         drivebase = db;
 
-//        Trajectory trajectory = Pathfinder.generate(points, config);
-//        TankModifier modifier = new TankModifier(trajectory).modify(wheelbase_width);
-//
-//        cSegments = trajectory.segments.length;
-//        leftControl = new TrajectoryControl(modifier.getLeftTrajectory(), ddL);
-//        rightControl = new TrajectoryControl(modifier.getRightTrajectory(), ddR);
+        Trajectory trajectory = Pathfinder.generate(points, config);
+        TankModifier modifier = new TankModifier(trajectory).modify(wheelbase_width);
+
+        cSegments = trajectory.segments.length;
+        leftControl = new TrajectoryControl("left", modifier.getLeftTrajectory(), ddL);
+        rightControl = new TrajectoryControl("right", modifier.getRightTrajectory(), ddR);
+
+        this.ddL = ddL;
+        this.ddR = ddR;
     }
 
     public void Start() {
         nsStart = System.nanoTime();
+        timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 update();
             }
         }, 0, 10);
+    }
+
+    public void Stop() {
+        if(timer != null) {
+            timer.cancel();
+            System.out.println("stoping drive control timer");
+        }
+
     }
 
     private void update() {
@@ -67,10 +82,15 @@ public class DriveController {
 
         if(dt < cSegments) {
             double leftPower = leftControl.getPower(dt, msSinceStart);
-            //double rightPower = rightControl.getPower(dt, msSinceStart);
-            //System.out.printf("Segment: %d, Left: %f, Right: %f\n",  dt, leftPower, rightPower);
-            drivebase.setPower(-leftPower, -0);
+            double rightPower = rightControl.getPower(dt, msSinceStart);
+
+
+//            System.out.printf("Left: %f, Right: %f ------ %f, %f\n", leftPower, rightPower, ddL.getPosition(), ddR.getPosition());
+
+            drivebase.setPower(-leftPower, -rightPower);
         } else {
+            System.out.println("AUTO OVER");
+            timer.cancel();
             drivebase.setPower(0, 0);
         }
     }

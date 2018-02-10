@@ -16,12 +16,13 @@ import jaci.pathfinder.modifiers.TankModifier;
 import javafx.scene.Camera;
 
 public class Robot extends IterativeRobot {
-    Joystick leftStick = new Joystick(0);
-    Joystick rightStick = new Joystick(1);
+    //Joystick leftStick = new Joystick(0);
+    //Joystick rightStick = new Joystick(1);
+    Joystick controller = new Joystick(0);
 
     Drivebase drivebase = new Drivebase();
-    DriveData driveDataLeft = new DriveData(2, 3, true);
-    DriveData driveDataRight = new DriveData(4,5, false);
+    DriveData driveDataLeft = new DriveData("left", 2, 3, true);
+    DriveData driveDataRight = new DriveData("right", 4,5, false);
     DriveController driveController = new DriveController(drivebase, driveDataLeft, driveDataRight);
 
     Servo servo = new Servo(9);
@@ -49,6 +50,8 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
+        driveDataLeft.reset();
+        driveDataRight.reset();
         driveController.Start();
     }
 
@@ -60,13 +63,15 @@ public class Robot extends IterativeRobot {
     }
 
     @Override
-    public void teleopInit() { }
+    public void teleopInit() {
+        driveController.Stop();
+    }
 
     @Override
     public void teleopPeriodic() {
-        double leftPower = leftStick.getY(GenericHID.Hand.kLeft);
-        double rightPower = rightStick.getY(GenericHID.Hand.kRight);
-        drivebase.setPower(leftPower, rightPower);
+        //double leftPower = leftStick.getY(GenericHID.Hand.kLeft);
+        //double rightPower = rightStick.getY(GenericHID.Hand.kRight);
+        drivebase.setPower(controller.getRawAxis(1), controller.getRawAxis(5));
 
         double angle = SmartDashboard.getNumber("Servo/angle", 0);
         servo.setAngle(angle);
