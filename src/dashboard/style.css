@@ -17,7 +17,6 @@ body {
     color: white;
     overflow: hidden;
     background: #222;
-    /* background-image: url("http://roborio-2522-frc.local:1181/stream.mjpg"); */
 }
 
 .tunable-value {
