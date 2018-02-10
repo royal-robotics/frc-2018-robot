@@ -44,12 +44,12 @@ public class DriveController {
     public DriveController(Drivebase db, DriveData ddL, DriveData ddR) {
         drivebase = db;
 
-        Trajectory trajectory = Pathfinder.generate(points, config);
-        TankModifier modifier = new TankModifier(trajectory).modify(wheelbase_width);
-
-        cSegments = trajectory.segments.length;
-        leftControl = new TrajectoryControl("left", modifier.getLeftTrajectory(), ddL);
-        rightControl = new TrajectoryControl("right", modifier.getRightTrajectory(), ddR);
+//        Trajectory trajectory = Pathfinder.generate(points, config);
+//        TankModifier modifier = new TankModifier(trajectory).modify(wheelbase_width);
+//
+//        cSegments = trajectory.segments.length;
+//        leftControl = new TrajectoryControl("left", modifier.getLeftTrajectory(), ddL);
+//        rightControl = new TrajectoryControl("right", modifier.getRightTrajectory(), ddR);
 
         this.ddL = ddL;
         this.ddR = ddR;

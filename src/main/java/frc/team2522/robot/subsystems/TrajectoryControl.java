@@ -3,7 +3,6 @@ package frc.team2522.robot.subsystems;
 import jaci.pathfinder.Trajectory;
 
 public class TrajectoryControl {
-    String name;
     Trajectory trajectory;
     DriveData driveData;
 
@@ -11,8 +10,7 @@ public class TrajectoryControl {
 
     public long msSinceStartLast = 0;
 
-    public TrajectoryControl(String name, Trajectory t, DriveData dd) {
-        this.name = name;
+    public TrajectoryControl(Trajectory t, DriveData dd) {
         trajectory = t;
         driveData = dd;
     }
@@ -46,7 +44,7 @@ public class TrajectoryControl {
         msSinceStartLast = msSinceStart;
 
         //System.out.printf("%f\t%f\t%f\t%f\t%f\n", power, kVf * vel, vel, pos, driveData.getPosition());
-        System.out.printf(name + "\t%f\t%f\t%f\t%f\t%f\n", pos, driveData.getPosition(), power, pAdjust, dAdjust);
+        System.out.printf("%f\t%f\t%f\t%f\t%f\n", pos, driveData.getPosition(), power, pAdjust, dAdjust);
 
         return power + dAdjust + pAdjust;
     }

@@ -16,7 +16,6 @@ public class DriveData {
 
     private Timer timer = new Timer();
     Encoder encoder;
-    String name;
 
     double lastPosition = 0;
     CircularList<Double> lastVelocities = new CircularList<Double>(10);
@@ -24,12 +23,10 @@ public class DriveData {
 
     long nsLastTime = 0;
 
-    public DriveData(String name, int aDio, int bDio, boolean reverseDirection) {
-        this.name = name;
+    public DriveData(int aDio, int bDio, boolean reverseDirection) {
         this.encoder = new Encoder(new DigitalInput(aDio), new DigitalInput(bDio));
         encoder.setReverseDirection(reverseDirection);
         encoder.setDistancePerPulse(driveDistancePerPulse);
-
         reset();
 
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -62,7 +59,6 @@ public class DriveData {
     }
 
     public double getPosition() {
-        SmartDashboard.putNumber("DriveData/" + name + "/", encoder.getDistance());
         return encoder.getDistance();
     }
 
