@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const electron = require("electron");
 const wpilib_NT = require("wpilib-nt-client");
 const client = new wpilib_NT.Client();
-const roborio = require("./roborio");
+const roborio = require("./mainProcess/roborio");
 
 // Module to control application life
 const app = electron.app;
@@ -53,25 +53,17 @@ function createWindow() {
         }
     });
 
-    ipc.on('attempt-connect',(ev,mesg) =>{
-        console.log("attempt-connect");
-        var results;
-        var process = roborio.getIPAsync(results);
-        process.once("exit", (code, signal) => setTimeout(() => {
-            console.log(results);
-            if (results !== undefined) {
-                // If Roborio is found
-                let ipList = results.match(/\d{1,3}\.\d{1,3}.\d{1,3}.\d{1,3}/g)
-                if(ipList == null || ipList.length != 1) {
-                    console.log("Error getting ip");
-                    return undefined;
-                }
-                mainWindow.webContents.send('ip-found', ipList[0]);
-                console.log(ipList[0])
-            }
-            console.log("Roborio not found");
-            // If Roborio is not found
-        }, 5000));
+    ipc.on('attempt-connect',(ev,mesg) => {
+        roborio.getIP().then(function(ip) {
+            let callback = (connected, err) => {
+                console.log("connected: " + connected);
+                console.log("err: " + err);
+                mainWindow.webContents.send('connected', connected);
+            };
+            client.start(callback, ip);
+        }, function(errorMessage) {
+            mainWindow.webContents.send('connected', false);
+        });
     });
 
     ipc.on('add', (ev, mesg) => {
