@@ -22,3 +22,7 @@ body {
 .tunable-value {
     color: black;
 }
+
+li {
+    cursor: pointer;
+}
