@@ -15,16 +15,17 @@ public class Robot extends IterativeRobot {
      * IMPORTANT!!!!!!!!!!!
      *
      * MOTOR CONTROLLER CAN ADDRESSES:
-     * 0: LEFT DRIVE
+     * 0: LEFT DRIVE*
      * 1: LEFT DRIVE
-     * 2: ELEVATOR
+     * 2: ELEVATOR*
      * 3: ELEVATOR
      * 4: ELEVATOR
      * 5: LEFT INTAKE
-     * 6: RIGHT DRIVE
+     * 6: RIGHT DRIVE*
      * 7: RIGHT DRIVE
-     * 8: ELEV IN
+     * 8: ELEV IN*
      * 9: RIGHT INTAKE
+     * * = TALON
      *
      *
      * PNEUMATIC PORTS:
@@ -38,6 +39,12 @@ public class Robot extends IterativeRobot {
      * 3 & 4: IN LO
      * 2 & 5: SHIFT
      * 1 & 6: PTO
+     *
+     *
+     * ENCODERS:
+     * ENC0: LEFT DRIVE
+     * ENC1: RIGHT DRIVE
+     * ENC2: ELEVATOR
     ************************************************************************/
     TalonSRX motorcontroller = new TalonSRX(1);
 
