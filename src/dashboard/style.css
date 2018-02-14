@@ -40,3 +40,7 @@ div {
 #auto {
     margin-top: 10px;
 }
+
+li {
+    cursor: pointer;
+}

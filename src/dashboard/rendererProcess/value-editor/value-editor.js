@@ -1,6 +1,6 @@
 // Value editor logic
-var tunables = []; //TODO: Make this private to this module
-var subtypes = {};
+let tunables = []; //TODO: Make this private to this module
+let subtypes = {};
 
 $(() => {
     $("#filter").on("change", filterchange);
@@ -12,12 +12,13 @@ $(() => {
             return;
 
         let keyShort = key.substr(stSmartDashboard.length);
-        var keySplit = keyShort.indexOf("/");
-        var keyPart1 = keyShort.substr(0, keySplit);
-        var keyPart2 = keyShort.substr(keySplit + 1);
-        var hasKey = subtypes.hasOwnProperty(keyPart1);
+        let keySplit = keyShort.indexOf("/");
+        let keyPart1 = keyShort.substr(0, keySplit);
+        let keyPart2 = keyShort.substr(keySplit + 1);
+        let hasKey = subtypes.hasOwnProperty(keyPart1);
+
         if(hasKey) {
-            var oldValue = subtypes[keyPart1];
+            let oldValue = subtypes[keyPart1];
             oldValue.push(keyPart2);
             subtypes[keyPart1] = oldValue;
         } else {
@@ -29,7 +30,7 @@ $(() => {
             console.log("Warning: new tunable value already defined");
         
         tunables[keyShort] = value;
-        updateTunablesList(true);
+        updateTunablesList(isNew); // Only update filter if this is a new value
     }, /*call immediately with all tunables*/true);
 });
 
@@ -41,27 +42,29 @@ function updateTunablesList(changefilter) {
     //Clearing and reinserting all the DOM elements isn't great, it's fast enough it works for now though
     $("#value-list").empty();
     if (changefilter) {
-        var filter = $("#filter");
-        var options = ""
-        for(var key in subtypes){
+        let filter = $("#filter");
+        let options = ""
+        for(let key in subtypes){
             console.log(key);
             options = options + " <option class='tunable-value' value='" + key + "'>" + key + "</option>";
         }
         filter.html(options); 
     }
 
-    var selected = $("#filter").val();
-    var selectedValue = subtypes[selected];
-    var mappedValue = selectedValue.map(function(value) {
+    let selected = $("#filter").val();
+    let selectedValue = subtypes[selected];
+    let mappedValue = selectedValue.map(function(value) {
         return selected + "/" + value;
     });
+
     for(let key in tunables) {
-        var filtered = mappedValue.includes(key);
+        // True if either the key starts with the filter or the All filter is selected
+        let filtered = mappedValue.includes(key) || selected == "";
         if (filtered) {
             let value = tunables[key];
             let type = typeof(value);
     
-            var div = null;
+            let div = null;
             switch(type) {
                 case "string":
                     div = $("#tunable-string").clone();

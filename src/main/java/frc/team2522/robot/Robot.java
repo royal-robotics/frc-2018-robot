@@ -11,6 +11,34 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.team2522.robot.subsystems.*;
 
 public class Robot extends IterativeRobot {
+    /************************************************************************
+     * IMPORTANT!!!!!!!!!!!
+     *
+     * MOTOR CONTROLLER CAN ADDRESSES:
+     * 0: LEFT DRIVE
+     * 1: LEFT DRIVE
+     * 2: ELEVATOR
+     * 3: ELEVATOR
+     * 4: ELEVATOR
+     * 5: LEFT INTAKE
+     * 6: RIGHT DRIVE
+     * 7: RIGHT DRIVE
+     * 8: ELEV IN
+     * 9: RIGHT INTAKE
+     *
+     *
+     * PNEUMATIC PORTS:
+     *
+     * MODULE 0:
+     * 2 & 5: RATCHET
+     * 1 & 6: BRAKE
+     * 0 & 7: IN HI
+     *
+     * MODULE 1:
+     * 3 & 4: IN LO
+     * 2 & 5: SHIFT
+     * 1 & 6: PTO
+    ************************************************************************/
     TalonSRX motorcontroller = new TalonSRX(1);
 
     Joystick leftStick = new Joystick(0);
