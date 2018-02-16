@@ -51,6 +51,15 @@ public class Robot extends IterativeRobot {
     Joystick leftStick = new Joystick(0);
     Joystick rightStick = new Joystick(1);
 
+    DoubleSolenoid ratchet = new DoubleSolenoid(0, 2, 5);
+    DoubleSolenoid brake = new DoubleSolenoid(0, 1, 6);
+    DoubleSolenoid inHi = new DoubleSolenoid(0, 0, 7);
+
+    DoubleSolenoid inLo = new DoubleSolenoid(1, 3, 4);
+    DoubleSolenoid shift = new DoubleSolenoid(1, 2, 5);
+    DoubleSolenoid pto = new DoubleSolenoid(1, 1, 6);
+
+
     Drivebase drivebase = new Drivebase();
 
 //    CvSink cvSink;
@@ -98,5 +107,41 @@ public class Robot extends IterativeRobot {
     public void teleopInit() { }
 
     @Override
-    public void teleopPeriodic() { }
+    public void teleopPeriodic() {
+        if (leftStick.getRawButton(1)) {
+            ratchet.set(DoubleSolenoid.Value.kForward);
+        } else {
+            ratchet.set(DoubleSolenoid.Value.kReverse);
+        }
+
+        if (leftStick.getRawButton(2)) {
+            brake.set(DoubleSolenoid.Value.kForward);
+        } else {
+            brake.set(DoubleSolenoid.Value.kReverse);
+        }
+
+        if (leftStick.getRawButton(3)) {
+            inHi.set(DoubleSolenoid.Value.kForward);
+        } else {
+            inHi.set(DoubleSolenoid.Value.kReverse);
+        }
+
+        if (leftStick.getRawButton(4)) {
+            inLo.set(DoubleSolenoid.Value.kForward);
+        } else {
+            inLo.set(DoubleSolenoid.Value.kReverse);
+        }
+
+        if (leftStick.getRawButton(5)) {
+            shift.set(DoubleSolenoid.Value.kForward);
+        } else {
+            shift.set(DoubleSolenoid.Value.kReverse);
+        }
+
+        if (leftStick.getRawButton(6)) {
+            pto.set(DoubleSolenoid.Value.kForward);
+        } else {
+            pto.set(DoubleSolenoid.Value.kReverse);
+        }
+    }
 }
