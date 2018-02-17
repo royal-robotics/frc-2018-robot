@@ -146,3 +146,20 @@ app.on('activate', function () {
         createWindow();
     }
 });
+
+// Guards to protect against running javascript for partials multiple times
+let valueEditorLoaded = false;
+ipc.on("camera-load", () => {
+    if (!valueEditorLoaded) {
+        valueEditorLoaded = true;
+        mainWindow.webContents.send("value-editor-load-continue");
+    }
+})
+
+let cameraLoaded = false;
+ipc.on("camera-load", () => {
+    if (!cameraLoaded) {
+        cameraLoaded = true;
+        mainWindow.webContents.send("camera-load-continue");
+    }
+});

@@ -1,5 +1,6 @@
 package frc.team2522.robot.camera;
 
+import java.io.OutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Filter;
@@ -17,35 +18,38 @@ public class CameraPipeline {
         this.joystick = joystick;
 
         new Thread(() -> {
-            //TODO: The camera supports YUYV images, experiment with setVideoMode
-            //and passing raw image to the video pipeline.
-            UsbCamera  usbCamera = new UsbCamera("USB Camera 0", 0);
+            CvSink cameraStream = createCameraStream();
 
-            //Create filter sink
-            CvSink cvSink = new CvSink("opencv_USB Camera 0");
-            cvSink.setSource(usbCamera);
+            CubeFilter cubeFilter = new CubeFilter(cameraStream);
 
-            CubeFilter cubeFilter = new CubeFilter(cvSink);
-
-            //Set Server Source
-            MjpegServer mjpegServer1 = new MjpegServer("serve_USB Camera 0", 1181);
-            CvSource outputStream = new CvSource("Blur", VideoMode.PixelFormat.kMJPEG, 640, 480, 30);
-            mjpegServer1.setSource(outputStream);
-
+            CvSource outputStream = createOutputStream();
             Mat frame = new Mat();
-
-            System.out.println("Setup video pipeline");
 
             while(!Thread.interrupted()) {
                 if(joystick.getRawButton(1))
                     cubeFilter.grabFrame(frame);
                 else
-                    cvSink.grabFrame(frame);
+                    cameraStream.grabFrame(frame);
 
                 outputStream.putFrame(frame);
             }
         }).start();
+    }
 
+    private CvSink createCameraStream() {
+        //TODO: The camera supports YUYV images, experiment with setVideoMode
+        //and passing raw image to the video pipeline.
 
+        UsbCamera  usbCamera = new UsbCamera("USB Camera 0", 0);
+        CvSink cvSink = new CvSink("opencv_USB Camera 0");
+        cvSink.setSource(usbCamera);
+        return cvSink;
+    }
+
+    private CvSource createOutputStream() {
+        MjpegServer mjpegServer1 = new MjpegServer("serve_USB Camera 0", 1181);
+        CvSource outputStream = new CvSource("Blur", VideoMode.PixelFormat.kMJPEG, 640, 480, 30);
+        mjpegServer1.setSource(outputStream);
+        return outputStream;
     }
 }
