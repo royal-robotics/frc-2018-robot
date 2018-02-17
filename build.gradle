@@ -7,8 +7,11 @@ plugins {
     id "jaci.openrio.gradle.GradleRIO" version "2018.01.11"
 }
 
+//apply plugin: "MotionProfile/GreetingPlugin"
+
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 def TEAM = 2522
@@ -16,6 +19,7 @@ def ROBOT_CLASS = "frc.team2522.robot.Robot"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
+
 deploy {
     targets {
         target("roborio", jaci.openrio.gradle.frc.RoboRIO) {
@@ -23,9 +27,9 @@ deploy {
         }
     }
     artifacts {
-        artifact('frcJava', jaci.openrio.gradle.frc.FRCJavaArtifact) {
-            targets << "roborio"
-        }
+       artifact('frcJava', jaci.openrio.gradle.frc.FRCJavaArtifact) {
+           targets << "roborio"
+       }
     }
 }
 
@@ -40,6 +44,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     compile 'junit:junit:4.12'
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
@@ -54,10 +59,23 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.4'
 }
 
-sourceSets {
-    test {
-        java {
-            srcDirs = ["src/java/tests"]
-        }
+task buildMotionProfile(type: Jar) {
+    baseName = "motionProfile"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes(
+            'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+            'Main-Class': 'MotionProfile.Generate'
+        )
     }
+    with jar
+}
+
+task runMotionProfile(type: JavaExec, dependsOn: buildMotionProfile) {
+    classpath = files('build/libs/Motion-Profile.jar')
+    main = 'MotionProfile.Generate'
+}
+
+task viewMotionProfile(type: Exec, dependsOn: runMotionProfile) {
+    commandLine 'cmd', '/c', 'Rscript', 'scripts/motion-profile.R'
 }

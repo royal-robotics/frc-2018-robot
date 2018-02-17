@@ -54,6 +54,7 @@ function createWindow() {
     });
 
     ipc.on('attempt-connect',(ev,mesg) => {
+        console.log("getting ip");
         roborio.getIP().then(function(ip) {
             let callback = (connected, err) => {
                 console.log("connected: " + connected);

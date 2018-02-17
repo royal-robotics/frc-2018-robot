@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.kauailabs.navx.frc.AHRS;
 
 import frc.team2522.robot.subsystems.*;
 
@@ -48,9 +49,6 @@ public class Robot extends IterativeRobot {
     ************************************************************************/
     TalonSRX motorcontroller = new TalonSRX(1);
 
-    Joystick leftStick = new Joystick(0);
-    Joystick rightStick = new Joystick(1);
-
     DoubleSolenoid ratchet = new DoubleSolenoid(0, 2, 5);
     DoubleSolenoid brake = new DoubleSolenoid(0, 1, 6);
     DoubleSolenoid inHi = new DoubleSolenoid(0, 0, 7);
@@ -59,14 +57,21 @@ public class Robot extends IterativeRobot {
     DoubleSolenoid shift = new DoubleSolenoid(1, 2, 5);
     DoubleSolenoid pto = new DoubleSolenoid(1, 1, 6);
 
+    AHRS gyro = new AHRS(SPI.Port.kMXP);
+
+    Joystick driver = new Joystick(0);
+
 
     Drivebase drivebase = new Drivebase();
+    DriveData driveDataLeft = new DriveData(2, 3, true);
+    DriveData driveDataRight = new DriveData(6,7, false);
+    DriveController driveController = new DriveController(drivebase, driveDataLeft, driveDataRight);
 
-    CameraPipeline camera = new CameraPipeline(leftStick);
+    CameraPipeline camera = new CameraPipeline(driver);
 
     @Override
     public void robotInit() {
-
+        gyro.reset();
     }
 
     @Override
@@ -76,50 +81,60 @@ public class Robot extends IterativeRobot {
     public void disabledPeriodic() { }
 
     @Override
-    public void autonomousInit() { }
-
-    @Override
     public void autonomousPeriodic() { }
 
     @Override
-    public void teleopInit() { }
+    public void autonomousInit() {
+        driveDataLeft.reset();
+        driveDataRight.reset();
+        driveController.Start();
+    }
+    
+    @Override
+    public void teleopInit() {
+        driveDataLeft.reset();
+        driveDataRight.reset();
+        driveController.Stop();
+    }
 
     @Override
     public void teleopPeriodic() {
-        if (leftStick.getRawButton(1)) {
+        if (driver.getRawButton(1)) {
             ratchet.set(DoubleSolenoid.Value.kForward);
         } else {
             ratchet.set(DoubleSolenoid.Value.kReverse);
         }
 
-        if (leftStick.getRawButton(2)) {
+        if (driver.getRawButton(2)) {
             brake.set(DoubleSolenoid.Value.kForward);
         } else {
             brake.set(DoubleSolenoid.Value.kReverse);
         }
 
-        if (leftStick.getRawButton(3)) {
+        if (driver.getRawButton(3)) {
             inHi.set(DoubleSolenoid.Value.kForward);
         } else {
             inHi.set(DoubleSolenoid.Value.kReverse);
         }
 
-        if (leftStick.getRawButton(4)) {
+        if (driver.getRawButton(4)) {
             inLo.set(DoubleSolenoid.Value.kForward);
         } else {
             inLo.set(DoubleSolenoid.Value.kReverse);
         }
 
-        if (leftStick.getRawButton(5)) {
+        if (driver.getRawButton(5)) {
             shift.set(DoubleSolenoid.Value.kForward);
         } else {
             shift.set(DoubleSolenoid.Value.kReverse);
         }
 
-        if (leftStick.getRawButton(6)) {
+        if (driver.getRawButton(6)) {
             pto.set(DoubleSolenoid.Value.kForward);
         } else {
             pto.set(DoubleSolenoid.Value.kReverse);
         }
+
+        drivebase.setPower(driver.getRawAxis(1), driver.getRawAxis(5));
     }
 }
