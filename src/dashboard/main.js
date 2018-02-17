@@ -147,7 +147,7 @@ app.on('activate', function () {
 
 // Guards to protect against running javascript for partials multiple times
 let valueEditorLoaded = false;
-ipc.on("camera-load", () => {
+ipc.on("value-editor-load", () => {
     if (!valueEditorLoaded) {
         valueEditorLoaded = true;
         mainWindow.webContents.send("value-editor-load-continue");

@@ -43,9 +43,9 @@ public class Robot extends IterativeRobot {
      *
      *
      * ENCODERS:
-     * ENC0: LEFT DRIVE
-     * ENC1: RIGHT DRIVE
-     * ENC2: ELEVATOR
+     * ENC0 (DIO 10 & 11): LEFT DRIVE
+     * ENC1 (DIO 12 & 13): RIGHT DRIVE
+     * ENC2 (DIO 14 & 15): ELEVATOR
     ************************************************************************/
     TalonSRX motorcontroller = new TalonSRX(1);
 

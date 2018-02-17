@@ -8,6 +8,7 @@ ipc.on("value-editor-load-continue", () => {
     let tunables = []; //TODO: Make this private to this module
     let subtypes = {};
 
+    console.log($("#filter"));
     $("#filter").on("change", filterchange);
 
     //Setup tunable listeners, makes sure we have all the tunables and their current values
@@ -38,6 +39,7 @@ ipc.on("value-editor-load-continue", () => {
     }, true);
 
     function filterchange() {
+        console.log("Filter changed");
         updateTunablesList(false);
     }
 
