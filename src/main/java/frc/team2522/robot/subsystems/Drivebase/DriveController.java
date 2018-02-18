@@ -1,10 +1,9 @@
-package frc.team2522.robot.subsystems;
+package frc.team2522.robot.subsystems.Drivebase;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
-import jaci.pathfinder.modifiers.TankModifier;
 
 import java.util.Timer;
 import java.util.TimerTask;
