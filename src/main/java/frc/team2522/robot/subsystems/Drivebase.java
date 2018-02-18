@@ -27,7 +27,7 @@ public class Drivebase {
     DriveData driveDataLeft = new DriveData(2, 3, true);
     DriveData driveDataRight = new DriveData(4,5, false);
 
-    DriveController driveController = new DriveController(this, driveDataLeft, driveDataRight);
+    DriveController driveController = new DriveController(differentialDrive, driveDataLeft, driveDataRight);
 
     Joystick driver;
 

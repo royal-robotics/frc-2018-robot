@@ -1,5 +1,6 @@
 package frc.team2522.robot.subsystems;
 
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
@@ -29,7 +30,7 @@ public class DriveController {
             new Waypoint(0, 150, Pathfinder.d2r (90)),
     };
 
-    Drivebase drivebase;
+    DifferentialDrive differentialDrive;
 
     long nsStart;
     private Timer timer;
@@ -41,8 +42,8 @@ public class DriveController {
     DriveData ddL;
     DriveData ddR;
 
-    public DriveController(Drivebase db, DriveData ddL, DriveData ddR) {
-        drivebase = db;
+    public DriveController(DifferentialDrive drive, DriveData ddL, DriveData ddR) {
+        this.differentialDrive = drive;
 
 //        Trajectory trajectory = Pathfinder.generate(points, config);
 //        TankModifier modifier = new TankModifier(trajectory).modify(wheelbase_width);
@@ -87,11 +88,11 @@ public class DriveController {
 
 //            System.out.printf("Left: %f, Right: %f ------ %f, %f\n", leftPower, rightPower, ddL.getPosition(), ddR.getPosition());
 
-            drivebase.differentialDrive.tankDrive(-leftPower, -rightPower);
+            differentialDrive.tankDrive(-leftPower, -rightPower);
         } else {
             System.out.println("AUTO OVER");
             timer.cancel();
-            drivebase.differentialDrive.tankDrive(0, 0);
+            differentialDrive.tankDrive(0, 0);
         }
     }
 }
