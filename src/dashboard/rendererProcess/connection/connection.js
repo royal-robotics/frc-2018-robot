@@ -17,7 +17,7 @@ function connectionStatus(connected) {
     if (!connected) {
         setTimeout(checkConnection, 5000);
     } else {
-        $("#alert-container").fadeOut();
+        setTimeout(() => $("#alert-container").fadeOut(), 2500);
     }
 }
 
