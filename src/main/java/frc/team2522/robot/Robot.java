@@ -43,14 +43,14 @@ public class Robot extends IterativeRobot {
      *
      *
      * ENCODERS:
-     * ENC0 (DIO 10 & 11): LEFT DRIVE
-     * ENC1 (DIO 12 & 13): RIGHT DRIVE
+     * ENC0 (DIO 10 & 11): LEFT DRIVE  6141
+     * ENC1 (DIO 12 & 13): RIGHT DRIVE  6125
      * ENC2 (DIO 14 & 15): ELEVATOR
     ************************************************************************/
     VictorSPX leftIntake = new VictorSPX(5);
     VictorSPX rightIntake = new VictorSPX(9);
 
-    Encoder leftEncoder = new Encoder(10, 11);
+    Encoder leftEncoder = new Encoder(10, 11, true);
     Encoder rightEncoder = new Encoder(12, 13);
 
     DoubleSolenoid ratchet = new DoubleSolenoid(0, 2, 5);
@@ -77,10 +77,16 @@ public class Robot extends IterativeRobot {
     }
 
     @Override
-    public void disabledInit() { }
+    public void disabledInit() {
+        leftEncoder.reset();
+        rightEncoder.reset();
+    }
 
     @Override
-    public void disabledPeriodic() { }
+    public void disabledPeriodic() {
+        System.out.println(leftEncoder.getRaw());
+        System.out.println(rightEncoder.getRaw());
+    }
 
     @Override
     public void autonomousPeriodic() { }
@@ -93,6 +99,8 @@ public class Robot extends IterativeRobot {
     @Override
     public void teleopInit() {
         drivebase.reset();
+        leftEncoder.reset();
+        rightEncoder.reset();
     }
 
     @Override
