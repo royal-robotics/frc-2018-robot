@@ -14,6 +14,9 @@ const BrowserWindow = electron.BrowserWindow;
 // Module for receiving messages from the BrowserWindow
 const ipc = electron.ipcMain;
 
+// Module for creating global keyboard shortcut
+const globalShortcut = electron.globalShortcut;
+
 // Keep a global reference of the window object. If you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected
 let mainWindow;
@@ -119,7 +122,9 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 app.on('ready', () => setTimeout(() => {
     createWindow();
-    mainWindow.webContents.openDevTools();
+    globalShortcut.register("F1", () => {
+        mainWindow.webContents.toggleDevTools();
+    })
 }, 0)); // Set a timeout of 0 on this task to fix deadlock issues
 
 // Quit when all windows are closed.
