@@ -87,11 +87,11 @@ public class DriveController {
 
 //            System.out.printf("Left: %f, Right: %f ------ %f, %f\n", leftPower, rightPower, ddL.getPosition(), ddR.getPosition());
 
-            drivebase.setPower(-leftPower, -rightPower);
+            drivebase.differentialDrive.tankDrive(-leftPower, -rightPower);
         } else {
             System.out.println("AUTO OVER");
             timer.cancel();
-            drivebase.setPower(0, 0);
+            drivebase.differentialDrive.tankDrive(0, 0);
         }
     }
 }

@@ -21,7 +21,7 @@ public class AutoDrive extends AutoStep {
 
     @Override
     public void stop() {
-        drivebase.setPower(0.0, 0.0);
+        //drivebase.setPower(0.0, 0.0);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class AutoDrive extends AutoStep {
 
     @Override
     public void periodic() {
-        drivebase.setPower(0.5, 0.5);
+        //drivebase.setPower(0.5, 0.5);
         if(timer.hasPeriodPassed(2)) {
             isCompleted = true;
         }

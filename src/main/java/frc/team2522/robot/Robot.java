@@ -62,11 +62,7 @@ public class Robot extends IterativeRobot {
     Joystick driver = new Joystick(0);
 
 
-    Drivebase drivebase = new Drivebase();
-    DriveData driveDataLeft = new DriveData(2, 3, true);
-    DriveData driveDataRight = new DriveData(6,7, false);
-    DriveController driveController = new DriveController(drivebase, driveDataLeft, driveDataRight);
-
+    Drivebase drivebase = new Drivebase(driver);
     CameraPipeline camera = new CameraPipeline(driver);
 
     @Override
@@ -85,16 +81,12 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
-        driveDataLeft.reset();
-        driveDataRight.reset();
-        driveController.Start();
+        drivebase.reset();
     }
     
     @Override
     public void teleopInit() {
-        driveDataLeft.reset();
-        driveDataRight.reset();
-        driveController.Stop();
+        drivebase.reset();
     }
 
     @Override
@@ -135,6 +127,6 @@ public class Robot extends IterativeRobot {
             pto.set(DoubleSolenoid.Value.kReverse);
         }
 
-        drivebase.setPower(driver.getRawAxis(1), driver.getRawAxis(5));
+        drivebase.fmsUpdate();
     }
 }
