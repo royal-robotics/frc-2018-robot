@@ -1,5 +1,11 @@
 package frc.team2522.robot.subsystems.Drivebase;
 
+import com.ctre.phoenix.drive.DiffDrive;
+import com.ctre.phoenix.drive.DriveMode;
+import com.ctre.phoenix.mechanical.Gearbox;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -15,14 +21,14 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
     teleop 'modes'
  */
 public class Drivebase {
-    VictorSP leftDrive1 = new VictorSP(0);
-    VictorSP leftDrive2 = new VictorSP(1);
-    VictorSP rightDrive1 = new VictorSP(2);
-    VictorSP rightDrive2 = new VictorSP(3);
+    TalonSRX leftDrive1 = new TalonSRX(0);
+    VictorSPX leftDrive2 = new VictorSPX(1);
+    TalonSRX rightDrive1 = new TalonSRX(6);
+    VictorSPX rightDrive2 = new VictorSPX(7);
 
-    SpeedControllerGroup leftMotors = new SpeedControllerGroup(leftDrive1, leftDrive2);
-    SpeedControllerGroup rightMotors = new SpeedControllerGroup(rightDrive1, rightDrive2);
-    DifferentialDrive differentialDrive = new DifferentialDrive(leftMotors, rightMotors);
+    Gearbox leftMotors = new Gearbox(leftDrive1, leftDrive2);
+    Gearbox rightMotors = new Gearbox(rightDrive1, rightDrive2);
+    DiffDrive differentialDrive = new DiffDrive(leftMotors, rightMotors);
 
     DriveData driveDataLeft = new DriveData(2, 3, true);
     DriveData driveDataRight = new DriveData(4,5, false);
@@ -37,7 +43,11 @@ public class Drivebase {
     }
 
     public void fmsUpdate() {
-        differentialDrive.tankDrive(driver.getRawAxis(1), driver.getRawAxis(5), true);
+        double leftStick = driver.getRawAxis(1);
+        double rightStick = driver.getRawAxis(5);
+        double forward = (leftStick + rightStick) / 2;
+        double turn = leftStick - forward;
+        differentialDrive.set(DriveMode.PercentOutput, forward, turn);
     }
 
     public void reset() {

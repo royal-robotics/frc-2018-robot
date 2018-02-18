@@ -1,5 +1,7 @@
 package frc.team2522.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import frc.team2522.robot.camera.CameraPipeline;
 
 import edu.wpi.first.wpilibj.*;
@@ -45,7 +47,11 @@ public class Robot extends IterativeRobot {
      * ENC1 (DIO 12 & 13): RIGHT DRIVE
      * ENC2 (DIO 14 & 15): ELEVATOR
     ************************************************************************/
-    TalonSRX motorcontroller = new TalonSRX(1);
+    VictorSPX leftIntake = new VictorSPX(5);
+    VictorSPX rightIntake = new VictorSPX(9);
+
+    Encoder leftEncoder = new Encoder(10, 11);
+    Encoder rightEncoder = new Encoder(12, 13);
 
     DoubleSolenoid ratchet = new DoubleSolenoid(0, 2, 5);
     DoubleSolenoid brake = new DoubleSolenoid(0, 1, 6);
@@ -66,6 +72,8 @@ public class Robot extends IterativeRobot {
     @Override
     public void robotInit() {
         gyro.reset();
+        leftEncoder.reset();
+        rightEncoder.reset();
     }
 
     @Override
@@ -126,5 +134,22 @@ public class Robot extends IterativeRobot {
         }
 
         drivebase.fmsUpdate();
+
+        double leftTrigger = driver.getRawAxis(2);
+        if (leftTrigger > 0.2) {
+            leftIntake.set(ControlMode.PercentOutput, leftTrigger);
+        } else {
+            leftIntake.set(ControlMode.PercentOutput, 0);
+        }
+
+        double rightTrigger = driver.getRawAxis(3);
+        if (rightTrigger > 0.2) {
+            rightIntake.set(ControlMode.PercentOutput, rightTrigger);
+        } else {
+            rightIntake.set(ControlMode.PercentOutput, 0);
+        }
+
+        System.out.println(leftEncoder.getRaw());
+        System.out.println(rightEncoder.getRaw());
     }
 }

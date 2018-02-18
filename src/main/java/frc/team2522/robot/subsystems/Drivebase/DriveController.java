@@ -1,5 +1,7 @@
 package frc.team2522.robot.subsystems.Drivebase;
 
+import com.ctre.phoenix.drive.DiffDrive;
+import com.ctre.phoenix.drive.DriveMode;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
@@ -29,7 +31,7 @@ public class DriveController {
             new Waypoint(0, 150, Pathfinder.d2r (90)),
     };
 
-    DifferentialDrive differentialDrive;
+    DiffDrive differentialDrive;
 
     long nsStart;
     private Timer timer;
@@ -41,7 +43,7 @@ public class DriveController {
     DriveData ddL;
     DriveData ddR;
 
-    public DriveController(DifferentialDrive drive, DriveData ddL, DriveData ddR) {
+    public DriveController(DiffDrive drive, DriveData ddL, DriveData ddR) {
         this.differentialDrive = drive;
 
 //        Trajectory trajectory = Pathfinder.generate(points, config);
@@ -81,17 +83,19 @@ public class DriveController {
         //System.out.printf("Max Seg: %d, Cur Seg: %d\n",  cSegments, dt);
 
         if(dt < cSegments) {
-            double leftPower = leftControl.getPower(dt, msSinceStart);
-            double rightPower = rightControl.getPower(dt, msSinceStart);
+            double leftPower = leftControl.getPower(dt, msSinceStart) * -1;
+            double rightPower = rightControl.getPower(dt, msSinceStart) * -1;
 
 
 //            System.out.printf("Left: %f, Right: %f ------ %f, %f\n", leftPower, rightPower, ddL.getPosition(), ddR.getPosition());
 
-            differentialDrive.tankDrive(-leftPower, -rightPower);
+            double forward = (leftPower + rightPower) / 2;
+            double turn = leftPower - forward;
+            differentialDrive.set(DriveMode.PercentOutput, forward, turn);
         } else {
             System.out.println("AUTO OVER");
             timer.cancel();
-            differentialDrive.tankDrive(0, 0);
+            differentialDrive.set(DriveMode.PercentOutput, 0, 0);
         }
     }
 }
