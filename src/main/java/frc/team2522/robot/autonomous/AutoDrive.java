@@ -1,7 +1,7 @@
 package frc.team2522.robot.autonomous;
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.team2522.robot.subsystems.Drivebase;
+import frc.team2522.robot.subsystems.Drivebase.Drivebase;
 
 public class AutoDrive extends AutoStep {
 

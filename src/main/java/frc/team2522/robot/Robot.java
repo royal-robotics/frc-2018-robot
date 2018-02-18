@@ -4,12 +4,10 @@ import frc.team2522.robot.camera.CameraPipeline;
 
 import edu.wpi.first.wpilibj.*;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
-import frc.team2522.robot.subsystems.*;
+import frc.team2522.robot.subsystems.Drivebase.Drivebase;
 
 public class Robot extends IterativeRobot {
     /************************************************************************
