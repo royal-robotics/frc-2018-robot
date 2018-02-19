@@ -6,7 +6,6 @@ import frc.team2522.robot.camera.CameraPipeline;
 
 import edu.wpi.first.wpilibj.*;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import frc.team2522.robot.subsystems.Drivebase.Drivebase;
