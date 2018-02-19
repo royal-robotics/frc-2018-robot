@@ -25,15 +25,15 @@ public class CameraPipeline {
             CvSource outputStream = createOutputStream();
             Mat frame = new Mat();
 
-            while(!Thread.interrupted()) {
-                if(joystick.getRawButton(1))
+            while (!Thread.interrupted()) {
+                if (joystick.getRawButton(1))
                     cubeFilter.grabFrame(frame);
                 else
                     cameraStream.grabFrame(frame);
 
                 outputStream.putFrame(frame);
             }
-        }).start();
+        });//}).start();
     }
 
     private CvSink createCameraStream() {

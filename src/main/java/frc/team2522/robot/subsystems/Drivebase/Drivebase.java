@@ -21,6 +21,8 @@ import frc.team2522.robot.libs.TankDrive;
     teleop 'modes'
  */
 public class Drivebase {
+    DoubleSolenoid shift = new DoubleSolenoid(1, 2, 5);
+
     TalonSRX leftDrive1 = new TalonSRX(0);
     VictorSPX leftDrive2 = new VictorSPX(1);
     TalonSRX rightDrive1 = new TalonSRX(6);
@@ -49,7 +51,7 @@ public class Drivebase {
     boolean tankDriveSet = true;
     boolean tankDriveSetPressed = false;
 
-    public void fmsUpdate() {
+    public void fmsUpdateTeleop() {
         if (!tankDriveSetPressed && driver.getRawButton(8)) {
             tankDriveSetPressed = true;
             tankDriveSet = !tankDriveSet;

@@ -9,7 +9,7 @@ public class LiftController {
     private final double resetUpHeight = 10.0;
 
     //TODO: pull this from a file deployed with the robot code
-    Trajectory trajectorySlow = generateTrajectory();
+    //Trajectory trajectorySlow = generateTrajectory();
 
     public LiftController() {
 
