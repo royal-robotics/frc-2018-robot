@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import frc.team2522.robot.subsystems.Drivebase.Drivebase;
+import frc.team2522.robot.subsystems.Elevator.Elevator;
 
 public class Robot extends IterativeRobot {
     /************************************************************************
@@ -47,9 +48,6 @@ public class Robot extends IterativeRobot {
      * ENC1 (DIO 12 & 13): RIGHT DRIVE  6125
      * ENC2 (DIO 14 & 15): ELEVATOR
     ************************************************************************/
-    VictorSPX leftIntake = new VictorSPX(5);
-    VictorSPX rightIntake = new VictorSPX(9);
-
     Encoder leftEncoder = new Encoder(10, 11, true);
     Encoder rightEncoder = new Encoder(12, 13);
 
@@ -69,6 +67,8 @@ public class Robot extends IterativeRobot {
     Drivebase drivebase = new Drivebase(driver);
     CameraPipeline camera = new CameraPipeline(driver);
 
+    Elevator elevator = new Elevator(driver);
+
     @Override
     public void robotInit() {
         gyro.reset();
@@ -78,6 +78,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void disabledInit() {
+        inHi.set(DoubleSolenoid.Value.kForward);
         leftEncoder.reset();
         rightEncoder.reset();
     }
@@ -98,10 +99,16 @@ public class Robot extends IterativeRobot {
     
     @Override
     public void teleopInit() {
+        inHi.set(DoubleSolenoid.Value.kReverse);
+        inLo.set(DoubleSolenoid.Value.kReverse);
+
         drivebase.reset();
         leftEncoder.reset();
         rightEncoder.reset();
     }
+
+    boolean lastInHiValue = false;
+    boolean lastInLoValue = false;
 
     @Override
     public void teleopPeriodic() {
@@ -117,47 +124,29 @@ public class Robot extends IterativeRobot {
             brake.set(DoubleSolenoid.Value.kReverse);
         }
 
-        if (driver.getRawButton(3)) {
-            inHi.set(DoubleSolenoid.Value.kForward);
-        } else {
-            inHi.set(DoubleSolenoid.Value.kReverse);
-        }
+        if(driver.getRawButton(3) && !lastInHiValue)
+            inHi.set(inHi.get() == DoubleSolenoid.Value.kForward ? DoubleSolenoid.Value.kReverse : DoubleSolenoid.Value.kForward);
 
-        if (driver.getRawButton(4)) {
-            inLo.set(DoubleSolenoid.Value.kForward);
-        } else {
-            inLo.set(DoubleSolenoid.Value.kReverse);
-        }
+        lastInHiValue = driver.getRawButton(3);
 
-        if (driver.getRawButton(5)) {
-            shift.set(DoubleSolenoid.Value.kForward);
-        } else {
-            shift.set(DoubleSolenoid.Value.kReverse);
-        }
+        if(driver.getRawButton(4) && !lastInLoValue)
+            inLo.set(inLo.get() == DoubleSolenoid.Value.kForward ? DoubleSolenoid.Value.kReverse : DoubleSolenoid.Value.kForward);
 
-        if (driver.getRawButton(6)) {
-            pto.set(DoubleSolenoid.Value.kForward);
-        } else {
-            pto.set(DoubleSolenoid.Value.kReverse);
-        }
+        lastInLoValue = driver.getRawButton(4);
 
-        drivebase.fmsUpdate();
+//        if (driver.getRawButton(5)) {
+//            shift.set(DoubleSolenoid.Value.kForward);
+//        } else {
+//            shift.set(DoubleSolenoid.Value.kReverse);
+//        }
+//
+//        if (driver.getRawButton(6)) {
+//            pto.set(DoubleSolenoid.Value.kForward);
+//        } else {
+//            pto.set(DoubleSolenoid.Value.kReverse);
+//        }
 
-        double leftTrigger = driver.getRawAxis(2);
-        if (leftTrigger > 0.2) {
-            leftIntake.set(ControlMode.PercentOutput, leftTrigger);
-        } else {
-            leftIntake.set(ControlMode.PercentOutput, 0);
-        }
-
-        double rightTrigger = driver.getRawAxis(3);
-        if (rightTrigger > 0.2) {
-            rightIntake.set(ControlMode.PercentOutput, rightTrigger);
-        } else {
-            rightIntake.set(ControlMode.PercentOutput, 0);
-        }
-
-        System.out.println(leftEncoder.getRaw());
-        System.out.println(rightEncoder.getRaw());
+        //drivebase.fmsUpdate();
+        elevator.fmsUpdateTeleop();
     }
 }

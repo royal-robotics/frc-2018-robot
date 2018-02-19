@@ -44,7 +44,7 @@ public class TrajectoryControl {
         msSinceStartLast = msSinceStart;
 
         //System.out.printf("%f\t%f\t%f\t%f\t%f\n", power, kVf * vel, vel, pos, driveData.getPosition());
-        System.out.printf("%f\t%f\t%f\t%f\t%f\n", pos, driveData.getPosition(), power, pAdjust, dAdjust);
+        //System.out.printf("%f\t%f\t%f\t%f\t%f\n", pos, driveData.getPosition(), power, pAdjust, dAdjust);
 
         return power + dAdjust + pAdjust;
     }
