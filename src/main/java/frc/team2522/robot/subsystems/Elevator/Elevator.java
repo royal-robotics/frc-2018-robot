@@ -1,14 +1,15 @@
 package frc.team2522.robot.subsystems.Elevator;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
-import frc.team2522.robot.subsystems.Elevator.Carriage.Carriage;
 import frc.team2522.robot.subsystems.Elevator.Intake.Intake;
 import frc.team2522.robot.subsystems.Elevator.Lift.Lift;
 
 public class Elevator {
     Joystick driver;
 
-    Carriage carriage = new Carriage();
+    TalonSRX carriage = new TalonSRX(8);
+    
     Intake intake;
     Lift lift;
 
