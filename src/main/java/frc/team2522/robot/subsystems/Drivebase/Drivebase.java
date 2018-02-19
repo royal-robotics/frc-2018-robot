@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2522.robot.libs.ObservableBoolean;
 import frc.team2522.robot.libs.TankDrive;
 
 /*
@@ -38,9 +39,12 @@ public class Drivebase {
     DriveData driveDataRight = new DriveData(12,13, false);
 
     Joystick driver;
+    ObservableBoolean isClimbingMode;
 
-    public Drivebase(Joystick driver) {
+    public Drivebase(Joystick driver, ObservableBoolean isClimbingMode) {
         this.driver = driver;
+        this.isClimbingMode = isClimbingMode;
+
         leftDrive2.follow(leftDrive1);
         rightDrive2.follow(rightDrive1);
         reset();

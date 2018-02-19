@@ -4,24 +4,21 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
-import frc.team2522.robot.subsystems.Drivebase.DriveData;
-import frc.team2522.robot.subsystems.Elevator.Carriage.Carriage;
-import jdk.nashorn.internal.scripts.JO;
 
 public class Lift {
 
     TalonSRX liftMotors = new TalonSRX(2);
     VictorSPX lift2 = new VictorSPX(3);
     VictorSPX lift3 = new VictorSPX(4);
+    TalonSRX carriage = null; //Shared with Lift;
 
     DoubleSolenoid brake = new DoubleSolenoid(0, 1, 6);
 
     Encoder encoder = new Encoder(14, 15);
 
     Joystick driver;
-    Carriage carriage;
 
-    public Lift(Joystick driver, Carriage carriage) {
+    public Lift(Joystick driver, TalonSRX carriage) {
         this.driver = driver;
         this.carriage = carriage;
 
