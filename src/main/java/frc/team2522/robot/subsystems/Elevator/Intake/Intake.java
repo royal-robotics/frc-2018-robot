@@ -43,6 +43,12 @@ public class Intake {
     }
 
     public void fmsUpdateTeleop() {
+
+
+
+
+
+
         if(driver.getRawButton(3) && !lastInHiValue)
             inHi.set(inHi.get() == DoubleSolenoid.Value.kForward ? DoubleSolenoid.Value.kReverse : DoubleSolenoid.Value.kForward);
 

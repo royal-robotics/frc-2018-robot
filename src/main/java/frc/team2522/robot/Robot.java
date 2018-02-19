@@ -1,18 +1,13 @@
 package frc.team2522.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import frc.team2522.robot.camera.CameraPipeline;
 
 import edu.wpi.first.wpilibj.*;
 
-import com.kauailabs.navx.frc.AHRS;
-
+import frc.team2522.robot.libs.ObservableBoolean;
 import frc.team2522.robot.subsystems.Climber.Climber;
 import frc.team2522.robot.subsystems.Drivebase.Drivebase;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
-
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
 
 public class Robot extends IterativeRobot {
     /************************************************************************
@@ -58,9 +53,12 @@ public class Robot extends IterativeRobot {
 
     CameraPipeline camera = new CameraPipeline(driver);
 
-    Drivebase drivebase = new Drivebase(driver);
-    Elevator elevator = new Elevator(driver);
-    Climber climber = new Climber(driver);
+
+    Boolean isClimbingMode = false;
+
+    Drivebase drivebase = new Drivebase(driver, new ObservableBoolean(isClimbingMode));
+    Elevator elevator = new Elevator(driver, new ObservableBoolean(isClimbingMode));
+    Climber climber = new Climber(driver, isClimbingMode);
 
     @Override
     public void robotInit() {

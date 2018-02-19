@@ -2,19 +2,22 @@ package frc.team2522.robot.subsystems.Elevator;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
+import frc.team2522.robot.libs.ObservableBoolean;
 import frc.team2522.robot.subsystems.Elevator.Intake.Intake;
 import frc.team2522.robot.subsystems.Elevator.Lift.Lift;
 
 public class Elevator {
     Joystick driver;
+    ObservableBoolean isClimbingMode;
 
     TalonSRX carriage = new TalonSRX(8);
-    
+
     Intake intake;
     Lift lift;
 
-    public Elevator(Joystick driver) {
+    public Elevator(Joystick driver, ObservableBoolean isClimbingMode) {
         this.driver = driver;
+        this.isClimbingMode = isClimbingMode;
 
         intake = new Intake(driver, carriage);
         lift = new Lift(driver, carriage);
