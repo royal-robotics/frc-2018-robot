@@ -8,16 +8,18 @@ function checkConnection() {
 
 $(() => {
     $("#connection-container").load("rendererProcess/connection/connection.html", () => {
-        NetworkTables.addRobotConnectionListener(connectionStatus, /*Call Immediately*/ true);
+        checkConnection();
+        NetworkTables.addRobotConnectionListener(connectionStatus, /*Call Immediately*/ false);
     });
 });
 
 function connectionStatus(connected) {
     createAlert(connected, false);
     if (!connected) {
+        $("#alert-container").fadeIn();
         setTimeout(checkConnection, 5000);
     } else {
-        setTimeout(() => $("#alert-container").fadeOut(), 2500);
+        setTimeout(() => $("#alert-container").fadeOut(), 2000);
     }
 }
 
