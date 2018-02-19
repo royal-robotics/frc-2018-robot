@@ -62,7 +62,9 @@ function createWindow() {
             let callback = (connected, err) => {
                 console.log("connected: " + connected);
                 console.log("err: " + err);
-                mainWindow.webContents.send('connected', connected);
+                if (client.isConnected()) {
+                    mainWindow.webContents.send('connected', connected);
+                }
             };
             client.start(callback, ip);
         }, function(errorMessage) {

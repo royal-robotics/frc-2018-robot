@@ -3,11 +3,11 @@ package frc.team2522.robot.subsystems.Drivebase;
 import com.ctre.phoenix.drive.DiffDrive;
 import com.ctre.phoenix.drive.DriveMode;
 import com.ctre.phoenix.mechanical.Gearbox;
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2522.robot.libs.TankDrive;
 
 /*
     Drivebase owns all sensors and motors that are part of the sub assembly.
@@ -26,12 +26,14 @@ public class Drivebase {
     TalonSRX rightDrive1 = new TalonSRX(6);
     VictorSPX rightDrive2 = new VictorSPX(7);
 
-    Gearbox leftMotors = new Gearbox(leftDrive1, leftDrive2);
-    Gearbox rightMotors = new Gearbox(rightDrive1, rightDrive2);
-    DiffDrive differentialDrive = new DiffDrive(leftMotors, rightMotors);
+    Gearbox leftMotors = new Gearbox(leftDrive1);
+    Gearbox rightMotors = new Gearbox(rightDrive1);
 
-    DriveData driveDataLeft = new DriveData(2, 3, true);
-    DriveData driveDataRight = new DriveData(4,5, false);
+    DiffDrive differentialDrive = new DiffDrive(leftMotors, rightMotors);
+    TankDrive tankDrive = new TankDrive(leftMotors, rightMotors);
+
+    DriveData driveDataLeft = new DriveData(10, 11, true);
+    DriveData driveDataRight = new DriveData(12,13, false);
 
     DriveController driveController = new DriveController(differentialDrive, driveDataLeft, driveDataRight);
 
@@ -39,15 +41,46 @@ public class Drivebase {
 
     public Drivebase(Joystick driver) {
         this.driver = driver;
+        leftDrive2.follow(leftDrive1);
+        rightDrive2.follow(rightDrive1);
         reset();
     }
 
+    boolean tankDriveSet = true;
+    boolean tankDriveSetPressed = false;
+
     public void fmsUpdate() {
-        double leftStick = driver.getRawAxis(1);
-        double rightStick = driver.getRawAxis(5);
-        double forward = (leftStick + rightStick) / 2;
-        double turn = leftStick - forward;
-        differentialDrive.set(DriveMode.PercentOutput, forward, turn);
+        if (!tankDriveSetPressed && driver.getRawButton(8)) {
+            tankDriveSetPressed = true;
+            tankDriveSet = !tankDriveSet;
+        } else if (!driver.getRawButton(8)) {
+            tankDriveSetPressed = false;
+        }
+
+        SmartDashboard.putBoolean("Drive/TankDriveSet", tankDriveSet);
+        SmartDashboard.putBoolean("Drive/CheesyDriveSet", !tankDriveSet);
+
+        if (tankDriveSet) {
+            double left = driver.getRawAxis(1);
+            double right = driver.getRawAxis(5);
+            if (left < 0.2 && left > -0.2) {
+                left = 0;
+            }
+            if (right < 0.2 && right > -0.2) {
+                right = 0;
+            }
+            tankDrive.set(DriveMode.PercentOutput, left, right);
+        } else {
+            double forward = driver.getRawAxis(1);
+            double turn = driver.getRawAxis(4);
+            if (forward < 0.2 && forward > -0.2) {
+                forward = 0;
+            }
+            if (turn < 0.2 && turn > -0.2) {
+                turn = 0;
+            }
+            differentialDrive.set(DriveMode.PercentOutput, forward, turn);
+        }
     }
 
     public void reset() {
