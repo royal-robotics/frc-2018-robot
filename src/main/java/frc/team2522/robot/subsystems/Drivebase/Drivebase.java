@@ -37,8 +37,6 @@ public class Drivebase {
     DriveData driveDataLeft = new DriveData(10, 11, true);
     DriveData driveDataRight = new DriveData(12,13, false);
 
-    DriveController driveController = new DriveController(differentialDrive, driveDataLeft, driveDataRight);
-
     Joystick driver;
 
     public Drivebase(Joystick driver) {
@@ -51,16 +49,34 @@ public class Drivebase {
     boolean tankDriveSet = true;
     boolean tankDriveSetPressed = false;
 
+    boolean shiftOn = false;
+    boolean shiftOnPressed = false;
+
     public void fmsUpdateTeleop() {
-        if (!tankDriveSetPressed && driver.getRawButton(8)) {
+        if (driver.getRawButton(7) && !tankDriveSetPressed) {
             tankDriveSetPressed = true;
             tankDriveSet = !tankDriveSet;
-        } else if (!driver.getRawButton(8)) {
+        } else if (!driver.getRawButton(7)) {
             tankDriveSetPressed = false;
+        }
+
+        if ((driver.getRawButton(9) || driver.getRawButton(10)) && !shiftOnPressed) {
+            shiftOnPressed = true;
+            shiftOn = !shiftOn;
+        } else if (!driver.getRawButton(9) && !driver.getRawButton(10)) {
+            shiftOnPressed = false;
         }
 
         SmartDashboard.putBoolean("Drive/TankDriveSet", tankDriveSet);
         SmartDashboard.putBoolean("Drive/CheesyDriveSet", !tankDriveSet);
+        SmartDashboard.putBoolean("Drive/HighGear", shiftOn);
+        SmartDashboard.putBoolean("Drive/LowGear", !shiftOn);
+
+        if (shiftOn) {
+            shift.set(DoubleSolenoid.Value.kForward);
+        } else {
+            shift.set(DoubleSolenoid.Value.kReverse);
+        }
 
         if (tankDriveSet) {
             double left = driver.getRawAxis(1);
@@ -71,6 +87,10 @@ public class Drivebase {
             if (right < 0.2 && right > -0.2) {
                 right = 0;
             }
+
+            SmartDashboard.putNumber("Drive/TankDrive/LeftPercent", left);
+            SmartDashboard.putNumber("Drive/TankDrive/RightPercent", right);
+
             tankDrive.set(DriveMode.PercentOutput, left, right);
         } else {
             double forward = driver.getRawAxis(1);

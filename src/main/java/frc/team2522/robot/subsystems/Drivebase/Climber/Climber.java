@@ -1,4 +1,4 @@
-package frc.team2522.robot.subsystems.Climber;
+package frc.team2522.robot.subsystems.Drivebase.Climber;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;

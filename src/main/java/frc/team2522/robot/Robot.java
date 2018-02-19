@@ -1,18 +1,12 @@
 package frc.team2522.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import frc.team2522.robot.camera.CameraPipeline;
 
 import edu.wpi.first.wpilibj.*;
 
-import com.kauailabs.navx.frc.AHRS;
-
-import frc.team2522.robot.subsystems.Climber.Climber;
+import frc.team2522.robot.subsystems.Drivebase.Climber.Climber;
 import frc.team2522.robot.subsystems.Drivebase.Drivebase;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
-
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
 
 public class Robot extends IterativeRobot {
     /************************************************************************
