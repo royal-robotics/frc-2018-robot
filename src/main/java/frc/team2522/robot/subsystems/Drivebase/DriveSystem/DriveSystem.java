@@ -35,7 +35,7 @@ public class DriveSystem {
             driveTypePressed = false;
         }
 
-        SmartDashboard.putString("Drive/DriveType", driveType.toString());
+        SmartDashboard.putString("DriveSystem/DriveType", driveType.toString());
     }
 
     public void updateShift(boolean leftButton, boolean rightButton) {
@@ -52,28 +52,28 @@ public class DriveSystem {
             shift.set(DoubleSolenoid.Value.kReverse);
         }
 
-        SmartDashboard.putString("Drive/Gear", shiftOn ? "High" : "Low");
+        SmartDashboard.putString("DriveSystem/Gear", shiftOn ? "High" : "Low");
     }
 
     public void drive(double left, double right, double forward, double turn, double deadzone) {
         if (driveType == DriveType.TankDrive) {
             if (left < deadzone && left > -deadzone) {
-                left = 0;
+                left = 0.0;
             }
             if (right < deadzone && right > -deadzone) {
-                right = 0;
+                right = 0.0;
             }
 
-            SmartDashboard.putNumber("Drive/TankDrive/LeftPercent", left);
-            SmartDashboard.putNumber("Drive/TankDrive/RightPercent", right);
+            SmartDashboard.putNumber("DriveSystem/TankDrive/LeftPercent", left);
+            SmartDashboard.putNumber("DriveSystem/TankDrive/RightPercent", right);
 
             tankDrive.set(DriveMode.PercentOutput, left, right);
         } else {  // currentDriveType == DriveType.CheesyDrive
             if (forward < deadzone && forward > -deadzone) {
-                forward = 0;
+                forward = 0.0;
             }
             if (turn < deadzone && turn > -deadzone) {
-                turn = 0;
+                turn = 0.0;
             }
 
             SmartDashboard.putNumber("Drive/CheesyDrive/ForwardPercent", forward);

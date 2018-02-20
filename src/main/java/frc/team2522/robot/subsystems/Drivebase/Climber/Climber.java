@@ -17,6 +17,8 @@ public class Climber {
     public Climber(TankDrive tankDrive, Boolean isClimbingMode) {
         this.tankDrive = tankDrive;
         this.isClimbingMode = isClimbingMode;
+        ratchet.set(DoubleSolenoid.Value.kReverse);
+        pto.set(DoubleSolenoid.Value.kReverse);
     }
 
     public void updateClimbing(boolean leftButton, boolean rightButton) {
@@ -31,10 +33,10 @@ public class Climber {
 
     public void climb(double left, double right, double deadzone) {
         if (left < deadzone) {
-            left = 0;
+            left = 0.0;
         }
         if (right < deadzone) {
-            right = 0;
+            right = 0.0;
         }
 
         double power = (left + right) / 2;

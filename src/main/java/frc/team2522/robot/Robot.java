@@ -4,7 +4,6 @@ import frc.team2522.robot.camera.CameraPipeline;
 
 import edu.wpi.first.wpilibj.*;
 
-import frc.team2522.robot.subsystems.Drivebase.Climber.Climber;
 import frc.team2522.robot.libs.ObservableBoolean;
 import frc.team2522.robot.subsystems.Drivebase.Drivebase;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
@@ -52,7 +51,6 @@ public class Robot extends IterativeRobot {
     Joystick driver = new Joystick(0);
 
     CameraPipeline camera = new CameraPipeline(driver);
-
 
     Boolean isClimbingMode = false;
 
