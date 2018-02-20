@@ -1,9 +1,13 @@
 package frc.team2522.robot.subsystems.Elevator.Lift;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import javax.naming.ldap.Control;
 
 public class Lift {
 
@@ -14,7 +18,7 @@ public class Lift {
 
     DoubleSolenoid brake = new DoubleSolenoid(0, 1, 6);
 
-
+    LiftData data = new LiftData();
 
     Joystick driver;
 
@@ -27,10 +31,14 @@ public class Lift {
     }
 
     public void fmsUpdateTeleop() {
+        lift2.getOutputCurrent();
+
         if(driver.getPOV() == 0) {
-            liftMotors.set(ControlMode.PercentOutput, 0.8);
+            SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
+            liftMotors.set(ControlMode.PercentOutput, 0.5);
         } else if(driver.getPOV() == 180) {
-            liftMotors.set(ControlMode.PercentOutput, -0.8);
+            liftMotors.set(ControlMode.PercentOutput, -0.5);
+            SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
         } else {
             liftMotors.set(ControlMode.PercentOutput, 0.0);
         }

@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2522.robot.libs.Button;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -19,10 +20,9 @@ public class Intake {
     TalonSRX carriage = null; //Shared with Lift;
 
     Joystick driver;
+    Button buttonIntakeMode;
 
     boolean rotateMode = false;
-    boolean lastInHiValue = false;
-    boolean lastInLoValue = false;
 
     Timer timer = null;
 
@@ -30,6 +30,8 @@ public class Intake {
     public Intake(Joystick driver, TalonSRX carriage) {
         this.driver = driver;
         this.carriage = carriage;
+
+        buttonIntakeMode = new Button(driver, 1, Button.ButtonType.Toggle);
 
         SmartDashboard.putNumber("Intake/Pull/carriage", 0.35);
         SmartDashboard.putNumber("Intake/Pull/left", 0.8);
@@ -42,23 +44,26 @@ public class Intake {
         SmartDashboard.putNumber("Intake/Rotate/interval", 333);
     }
 
+    int armState = 0;
     public void fmsUpdateTeleop() {
 
+        if(buttonIntakeMode.isPressed()) {
+            if(armState == 0) {
+                //Out
+                inHi.set(DoubleSolenoid.Value.kReverse);
+                inLo.set(DoubleSolenoid.Value.kForward);
+            } else if(armState == 1) {
+                //neutral
+                inHi.set(DoubleSolenoid.Value.kReverse);
+                inLo.set(DoubleSolenoid.Value.kReverse);
+            } else {
+                inHi.set(DoubleSolenoid.Value.kForward);
+                inLo.set(DoubleSolenoid.Value.kReverse);
+            }
 
-
-
-
-
-        if(driver.getRawButton(3) && !lastInHiValue)
-            inHi.set(inHi.get() == DoubleSolenoid.Value.kForward ? DoubleSolenoid.Value.kReverse : DoubleSolenoid.Value.kForward);
-
-        lastInHiValue = driver.getRawButton(3);
-
-        if(driver.getRawButton(4) && !lastInLoValue)
-            inLo.set(inLo.get() == DoubleSolenoid.Value.kForward ? DoubleSolenoid.Value.kReverse : DoubleSolenoid.Value.kForward);
-
-        lastInLoValue = driver.getRawButton(4);
-
+            if(++armState == 3)
+                armState = 0;
+        }
 
         if(driver.getRawButton(5)) { //Pull the cube in
             stopRotateTimer();

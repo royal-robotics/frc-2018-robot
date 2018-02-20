@@ -2,6 +2,7 @@ package frc.team2522.robot.subsystems.Elevator.Lift;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.libs.CircularList;
 
 import java.util.Timer;
@@ -23,7 +24,7 @@ public class LiftData {
     public LiftData() {
         // TODO: The spool is actually bigger when the lift is down since the cord increases
         // the diameter. We should adjust this value as the lift moves.
-        final double inchesPerPulse = (3.5 * Math.PI) / 256;
+        final double inchesPerPulse = (3.5 * Math.PI) / 256.0;
 
         encoder.setDistancePerPulse(inchesPerPulse);
         encoder.setReverseDirection(false);
@@ -45,13 +46,26 @@ public class LiftData {
 
         double newVelocity = changeInPosition / (msUpdate / 1000.0);
         lastVelocities.add(newVelocity);
+
+        SmartDashboard.putNumber("Lift/Data/position", getPosition());
+        SmartDashboard.putNumber("Lift/Data/velocity", getVelocity());
+
+        System.out.println(getPosition());
     }
 
     public double getPosition() {
-        return 0;
+        return encoder.getDistance();
     }
 
     public double getVelocity() {
-        return 0;
+        if(lastVelocities.size() < 1)
+            return 0;
+
+        double total = 0;
+        for(int i = 0; i < lastVelocities.size(); i++) {
+            total += lastVelocities.get(i);
+        }
+
+        return total / lastVelocities.size();
     }
 }
