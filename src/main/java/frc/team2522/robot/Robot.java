@@ -56,9 +56,8 @@ public class Robot extends IterativeRobot {
 
     Boolean isClimbingMode = false;
 
-    Drivebase drivebase = new Drivebase(driver, new ObservableBoolean(isClimbingMode));
+    Drivebase drivebase = new Drivebase(driver, isClimbingMode);
     Elevator elevator = new Elevator(driver, new ObservableBoolean(isClimbingMode));
-    Climber climber = new Climber(driver, isClimbingMode);
 
     @Override
     public void robotInit() {
@@ -87,8 +86,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        //drivebase.fmsUpdateTeleop();
+        drivebase.fmsUpdateTeleop();
         elevator.fmsUpdateTeleop();
-        climber.fmsUpdateTeleop();
     }
 }
