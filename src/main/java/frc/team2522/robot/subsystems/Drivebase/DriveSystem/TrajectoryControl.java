@@ -1,5 +1,6 @@
-package frc.team2522.robot.subsystems.Drivebase;
+package frc.team2522.robot.subsystems.Drivebase.DriveSystem;
 
+import frc.team2522.robot.subsystems.Drivebase.DriveSystem.DriveData;
 import jaci.pathfinder.Trajectory;
 
 public class TrajectoryControl {

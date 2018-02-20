@@ -1,8 +1,7 @@
-package frc.team2522.robot.subsystems.Drivebase;
+package frc.team2522.robot.subsystems.Drivebase.DriveSystem;
 
 import com.ctre.phoenix.drive.DiffDrive;
 import com.ctre.phoenix.drive.DriveMode;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
