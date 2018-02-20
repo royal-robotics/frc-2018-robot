@@ -4,8 +4,8 @@ import frc.team2522.robot.camera.CameraPipeline;
 
 import edu.wpi.first.wpilibj.*;
 
+import frc.team2522.robot.subsystems.Drivebase.Climber.Climber;
 import frc.team2522.robot.libs.ObservableBoolean;
-import frc.team2522.robot.subsystems.Climber.Climber;
 import frc.team2522.robot.subsystems.Drivebase.Drivebase;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
 
@@ -56,9 +56,8 @@ public class Robot extends IterativeRobot {
 
     Boolean isClimbingMode = false;
 
-    Drivebase drivebase = new Drivebase(driver, new ObservableBoolean(isClimbingMode));
+    Drivebase drivebase = new Drivebase(driver, isClimbingMode);
     Elevator elevator = new Elevator(driver, new ObservableBoolean(isClimbingMode));
-    Climber climber = new Climber(driver, isClimbingMode);
 
     @Override
     public void robotInit() {
@@ -87,8 +86,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        //drivebase.fmsUpdateTeleop();
+        drivebase.fmsUpdateTeleop();
         elevator.fmsUpdateTeleop();
-        climber.fmsUpdateTeleop();
     }
 }
