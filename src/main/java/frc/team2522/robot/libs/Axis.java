@@ -2,11 +2,12 @@ package frc.team2522.robot.libs;
 
 import edu.wpi.first.wpilibj.Joystick;
 
-public class Axis {
+public class Axis implements IButton{
     private Joystick joystick;
     private int axisIndex;
     private double deadband;
 
+    private double defaultEdge = 0.25;
     private double lastReading = 0.0;
 
     public Axis(Joystick joystick, int axisIndex, double deadband) {
@@ -16,8 +17,16 @@ public class Axis {
     }
 
     public double getValue() {
-        lastReading = joystick.getRawAxis(axisIndex);
+        double value = joystick.getRawAxis(axisIndex);
+        if (value < deadband && value > -deadband) {
+            value = 0.0;
+        }
+        lastReading = value;
         return lastReading;
+    }
+
+    public boolean isPressed() {
+        return getValue() > defaultEdge;
     }
 
     public boolean isPressed(double edge) {
@@ -25,9 +34,8 @@ public class Axis {
     }
 
     public boolean isToggled(double edge) {
-        double currentValue = joystick.getRawAxis(axisIndex);
+        double currentValue = getValue();
         boolean value = lastReading < edge && currentValue > edge;
-        lastReading = currentValue;
         return value;
     }
 }

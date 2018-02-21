@@ -2,7 +2,9 @@ package frc.team2522.robot.subsystems.Drivebase.Climber;
 
 import com.ctre.phoenix.drive.DriveMode;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2522.robot.libs.Axis;
 import frc.team2522.robot.libs.TankDrive;
 
 public class Climber {
@@ -20,28 +22,24 @@ public class Climber {
         pto.set(DoubleSolenoid.Value.kReverse);
     }
 
-    public void updateClimbing(boolean leftButton, boolean rightButton) {
-        if ((leftButton && rightButton) && !isClimbingMode) {
-            isClimbingMode = true;
-            ratchet.set(DoubleSolenoid.Value.kForward);
-            pto.set(DoubleSolenoid.Value.kForward);
-        }
-
-        SmartDashboard.putBoolean("Climber/ClimbEnabled", isClimbingMode);
+    public void turnClimbModeOn() {
+        isClimbingMode = true;
+        ratchet.set(DoubleSolenoid.Value.kForward);
+        pto.set(DoubleSolenoid.Value.kForward);
     }
 
-    public void climb(double left, double right, double deadzone) {
-        if (left < deadzone) {
-            left = 0.0;
-        }
-        if (right < deadzone) {
-            right = 0.0;
-        }
+    public void climb(Axis left, Axis right) {
+        double leftPower = left.getValue();
+        double rightPower = right.getValue();
 
-        double power = (left + right) / 2;
+        double power = (leftPower + rightPower) / 2;
 
         SmartDashboard.putNumber("Drive/ClimbDrive/Percent", power);
 
         tankDrive.set(DriveMode.PercentOutput, power, power);
+    }
+
+    public void writeToDashboard() {
+        SmartDashboard.putBoolean("Climber/ClimbEnabled", isClimbingMode);
     }
 }

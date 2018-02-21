@@ -5,8 +5,8 @@ import com.ctre.phoenix.mechanical.Gearbox;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
-import frc.team2522.robot.libs.Button;
-import frc.team2522.robot.libs.TankDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2522.robot.libs.*;
 import frc.team2522.robot.subsystems.Drivebase.Climber.Climber;
 import frc.team2522.robot.subsystems.Drivebase.DriveSystem.DriveSystem;
 
@@ -39,17 +39,23 @@ public class Drivebase {
     DriveSystem driveSystem = new DriveSystem(tankDrive, differentialDrive);
     Climber climber = new Climber(tankDrive, isClimbingMode);
 
+    Axis left = new Axis(driver, 1, 0.1);
+    Axis right = new Axis(driver, 5, 0.1);
+    Axis turn = new Axis(driver, 4, 0.1);
+
     Button btnToggleDriveType;
     Button btnToggleShift1;
     Button btnToggleShift2;
+    MultiButton btnToggleClimb;
 
     public Drivebase(Joystick driver, Boolean isClimbingMode) {
         this.driver = driver;
         this.isClimbingMode = isClimbingMode;
 
-        btnToggleDriveType = new Button(driver, 7, Button.ButtonType.Toggle);
-        btnToggleShift1 = new Button(driver, 9, Button.ButtonType.Toggle);
-        btnToggleShift2 = new Button(driver, 10, Button.ButtonType.Toggle);
+        btnToggleDriveType = new Button(driver, 7, IButton.ButtonType.Toggle);
+        btnToggleShift1 = new Button(driver, 9, IButton.ButtonType.Toggle);
+        btnToggleShift2 = new Button(driver, 10, IButton.ButtonType.Toggle);
+        btnToggleClimb = new MultiButton(driver, new int[] {5, 6}, IButton.ButtonType.Toggle);
 
         leftDrive2.follow(leftDrive1);
         rightDrive2.follow(rightDrive1);
@@ -65,15 +71,18 @@ public class Drivebase {
             driveSystem.toggleShift();
         }
 
-        //TODO: Make a double button to trigger this
-        //climber.updateClimbing(driver.getRawButton(5), driver.getRawButton(6));
+        if(btnToggleClimb.isPressed()) {
+            climber.turnClimbModeOn();
+        }
 
-//        if (isClimbingMode) {
-//            climber.climb(left, right, DEADZONE);
-//        } else {  // !isClimbingMode
-            //TODO: Make a `Axis` type and pass that in
-            driveSystem.drive(driver);
-//        }
+        //TODO: Make an `Axis` type and pass that in instead of driver
+        if (isClimbingMode) {
+            //climber.climb(left, right);
+        } else {  // !isClimbingMode
+            driveSystem.drive(left, right, turn);
+        }
+        driveSystem.writeToDashboard();
+        climber.writeToDashboard();
     }
 
     public void reset() {
