@@ -2,7 +2,6 @@ package frc.team2522.robot.subsystems.Drivebase.Climber;
 
 import com.ctre.phoenix.drive.DriveMode;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.libs.TankDrive;
 

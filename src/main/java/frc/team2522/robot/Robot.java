@@ -84,7 +84,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        //drivebase.fmsUpdateTeleop();
+        drivebase.fmsUpdateTeleop();
         elevator.fmsUpdateTeleop();
     }
 }
