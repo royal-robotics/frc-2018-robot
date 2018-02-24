@@ -31,13 +31,11 @@ public class Lift {
     }
 
     public void fmsUpdateTeleop() {
-        lift2.getOutputCurrent();
-
         if(driver.getPOV() == 0) {
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
-            liftMotors.set(ControlMode.PercentOutput, 0.5);
+            liftMotors.set(ControlMode.PercentOutput, 0.6);
         } else if(driver.getPOV() == 180) {
-            liftMotors.set(ControlMode.PercentOutput, -0.5);
+            liftMotors.set(ControlMode.PercentOutput, -0.6);
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
         } else {
             liftMotors.set(ControlMode.PercentOutput, 0.0);

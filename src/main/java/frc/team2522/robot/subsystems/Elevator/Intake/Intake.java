@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2522.robot.libs.Axis;
 import frc.team2522.robot.libs.Button;
 import frc.team2522.robot.*;
 
@@ -40,7 +41,6 @@ public class Intake {
     }
 
     public void fmsUpdateTeleop() {
-
         if(Controls.Elevator.Intake.pickup.isPressed()) {
             inHi.set(DoubleSolenoid.Value.kReverse);
             inLo.set(DoubleSolenoid.Value.kReverse);
@@ -56,27 +56,28 @@ public class Intake {
             inLo.set(DoubleSolenoid.Value.kForward);
         }
 
-//        if(driver.getRawButton(5)) { //Pull the cube in
-//            stopRotateTimer();
-//            setPull();
-//        } else if(driver.getRawButton(6)) { //Correct the orientation of the cube
-//            if(timer == null) {
-//                timer = new Timer();
-//                timer.scheduleAtFixedRate(new TimerTask() {
-//                    public void run() {
-//                        rotateMode = !rotateMode;
-//                        if(rotateMode) {
-//                            setPull();
-//                        } else {
-//                            setRotate();
-//                        }
-//                    }
-//                }, 0, (int)SmartDashboard.getNumber("Intake/Rotate/interval", 333));
-//            }
-//        } else {
-//            stopRotateTimer();
-//            setStop();
-//        }
+        
+
+        // if(axisLeft.isPressed(0.5)) { //Pull the cube in
+        //     stopRotateTimer();
+        //     setPull();
+        // } else if(axisRight.isPressed(0.5)) { //Correct the orientation of the cube
+        //     if(timer == null) {
+        //         timer = new Timer();
+        //         timer.scheduleAtFixedRate(new TimerTask() {
+        //             public void run() {
+        //                 rotateMode = !rotateMode;
+        //                 if(rotateMode) {
+        //                     setPull();
+        //                 } else {
+        //                     setRotate();
+        //                 }
+        //             }
+        //         }, 0, (int)SmartDashboard.getNumber("Intake/Rotate/interval", 333));
+        //     }
+        // } else {
+        //     stopRotateTimer();
+        //     setStop();
     }
 
     private void stopRotateTimer() {
@@ -87,13 +88,13 @@ public class Intake {
     }
 
     private void setPull() {
-        carriage.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Pull/carriage", 0.35));
+        carriage.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Pull/carriage", 0.55));
         leftIntake.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Pull/left", 0.8));
         rightIntake.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Pull/right", 0.8));
     }
 
     private void setRotate() {
-        carriage.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Rotate/carriage", 0.35));
+        carriage.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Rotate/carriage", 0.55));
         leftIntake.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Rotate/left", 0.8));
         rightIntake.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Rotate/right", -0.2));
     }
