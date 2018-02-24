@@ -52,16 +52,16 @@ public class Drivebase {
     public void fmsUpdateTeleop() {
         driveSystem.updateDriveType(driver.getRawButton(7));
         driveSystem.updateShift(driver.getRawButton(9), driver.getRawButton(10));
-        climber.updateClimbing(driver.getRawButton(5), driver.getRawButton(6));
+        //climber.updateClimbing(driver.getRawButton(5), driver.getRawButton(6));
 
         double left = driver.getRawAxis(1);
         double right = driver.getRawAxis(5);
         double turn = driver.getRawAxis(4);
-        if (isClimbingMode) {
-            climber.climb(left, right, DEADZONE);
-        } else {  // !isClimbingMode
+//        if (isClimbingMode) {
+//            climber.climb(left, right, DEADZONE);
+//        } else {  // !isClimbingMode
             driveSystem.drive(left, right, left, turn, DEADZONE);
-        }
+//        }
     }
 
     public void reset() {

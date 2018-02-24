@@ -48,14 +48,12 @@ public class Robot extends IterativeRobot {
 
     ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 
-    Joystick driver = new Joystick(0);
-
-    CameraPipeline camera = new CameraPipeline(driver);
+    CameraPipeline camera = new CameraPipeline(Controls.driver);
 
     Boolean isClimbingMode = false;
 
-    Drivebase drivebase = new Drivebase(driver, isClimbingMode);
-    Elevator elevator = new Elevator(driver, new ObservableBoolean(isClimbingMode));
+    Drivebase drivebase = new Drivebase(Controls.driver, isClimbingMode);
+    Elevator elevator = new Elevator(Controls.driver, new ObservableBoolean(isClimbingMode));
 
     @Override
     public void robotInit() {
@@ -84,7 +82,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        //drivebase.fmsUpdateTeleop();
+        drivebase.fmsUpdateTeleop();
         elevator.fmsUpdateTeleop();
     }
 }
