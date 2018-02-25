@@ -26,7 +26,7 @@ public class Axis implements IButton{
     }
 
     public boolean isPressed() {
-        return getValue() > defaultEdge;
+        return isPressed(defaultEdge);
     }
 
     public boolean isPressed(double edge) {
