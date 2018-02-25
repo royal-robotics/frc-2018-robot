@@ -33,7 +33,7 @@ public class CameraPipeline {
 
                 outputStream.putFrame(frame);
             }
-        });//}).start();
+        }).start();
     }
 
     private CvSink createCameraStream() {

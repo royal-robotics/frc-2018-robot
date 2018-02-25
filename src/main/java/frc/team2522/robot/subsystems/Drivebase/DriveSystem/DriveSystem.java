@@ -48,7 +48,7 @@ public class DriveSystem {
         final double DEADZONE = 0.2;
 
         if (driveType == DriveType.TankDrive) {
-            double left = driver.getRawAxis(1);
+            double left = -driver.getRawAxis(1);
             double right = driver.getRawAxis(5);
 
             if (left < DEADZONE && left > -DEADZONE) {
@@ -63,8 +63,8 @@ public class DriveSystem {
 
             tankDrive.set(DriveMode.PercentOutput, left, right);
         } else {  // currentDriveType == DriveType.CheesyDrive
-            double forward = driver.getRawAxis(1);
-            double turn = driver.getRawAxis(4);
+            double forward = driver.getRawAxis(4);
+            double turn = driver.getRawAxis(1);
 
             if (forward < DEADZONE && forward > -DEADZONE) {
                 forward = 0.0;
@@ -73,10 +73,15 @@ public class DriveSystem {
                 turn = 0.0;
             }
 
+            double leftPower =  forward - turn;
+            double rightPower = forward + turn;
+
             SmartDashboard.putNumber("Drive/CheesyDrive/ForwardPercent", forward);
             SmartDashboard.putNumber("Drive/CheesyDrive/TurnPercent", turn);
 
-            diffDrive.set(DriveMode.PercentOutput, forward, turn);
+            //diffDrive
+            //diffDrive.set(DriveMode.PercentOutput, leftPower, rightPower);
+            tankDrive.set(DriveMode.PercentOutput, leftPower, rightPower);
         }
     }
 
