@@ -50,7 +50,7 @@ public class LiftData {
         SmartDashboard.putNumber("Lift/Data/position", getPosition());
         SmartDashboard.putNumber("Lift/Data/velocity", getVelocity());
 
-        System.out.println(getPosition());
+        //System.out.println(getPosition());
     }
 
     public double getPosition() {

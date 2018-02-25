@@ -5,6 +5,7 @@ import com.ctre.phoenix.drive.DriveMode;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2522.robot.libs.Axis;
 import frc.team2522.robot.libs.DriveType;
 import frc.team2522.robot.libs.TankDrive;
 
@@ -24,13 +25,15 @@ public class DriveSystem {
         this.diffDrive = diffDrive;
     }
 
+    public DriveType getDriveType() {
+        return driveType;
+    }
+
     public void toggleControlsType() {
         if(driveType == DriveType.TankDrive)
             driveType = DriveType.CheesyDrive;
         else
             driveType = DriveType.TankDrive;
-
-        SmartDashboard.putString("DriveSystem/DriveType", driveType.toString());
     }
 
     public void toggleShift() {
@@ -39,48 +42,24 @@ public class DriveSystem {
         } else {
             shift.set(DoubleSolenoid.Value.kForward);
         }
-
-        boolean shiftOn = shift.get() == DoubleSolenoid.Value.kForward;
-        SmartDashboard.putString("DriveSystem/Gear", shiftOn ? "High" : "Low");
     }
 
-    public void drive(Joystick driver) {
-        final double DEADZONE = 0.2;
-
+    public void drive(Axis left, Axis right, Axis turn) {
         if (driveType == DriveType.TankDrive) {
-            double left = -driver.getRawAxis(1);
-            double right = driver.getRawAxis(5);
+            SmartDashboard.putNumber("DriveSystem/TankDrive/LeftPercent", left.getValue());
+            SmartDashboard.putNumber("DriveSystem/TankDrive/RightPercent", right.getValue());
 
-            if (left < DEADZONE && left > -DEADZONE) {
-                left = 0.0;
-            }
-            if (right < DEADZONE && right > -DEADZONE) {
-                right = 0.0;
-            }
-
-            SmartDashboard.putNumber("DriveSystem/TankDrive/LeftPercent", left);
-            SmartDashboard.putNumber("DriveSystem/TankDrive/RightPercent", right);
-
-            tankDrive.set(DriveMode.PercentOutput, left, right);
+            tankDrive.set(DriveMode.PercentOutput, left.getValue(), right.getValue());
         } else {  // currentDriveType == DriveType.CheesyDrive
-            double forward = driver.getRawAxis(4);
-            double turn = driver.getRawAxis(1);
+            double forwardPower = left.getValue();
+            double turnPower = turn.getValue();
 
-            if (forward < DEADZONE && forward > -DEADZONE) {
-                forward = 0.0;
-            }
-            if (turn < DEADZONE && turn > -DEADZONE) {
-                turn = 0.0;
-            }
+            double leftPower =  forwardPower - turnPower;
+            double rightPower = turnPower + turnPower;
 
-            double leftPower =  forward - turn;
-            double rightPower = forward + turn;
+            SmartDashboard.putNumber("Drive/CheesyDrive/LeftPercent", leftPower);
+            SmartDashboard.putNumber("Drive/CheesyDrive/RightPercent", rightPower);
 
-            SmartDashboard.putNumber("Drive/CheesyDrive/ForwardPercent", forward);
-            SmartDashboard.putNumber("Drive/CheesyDrive/TurnPercent", turn);
-
-            //diffDrive
-            //diffDrive.set(DriveMode.PercentOutput, leftPower, rightPower);
             tankDrive.set(DriveMode.PercentOutput, leftPower, rightPower);
         }
     }
@@ -88,5 +67,11 @@ public class DriveSystem {
     public void reset() {
         driveDataLeft.reset();
         driveDataRight.reset();
+    }
+
+    public void writeToDashboard() {
+        SmartDashboard.putString("DriveSystem/DriveType", driveType.toString());
+        boolean shiftOn = shift.get() == DoubleSolenoid.Value.kForward;
+        SmartDashboard.putString("DriveSystem/Gear", shiftOn ? "High" : "Low");
     }
 }
