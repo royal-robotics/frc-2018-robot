@@ -5,6 +5,15 @@ $(() => {
         if($(this).hasClass("active"))
             loadTab(this);
     });
+
+    jQuery.ajax({
+        url: "rendererProcess/camera/camera-save.js",
+        dataType: 'script',
+        success: function() {
+            console.log("success");
+        },
+        async: true
+    })
 });
 
 function loadTab(tab) {
@@ -17,4 +26,9 @@ function loadTab(tab) {
         else
             $(this).removeClass("active")
     });
+}
+
+
+function loadTabState(tab) {
+    var path = $(tab).children("a").attr("name");
 }

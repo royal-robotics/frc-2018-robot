@@ -1,0 +1,1 @@
+var cameraSwitch = 0;
