@@ -7,10 +7,7 @@ import frc.team2522.robot.libs.IButton;
 
 public class Controls {
     public static Joystick driver = new Joystick(0);
-
-    public static void setMode(boolean onePersonMode) {
-
-    }
+    private static boolean onePersonMode = true;
 
     public static class Elevator {
         public static class Intake {

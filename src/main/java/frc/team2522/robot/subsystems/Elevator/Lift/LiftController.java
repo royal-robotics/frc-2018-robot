@@ -5,17 +5,37 @@ import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
 
 public class LiftController {
+
+    public enum MovementType {
+        Slow,
+        Quick
+    }
+
     private final double maxHeight = 100.0;
-    private final double resetUpHeight = 10.0;
+    private final double minHeight = 0.0;
 
     //TODO: pull this from a file deployed with the robot code
     //Trajectory trajectorySlow = generateTrajectory();
 
-    public LiftController() {
+    public void BeginMovement(MovementType type, double setPoint) {
 
     }
 
-    public static Trajectory generateTrajectory() {
+    public void cancelMovement() {
+        //quickly decelerate and then stopMovement
+    }
+
+    public void stopMovement() {
+
+    }
+
+    public void quickMovement(double position) {
+        //This should be ignored if operatorMovement is running
+    }
+
+
+
+    private static Trajectory generateTrajectory() {
         final Waypoint[] points = new Waypoint[] {
                 new Waypoint(0, 0, 0),
                 new Waypoint(100, 0, 0),
