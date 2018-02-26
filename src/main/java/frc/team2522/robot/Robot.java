@@ -1,10 +1,12 @@
 package frc.team2522.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.camera.CameraPipeline;
 
 import edu.wpi.first.wpilibj.*;
 
 import frc.team2522.robot.libs.ObservableBoolean;
+import frc.team2522.robot.libs.Stopwatch;
 import frc.team2522.robot.subsystems.Drivebase.Drivebase;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
 
@@ -45,13 +47,14 @@ public class Robot extends IterativeRobot {
      * ENC2 (DIO 14 & 15): ELEVATOR
     ************************************************************************/
 
-
     ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+
 
     CameraPipeline camera = new CameraPipeline(Controls.driver);
 
     Boolean isClimbingMode = false;
 
+    Stopwatch robotStopwatch = Stopwatch.StartNew();
     Drivebase drivebase = new Drivebase(Controls.driver, isClimbingMode);
     Elevator elevator = new Elevator(Controls.driver, new ObservableBoolean(isClimbingMode));
 
@@ -61,18 +64,23 @@ public class Robot extends IterativeRobot {
     }
 
     @Override
+    public void robotPeriodic() {
+        SmartDashboard.putNumber("robot/uptime/", robotStopwatch.getElapsedTime().getSeconds());
+    }
+
+    @Override
     public void disabledInit() {
     }
 
     @Override
-    public void disabledPeriodic() {  }
+    public void disabledPeriodic() { }
 
     @Override
     public void autonomousPeriodic() { }
 
     @Override
     public void autonomousInit() {
-        //reset();
+        drivebase.reset();
     }
     
     @Override
@@ -82,7 +90,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopPeriodic() {
-        //drivebase.fmsUpdateTeleop();
+        drivebase.fmsUpdateTeleop();
         elevator.fmsUpdateTeleop();
     }
 }

@@ -15,7 +15,6 @@ $(() => {
 });
 
 function connectionStatus(connected) {
-    console.log("connection-status");
     createAlert(connected, false);
     if (!connected) {
         $("#alert-container").fadeIn();
