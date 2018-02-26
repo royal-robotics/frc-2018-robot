@@ -2,6 +2,7 @@
 function checkConnection() {
     if(!NetworkTables.isRobotConnected()) {
         createAlert(false, true);
+        console.log("attempt-connect");
         ipc.send('attempt-connect');
     }
 }
@@ -14,10 +15,11 @@ $(() => {
 });
 
 function connectionStatus(connected) {
+    console.log("connection-status");
     createAlert(connected, false);
     if (!connected) {
         $("#alert-container").fadeIn();
-        setTimeout(checkConnection, 5000);
+        setTimeout(checkConnection, 500);
     } else {
         setTimeout(() => $("#alert-container").fadeOut(), 2000);
     }

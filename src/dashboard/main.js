@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron = require("electron");
 const wpilib_NT = require("wpilib-nt-client");
-const client = new wpilib_NT.Client();
 const roborio = require("./mainProcess/roborio");
 
 // Module to control application life
@@ -21,55 +20,31 @@ const globalShortcut = electron.globalShortcut;
 // be closed automatically when the JavaScript object is garbage collected
 let mainWindow;
 
-let connected, ready = false;
 function createWindow() {
-    // Attempt to connect to the localhost
-    client.start((con, err) => {
-        // If the Window is ready than send the connection status to it
-        if (ready) {
-            mainWindow.webContents.send('connected', con);
-        } else {
-            connected = () => mainWindow.webContents.send('connected', con);
-        }
-    });
-
     // When the script starts running in the window set the ready variable
     ipc.on('ready', (ev, mesg) => {
         console.log("ready");
-        ready = true;
-        // Send connection message to the window if the message is ready
-        if (connected) {
-            connected();
-        }
     });
 
-    // When the user chooses the address of the bot then try to connect
-    ipc.on('connect', (ev, address, port) => {
-        console.log("connect");
-        let callback = (connected, err) => {
-            mainWindow.webContents.send('connected', connected);
-        };
-        if (port) {
-            client.start(callback, address, port);
-        } else {
-            client.start(callback, address);
-        }
-    });
-
-    ipc.on('attempt-connect',(ev,mesg) => {
-        console.log("getting ip");
-        roborio.getIP().then(function(ip) {
-            let callback = (connected, err) => {
-                console.log("connected: " + connected);
-                console.log("err: " + err);
-                if (client.isConnected()) {
-                    mainWindow.webContents.send('connected', connected);
+    let attempting = false;
+    let client = new wpilib_NT.Client();
+    ipc.on('attempt-connect', (ev, mesg) => {
+        if(attempting === false) {
+            attempting = true;
+            console.log("getting ip");
+            roborio.getIP().then(function(ip) {
+                attempting = false;
+                if(!client.isConnected()) {
+                    client.start((connected, err, is2_0) => {
+                        if(err != null) console.log("err: " + err);
+                        mainWindow.webContents.send('connected', client.isConnected());
+                    }, ip);
                 }
-            };
-            client.start(callback, ip);
-        }, function(errorMessage) {
-            mainWindow.webContents.send('connected', false);
-        });
+            }, function(errorMessage) {
+                attempting = false;
+                mainWindow.webContents.send('connected', false);
+            });
+        }
     });
 
     ipc.on('add', (ev, mesg) => {
@@ -160,11 +135,3 @@ ipc.on("value-editor-load", () => {
         mainWindow.webContents.send("value-editor-load-continue");
     }
 })
-
-let cameraLoaded = false;
-ipc.on("camera-load", () => {
-    if (!cameraLoaded) {
-        cameraLoaded = true;
-        mainWindow.webContents.send("camera-load-continue");
-    }
-});
