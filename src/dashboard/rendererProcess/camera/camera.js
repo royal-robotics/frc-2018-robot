@@ -3,10 +3,7 @@ var streamUrl = `${baseUrl}/stream.mjpg`;
 var settingsUrl = `${baseUrl}/settings.json`;
 
 
-// Camera debug functionality
 $(() => {
-    console.log(cameraSwitch++);
-
     ipc.on('connected', (ev, isConnected) => connectionChange(isConnected));
     connectionChange(NetworkTables.isRobotConnected());
 });

@@ -1,1 +1,1 @@
-var cameraSwitch = 0;
+//This is for camera related code that only runs once.
