@@ -2,21 +2,26 @@
 function checkConnection() {
     if(!NetworkTables.isRobotConnected()) {
         createAlert(false, true);
+        console.log("attempt-connect");
         ipc.send('attempt-connect');
     }
 }
 
 $(() => {
     $("#connection-container").load("rendererProcess/connection/connection.html", () => {
+        checkConnection();
         // Don't call immediately because that causes a double connection check that can lock the connection code
-        NetworkTables.addRobotConnectionListener(connectionStatus, false);
+        NetworkTables.addRobotConnectionListener(connectionStatus, /*Call Immediately*/ false);
     });
 });
 
 function connectionStatus(connected) {
     createAlert(connected, false);
     if (!connected) {
-        setTimeout(checkConnection, 3000);
+        $("#alert-container").fadeIn();
+        setTimeout(checkConnection, 500);
+    } else {
+        setTimeout(() => $("#alert-container").fadeOut(), 2000);
     }
 }
 

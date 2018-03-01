@@ -1,14 +1,14 @@
 package frc.team2522.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.camera.CameraPipeline;
 
 import edu.wpi.first.wpilibj.*;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
-import frc.team2522.robot.subsystems.*;
+import frc.team2522.robot.libs.ObservableBoolean;
+import frc.team2522.robot.libs.Stopwatch;
+import frc.team2522.robot.subsystems.Drivebase.Drivebase;
+import frc.team2522.robot.subsystems.Elevator.Elevator;
 
 public class Robot extends IterativeRobot {
     /************************************************************************
@@ -42,106 +42,55 @@ public class Robot extends IterativeRobot {
      *
      *
      * ENCODERS:
-     * ENC0: LEFT DRIVE
-     * ENC1: RIGHT DRIVE
-     * ENC2: ELEVATOR
+     * ENC0 (DIO 10 & 11): LEFT DRIVE  6141
+     * ENC1 (DIO 12 & 13): RIGHT DRIVE  6125
+     * ENC2 (DIO 14 & 15): ELEVATOR
     ************************************************************************/
-    TalonSRX motorcontroller = new TalonSRX(1);
 
-    Joystick leftStick = new Joystick(0);
-    Joystick rightStick = new Joystick(1);
-
-    DoubleSolenoid ratchet = new DoubleSolenoid(0, 2, 5);
-    DoubleSolenoid brake = new DoubleSolenoid(0, 1, 6);
-    DoubleSolenoid inHi = new DoubleSolenoid(0, 0, 7);
-
-    DoubleSolenoid inLo = new DoubleSolenoid(1, 3, 4);
-    DoubleSolenoid shift = new DoubleSolenoid(1, 2, 5);
-    DoubleSolenoid pto = new DoubleSolenoid(1, 1, 6);
+    ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 
 
-    Drivebase drivebase = new Drivebase();
+    CameraPipeline camera = new CameraPipeline(Controls.driver);
 
-//    CvSink cvSink;
-//    CvSource outputStream;
-//
-//    Mat source = new Mat();
-//    Mat output = new Mat();
+    Boolean isClimbingMode = false;
 
-    CameraPipeline camera = new CameraPipeline(leftStick);
+    Stopwatch robotStopwatch = Stopwatch.StartNew();
+    Drivebase drivebase = new Drivebase(Controls.driver, isClimbingMode);
+    Elevator elevator = new Elevator(Controls.driver, new ObservableBoolean(isClimbingMode));
 
     @Override
     public void robotInit() {
-//        CameraServer.getInstance().startAutomaticCapture();
-//
-//        cvSink = CameraServer.getInstance().getVideo();
-//        outputStream = new CvSource("blur", VideoMode.PixelFormat.kMJPEG, 640, 480, 30);
-//
-//        MjpegServer mjpegServer2 = CameraServer.getInstance().addServer("server_blur", 1182);
-//        mjpegServer2.setSource(outputStream);
-
-        SmartDashboard.putNumber("Servo/angle", 0);
-
-        SmartDashboard.putString("example/test-string", "hello world");
-        SmartDashboard.putBoolean("example/test-boolean", true);
-        SmartDashboard.putNumber("example/test-number", 42);
+        gyro.reset();
     }
 
     @Override
-    public void disabledInit() { }
-
-    @Override
-    public void disabledPeriodic() {
-//        cvSink.grabFrame(source);
-//        Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
-//        outputStream.putFrame(output);
+    public void robotPeriodic() {
+        SmartDashboard.putNumber("robot/uptime/", robotStopwatch.getElapsedTime().getSeconds());
     }
 
     @Override
-    public void autonomousInit() { }
+    public void disabledInit() {
+    }
+
+    @Override
+    public void disabledPeriodic() { }
 
     @Override
     public void autonomousPeriodic() { }
 
     @Override
-    public void teleopInit() { }
+    public void autonomousInit() {
+        drivebase.reset();
+    }
+    
+    @Override
+    public void teleopInit() {
+        drivebase.reset();
+    }
 
     @Override
     public void teleopPeriodic() {
-        if (leftStick.getRawButton(1)) {
-            ratchet.set(DoubleSolenoid.Value.kForward);
-        } else {
-            ratchet.set(DoubleSolenoid.Value.kReverse);
-        }
-
-        if (leftStick.getRawButton(2)) {
-            brake.set(DoubleSolenoid.Value.kForward);
-        } else {
-            brake.set(DoubleSolenoid.Value.kReverse);
-        }
-
-        if (leftStick.getRawButton(3)) {
-            inHi.set(DoubleSolenoid.Value.kForward);
-        } else {
-            inHi.set(DoubleSolenoid.Value.kReverse);
-        }
-
-        if (leftStick.getRawButton(4)) {
-            inLo.set(DoubleSolenoid.Value.kForward);
-        } else {
-            inLo.set(DoubleSolenoid.Value.kReverse);
-        }
-
-        if (leftStick.getRawButton(5)) {
-            shift.set(DoubleSolenoid.Value.kForward);
-        } else {
-            shift.set(DoubleSolenoid.Value.kReverse);
-        }
-
-        if (leftStick.getRawButton(6)) {
-            pto.set(DoubleSolenoid.Value.kForward);
-        } else {
-            pto.set(DoubleSolenoid.Value.kReverse);
-        }
+        drivebase.fmsUpdateTeleop();
+        elevator.fmsUpdateTeleop();
     }
 }

@@ -1,0 +1,17 @@
+Drivebase:
+    DriveMotors (joysticks)
+    Shifting (either joystick button)
+    Drive config (back button - left weird button)
+
+Elevator:
+    Lift:
+        Manual slow movement (up, down D-pad)
+        Ground, Switch, Middle Scale (A = ground, B = Switch, Y = Scale)
+    Intake:
+        intaking (left trigger)
+        rotate-cube mode (right trigger)
+
+
+Climber:
+    Winching (same axis as drive motors)
+    pto + racket (both bumpers)

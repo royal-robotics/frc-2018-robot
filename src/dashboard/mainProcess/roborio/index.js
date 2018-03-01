@@ -10,7 +10,7 @@ exports.getIP = () => {
                 let ipList = stdout.match(/\d{1,3}\.\d{1,3}.\d{1,3}.\d{1,3}/g)
                 if(ipList === null || ipList.length !== 1) {
                     console.log("Error getting ip");
-                    return undefined;
+                    reject("Error getting ip");
                 }
                 resolve(ipList[0]);
             }

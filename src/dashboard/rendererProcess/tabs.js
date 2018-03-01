@@ -1,9 +1,11 @@
 // Tab logic
 $(() => {
     $("#tabs > li").each(function(index) {
-        this.onclick = () => loadTab(this);
-        if($(this).hasClass("active"))
-            loadTab(this);
+        loadTabState(this, () => {
+            this.onclick = () => loadTab(this);
+            if($(this).hasClass("active"))
+                loadTab(this);
+        });
     });
 });
 
@@ -17,4 +19,20 @@ function loadTab(tab) {
         else
             $(this).removeClass("active")
     });
+}
+
+
+function loadTabState(tab, callback) {
+    var name = $(tab).children("a").attr("name");
+    var path = `rendererProcess/${name}/${name}-state.js`
+
+    //This will throw a ERR_FILE_NOT_FOUND if the state file doesn't exist
+    $.ajax({
+        url: path,
+        dataType: 'script',
+        success: callback,
+        error: callback,
+        async: true
+    });
+    
 }

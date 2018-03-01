@@ -25,8 +25,8 @@ public class CameraPipeline {
             CvSource outputStream = createOutputStream();
             Mat frame = new Mat();
 
-            while(!Thread.interrupted()) {
-                if(joystick.getRawButton(1))
+            while (!Thread.interrupted()) {
+                if (!joystick.getRawButton(1))
                     cubeFilter.grabFrame(frame);
                 else
                     cameraStream.grabFrame(frame);
@@ -48,7 +48,7 @@ public class CameraPipeline {
 
     private CvSource createOutputStream() {
         MjpegServer mjpegServer1 = new MjpegServer("serve_USB Camera 0", 1181);
-        CvSource outputStream = new CvSource("Blur", VideoMode.PixelFormat.kMJPEG, 640, 480, 30);
+        CvSource outputStream = new CvSource("Blur", VideoMode.PixelFormat.kMJPEG, 640, 480, 5);
         mjpegServer1.setSource(outputStream);
         return outputStream;
     }
