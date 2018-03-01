@@ -47,7 +47,7 @@ public class Robot extends IterativeRobot {
      * ENC2 (DIO 14 & 15): ELEVATOR
     ************************************************************************/
 
-    ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+    //ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 
 
     CameraPipeline camera = new CameraPipeline(Controls.driver);
@@ -60,7 +60,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void robotInit() {
-        gyro.reset();
+        //gyro.reset();
     }
 
     @Override

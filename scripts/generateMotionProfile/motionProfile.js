@@ -2,68 +2,67 @@ const fs = require('fs');
 var exec = require('child_process').exec
 let Client = require('ssh2-sftp-client');
 
-var motionProfile = {
-    "wheelbase-width": 31.25,
-    "waypoints" : [
-        {"x": -3.1, "y": -1.0, "angle": -45.0},
-        {"x": -2.0, "y": -2.0, "angle": 0.0},
-        {"x": 0.0, "y": 0.0, "angle": 0.0}
-    ],
-    "config": {
-        "fit-method": "HERMITE_CUBIC",
-        "numSamples": 10000,
-        "dt": 0.01,
-        "max-velocity": 150.0,
-        "max-acceleration": 150.0,
-        "max-jerk": 600.0
-    },
-    "output-center-csv" : "temp/motion-profile-center.csv",
-    "output-center-bin" : "temp/motion-profile-center.bin",
-    "output-left-csv" : null,
-    "output-left-bin" : null,
-    "output-right-csv" : null,
-    "output-right-bin" : null
-}
-
 if (!fs.existsSync("./temp")){
     fs.mkdirSync("./temp");
 }
 
-fs.writeFile("./temp/motion-profile.json", JSON.stringify(motionProfile), 'utf8', function (err) {
-    if (err)
-        return console.log(err);
 
-    console.log("Created motion-profile.json.");
+var basePath = "./"
 
-    var child = exec('java -jar motionProfile.jar temp/motion-profile.json', function (error, stdout, stderr) {
-        if(error !== null)
-            return console.log('exec error: ' + error);
+var motionProfilePath = basePath + "motionProfiles";
 
-        console.log("Generated motion profile.");
-        sendFiles();
-    });
-});
+generateProfiles();
+sendFiles();
 
-function sendFiles() {
-    fs.readdir("./temp", async function(err, files) {
-        let sftp = new Client();
-        await sftp.connect({
-            host: '10.25.22.2',
-            port: '22',
-            username: 'lvuser',
-            password: '',
-            readyTimeout: 2000
-        });
+
+
+function generateProfiles() {
+    fs.readdir(motionProfilePath, async function(err, files) {
+
+        var generateJarPath = basePath + "generate/build/libs/generate.jar";
 
         for(var i = 0; i < files.length; i++) {
             var file = files[i];
-            if(file.endsWith(".bin")) {
-                await sftp.put('temp/' + file, file);
-                console.log("Sent: " + file);
+            if(file.endsWith(".json")) {
+                    var child = exec(`java -jar ${generateJarPath} ${motionProfilePath}/${file}`, function (error, stdout, stderr) {
+                    if(error !== null)
+                        console.log('exec error: ' + error);
+
+                    console.log("Generated motion profiles: " + file);
+                });
             }
         }
+    });
+}
+
+function sendFiles() {
+    // This assumes the motion profiles will be put in the temp diretory.
+    // However, the motion profile .json schema lets the output go anywhere.
+    fs.readdir("./temp", async function(err, files) {
+        let sftp = new Client();
+
+        try {
+            await sftp.connect({
+                host: '10.25.22.2',
+                port: '22',
+                username: 'lvuser',
+                password: '',
+                readyTimeout: 2000
+            });
+
+            for(var i = 0; i < files.length; i++) {
+                var file = files[i];
+                if(file.endsWith(".bin")) {
+                    await sftp.put('temp/' + file, file);
+                    console.log("Sent: " + file);
+                }
+            }
+
+            console.log("\ndone!\n");
+        } catch (e) {
+            console.log("failed to connect to roborio!");
+        }
         
-        console.log("\ndone!\n");
         process.exit();
     });
 }
