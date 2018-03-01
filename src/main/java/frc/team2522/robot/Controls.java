@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import frc.team2522.robot.libs.Axis;
 import frc.team2522.robot.libs.Button;
 import frc.team2522.robot.libs.IButton;
+import frc.team2522.robot.libs.POVButton;
 
 public class Controls {
     public static Joystick driver = new Joystick(0);
@@ -19,7 +20,12 @@ public class Controls {
             public static IButton rotateCube = new Axis(driver, 3, 0.1); // Right Trigger
         }
         public static class Lift {
-
+            public static IButton liftUp = new POVButton(driver, 0);
+            public static IButton liftdown = new POVButton(driver, 180);
+            public static Button brake = new Button(driver, 4, Button.ButtonType.Hold);
         }
+    }
+    public static class Drivebase {
+
     }
 }

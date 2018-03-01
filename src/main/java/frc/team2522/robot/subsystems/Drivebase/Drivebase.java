@@ -39,9 +39,9 @@ public class Drivebase {
     DriveSystem driveSystem = new DriveSystem(tankDrive, differentialDrive);
     Climber climber = new Climber(tankDrive, isClimbingMode);
 
-    Axis left = new Axis(driver, 1, 0.1);
-    Axis right = new Axis(driver, 5, 0.1);
-    Axis turn = new Axis(driver, 4, 0.1);
+    Axis left;
+    Axis right;
+    Axis turn;
 
     Button btnToggleDriveType;
     Button btnToggleShift1;
@@ -52,6 +52,9 @@ public class Drivebase {
         this.driver = driver;
         this.isClimbingMode = isClimbingMode;
 
+        left = new Axis(driver, 1, 0.1);
+        right = new Axis(driver, 5, 0.1);
+        turn = new Axis(driver, 4, 0.1);
         btnToggleDriveType = new Button(driver, 7, IButton.ButtonType.Toggle);
         btnToggleShift1 = new Button(driver, 9, IButton.ButtonType.Toggle);
         btnToggleShift2 = new Button(driver, 10, IButton.ButtonType.Toggle);
@@ -81,8 +84,8 @@ public class Drivebase {
         } else {  // !isClimbingMode
             driveSystem.drive(left, right, turn);
         }
-        driveSystem.writeToDashboard();
-        climber.writeToDashboard();
+        //driveSystem.writeToDashboard();
+        //climber.writeToDashboard();
     }
 
     public void reset() {

@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2522.robot.Controls;
 
 import javax.naming.ldap.Control;
 
@@ -31,14 +32,20 @@ public class Lift {
     }
 
     public void fmsUpdateTeleop() {
-        if(driver.getPOV() == 0) {
+        if(Controls.Elevator.Lift.liftUp.isPressed()) {
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
             liftMotors.set(ControlMode.PercentOutput, 0.6);
-        } else if(driver.getPOV() == 180) {
+        } else if(Controls.Elevator.Lift.liftdown.isPressed()) {
             liftMotors.set(ControlMode.PercentOutput, -0.6);
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
         } else {
             liftMotors.set(ControlMode.PercentOutput, 0.0);
+        }
+
+        if (Controls.Elevator.Lift.brake.isPressed()) {
+            brake.set(DoubleSolenoid.Value.kForward);
+        } else {
+            brake.set(DoubleSolenoid.Value.kForward);
         }
     }
 }
