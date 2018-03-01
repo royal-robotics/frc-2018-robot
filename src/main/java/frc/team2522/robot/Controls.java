@@ -18,5 +18,8 @@ public class Controls {
             public static IButton pullCube = new Axis(driver, 2, 0.1); // Left Trigger
             public static IButton rotateCube = new Axis(driver, 3, 0.1); // Right Trigger
         }
+        public static class Lift {
+
+        }
     }
 }
