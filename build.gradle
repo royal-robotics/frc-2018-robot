@@ -5,7 +5,7 @@ plugins {
     id "eclipse"
     id "idea"
     id "jaci.openrio.gradle.GradleRIO" version "2018.01.11"
-    id "com.moowork.node" version "1.2.0"
+   // id "com.moowork.node" version "1.2.0"
 }
 
 repositories {
@@ -67,9 +67,9 @@ task viewMotionProfile(type: Exec, dependsOn: runMotionProfile) {
     commandLine 'cmd', '/c', 'Rscript', 'scripts/motion-profile.R'
 }
 
-task generateMotionProfile(type: NodeTask) {
-  script = file( 'scripts/generateMotionProfile/motionProfile.js')
-  execOverrides {
-    it.workingDir = 'scripts/generateMotionProfile'
-  }
-}
+// task generateMotionProfile(type: NodeTask) {
+//   script = file( 'scripts/generateMotionProfile/motionProfile.js')
+//   execOverrides {
+//     it.workingDir = 'scripts/generateMotionProfile'
+//   }
+// }

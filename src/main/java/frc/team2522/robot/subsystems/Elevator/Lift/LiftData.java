@@ -9,6 +9,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class LiftData {
+    //100% power = 177 inches / second (According to Rafi)
+
+    //Observed velocity data:
+    //.4% = 39 inches / second
+    //.6% = 69 inches / second
+
     private final int msUpdate = 10;
 
     //Average velocity state
@@ -21,10 +27,12 @@ public class LiftData {
     private Encoder encoder = new Encoder(14, 15);
     private DigitalInput hallEffect = new DigitalInput(0);
 
+    //Reset state
+    private boolean isCalibrated = false;
+    private boolean lastHallEffect = hallEffect.get();
+
     public LiftData() {
-        // TODO: The spool is actually bigger when the lift is down since the cord increases
-        // the diameter. We should adjust this value as the lift moves.
-        final double inchesPerPulse = (3.5 * Math.PI) / 256.0;
+        final double inchesPerPulse = (3.7 * Math.PI) / 256.0;
 
         encoder.setDistancePerPulse(inchesPerPulse);
         encoder.setReverseDirection(false);
@@ -47,9 +55,26 @@ public class LiftData {
         double newVelocity = changeInPosition / (msUpdate / 1000.0);
         lastVelocities.add(newVelocity);
 
+
+        //update hall effect (false is when we're by the magnet)
+        boolean hallEffectReading = hallEffect.get();
+
+        boolean isHallEffectEdge = hallEffectReading == false && lastHallEffect == true;
+        //On an edge + negative velocity we reset.
+        //TODO: instead of resetting to 0, reset to the average of the last 2 position readings
+        if(isHallEffectEdge && getVelocity() < -1.0) {
+            encoder.reset();
+        }
+
+        //going false -> true means we hit an edge
+        //Do something with the reading
+        lastHallEffect = hallEffectReading;
+
+
+        //dashboard update
         SmartDashboard.putNumber("Lift/Data/position", getPosition());
         SmartDashboard.putNumber("Lift/Data/velocity", getVelocity());
-
+        SmartDashboard.putBoolean("Lift/Data/hallEffect", hallEffectReading);
         //System.out.println(getPosition());
     }
 

@@ -34,9 +34,9 @@ public class Lift {
     public void fmsUpdateTeleop() {
         if(Controls.Elevator.Lift.liftUp.isPressed()) {
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
-            liftMotors.set(ControlMode.PercentOutput, 0.6);
+            liftMotors.set(ControlMode.PercentOutput, 0.5);
         } else if(Controls.Elevator.Lift.liftdown.isPressed()) {
-            liftMotors.set(ControlMode.PercentOutput, -0.6);
+            liftMotors.set(ControlMode.PercentOutput, -0.5);
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
         } else {
             liftMotors.set(ControlMode.PercentOutput, 0.0);
