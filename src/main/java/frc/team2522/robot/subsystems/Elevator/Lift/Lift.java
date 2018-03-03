@@ -23,6 +23,9 @@ public class Lift {
 
     Joystick driver;
 
+    //If we fail to calibrate, or detect a problem switch to manual mode
+    boolean isManualMode = true;
+
     public Lift(Joystick driver, TalonSRX carriage) {
         this.driver = driver;
         this.carriage = carriage;
@@ -32,20 +35,28 @@ public class Lift {
     }
 
     public void fmsUpdateTeleop() {
+        if(isManualMode)
+            fmsUpdateTeleopManualMode();
+        else
+            fmsUpdateTeleopEncoderMode();
+    }
+
+    private void fmsUpdateTeleopManualMode() {
         if(Controls.Elevator.Lift.liftUp.isPressed()) {
+            brake.set(DoubleSolenoid.Value.kReverse);
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
-            liftMotors.set(ControlMode.PercentOutput, 0.5);
+            liftMotors.set(ControlMode.PercentOutput, 0.7);
         } else if(Controls.Elevator.Lift.liftdown.isPressed()) {
-            liftMotors.set(ControlMode.PercentOutput, -0.5);
+            brake.set(DoubleSolenoid.Value.kReverse);
+            liftMotors.set(ControlMode.PercentOutput, -0.4);
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
         } else {
+            brake.set(DoubleSolenoid.Value.kForward);
             liftMotors.set(ControlMode.PercentOutput, 0.0);
         }
+    }
 
-        if (Controls.Elevator.Lift.brake.isPressed()) {
-            brake.set(DoubleSolenoid.Value.kForward);
-        } else {
-            brake.set(DoubleSolenoid.Value.kForward);
-        }
+    private void fmsUpdateTeleopEncoderMode() {
+
     }
 }

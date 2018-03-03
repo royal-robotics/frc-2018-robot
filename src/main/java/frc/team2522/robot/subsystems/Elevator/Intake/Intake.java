@@ -56,27 +56,34 @@ public class Intake {
             inLo.set(DoubleSolenoid.Value.kForward);
         }
 
-
-        if (Controls.Elevator.Intake.pullCube.isPressed()) {
+        if(Controls.Elevator.Intake.pullCube.isPressed() && Controls.Elevator.Intake.pushCube.isPressed()) {
+            makeRotateTimer();
+        }
+        else if (Controls.Elevator.Intake.pullCube.isPressed()) {
             stopRotateTimer();
             setPull();
-        } else if (Controls.Elevator.Intake.rotateCube.isPressed()) {
-            if (timer == null) {
-                timer = new Timer();
-                timer.scheduleAtFixedRate(new TimerTask() {
-                    public void run() {
-                        rotateMode = !rotateMode;
-                        if (rotateMode) {
-                            setPull();
-                        } else {
-                            setRotate();
-                        }
-                    }
-                }, 0, (int) SmartDashboard.getNumber("Intake/Rotate/interval", 333));
-            }
+        } else if (Controls.Elevator.Intake.pushCube.isPressed()) {
+            stopRotateTimer();
+            setPush();
         } else {
             stopRotateTimer();
             setStop();
+        }
+    }
+
+    private void makeRotateTimer() {
+        if (timer == null) {
+            timer = new Timer();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                public void run() {
+                    rotateMode = !rotateMode;
+                    if (rotateMode) {
+                        setPull();
+                    } else {
+                        setRotate();
+                    }
+                }
+            }, 0, (int) SmartDashboard.getNumber("Intake/Rotate/interval", 333));
         }
     }
 
@@ -91,6 +98,12 @@ public class Intake {
         carriage.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Pull/carriage", 0.75));
         leftIntake.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Pull/left", 0.8));
         rightIntake.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Pull/right", 0.8));
+    }
+
+    private void setPush() {
+        carriage.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Pull/carriage", 0.75));
+        leftIntake.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Pull/left", 0.8));
+        rightIntake.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Pull/right", 0.8));
     }
 
     private void setRotate() {

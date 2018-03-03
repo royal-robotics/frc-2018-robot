@@ -16,13 +16,13 @@ public class Controls {
             public static Button closed = new Button(driver, 2, Button.ButtonType.Toggle); // B Button
             public static Button open = new Button(driver, 3, Button.ButtonType.Toggle); // X Button
 
+            //If both of these buttons are on rotate runs (we should make a multi-button that handles this)
             public static IButton pullCube = new Axis(driver, 2, 0.1); // Left Trigger
-            public static IButton rotateCube = new Axis(driver, 3, 0.1); // Right Trigger
+            public static IButton pushCube = new Axis(driver, 3, 0.1); // Right Trigger
         }
         public static class Lift {
             public static IButton liftUp = new POVButton(driver, 0);
             public static IButton liftdown = new POVButton(driver, 180);
-            public static Button brake = new Button(driver, 4, Button.ButtonType.Hold);
         }
     }
     public static class Drivebase {
