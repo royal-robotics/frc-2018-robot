@@ -45,10 +45,10 @@ public class Lift {
         if(Controls.Elevator.Lift.liftUp.isPressed()) {
             brake.set(DoubleSolenoid.Value.kReverse);
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
-            liftMotors.set(ControlMode.PercentOutput, 0.7);
+            liftMotors.set(ControlMode.PercentOutput, 0.5);
         } else if(Controls.Elevator.Lift.liftdown.isPressed()) {
             brake.set(DoubleSolenoid.Value.kReverse);
-            liftMotors.set(ControlMode.PercentOutput, -0.4);
+            liftMotors.set(ControlMode.PercentOutput, -0.2);
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
         } else {
             brake.set(DoubleSolenoid.Value.kForward);

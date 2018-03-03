@@ -52,7 +52,7 @@ public class Robot extends IterativeRobot {
 
     CameraPipeline camera = new CameraPipeline(Controls.driver);
 
-    Boolean isClimbingMode = false;
+    Boolean isClimbingMode = new Boolean(false);
 
     Stopwatch robotStopwatch = Stopwatch.StartNew();
     Drivebase drivebase = new Drivebase(Controls.driver, isClimbingMode);
