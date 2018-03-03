@@ -39,7 +39,6 @@ public class Climber {
         tankDrive.set(DriveMode.PercentOutput, power, power);
     }
 
-    public void writeToDashboard() {
-        SmartDashboard.putBoolean("Climber/ClimbEnabled", isClimbingMode);
+    public void writeToDashboard() { SmartDashboard.putBoolean("Climber/ClimbEnabled", isClimbingMode);
     }
 }

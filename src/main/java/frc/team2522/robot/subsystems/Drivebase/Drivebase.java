@@ -2,6 +2,7 @@ package frc.team2522.robot.subsystems.Drivebase;
 
 import com.ctre.phoenix.drive.DiffDrive;
 import com.ctre.phoenix.mechanical.Gearbox;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
@@ -54,6 +55,8 @@ public class Drivebase {
         leftDrive2.follow(leftDrive1);
         rightDrive2.follow(rightDrive1);
         driveSystem.reset();
+        leftDrive1.setNeutralMode(NeutralMode.Brake);
+        rightDrive1.setNeutralMode(NeutralMode.Brake);
     }
 
     public void fmsUpdateTeleop() {

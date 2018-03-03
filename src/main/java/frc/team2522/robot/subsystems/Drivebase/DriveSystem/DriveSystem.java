@@ -49,13 +49,13 @@ public class DriveSystem {
             SmartDashboard.putNumber("DriveSystem/TankDrive/LeftPercent", left.getValue());
             SmartDashboard.putNumber("DriveSystem/TankDrive/RightPercent", right.getValue());
 
-            tankDrive.set(DriveMode.PercentOutput, left.getValue(), right.getValue());
+            tankDrive.set(DriveMode.PercentOutput, -left.getValue(), right.getValue());
         } else {  // currentDriveType == DriveType.CheesyDrive
-            double forwardPower = left.getValue();
-            double turnPower = turn.getValue();
+            double forwardPower = turn.getValue();
+            double turnPower = left.getValue()/2;
 
             double leftPower =  forwardPower - turnPower;
-            double rightPower = turnPower + turnPower;
+            double rightPower = forwardPower + turnPower;
 
             SmartDashboard.putNumber("Drive/CheesyDrive/LeftPercent", leftPower);
             SmartDashboard.putNumber("Drive/CheesyDrive/RightPercent", rightPower);
