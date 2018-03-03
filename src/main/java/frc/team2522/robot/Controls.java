@@ -1,10 +1,7 @@
 package frc.team2522.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
-import frc.team2522.robot.libs.Axis;
-import frc.team2522.robot.libs.Button;
-import frc.team2522.robot.libs.IButton;
-import frc.team2522.robot.libs.POVButton;
+import frc.team2522.robot.libs.*;
 
 public class Controls {
     public static Joystick driver = new Joystick(0);
@@ -26,6 +23,12 @@ public class Controls {
         }
     }
     public static class Drivebase {
-
+        public static class Climber {
+            public static IButton activateClimb = new MultiButton(driver, new int[] {5,6}, IButton.ButtonType.Toggle, MultiButton.MultiButtonType.BothButton);
+        }
+        public static class DriveSystem {
+            public static Button driveConfig = new Button(driver, 7, IButton.ButtonType.Toggle);
+            public static IButton shift = new MultiButton(driver, new int [] {9,10}, IButton.ButtonType.Toggle, MultiButton.MultiButtonType.EitherButton);
+        }
     }
 }

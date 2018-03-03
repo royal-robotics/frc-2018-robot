@@ -14,4 +14,4 @@ Elevator:
 
 Climber:
     Winching (same axis as drive motors)
-    pto + racket (both bumpers)
+    pto + ratchet (both bumpers)

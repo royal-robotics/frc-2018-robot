@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2522.robot.Controls;
 import frc.team2522.robot.libs.*;
 import frc.team2522.robot.subsystems.Drivebase.Climber.Climber;
 import frc.team2522.robot.subsystems.Drivebase.DriveSystem.DriveSystem;
@@ -43,11 +44,6 @@ public class Drivebase {
     Axis right;
     Axis turn;
 
-    Button btnToggleDriveType;
-    Button btnToggleShift1;
-    Button btnToggleShift2;
-    MultiButton btnToggleClimb;
-
     public Drivebase(Joystick driver, Boolean isClimbingMode) {
         this.driver = driver;
         this.isClimbingMode = isClimbingMode;
@@ -55,26 +51,21 @@ public class Drivebase {
         left = new Axis(driver, 1, 0.1);
         right = new Axis(driver, 5, 0.1);
         turn = new Axis(driver, 4, 0.1);
-        btnToggleDriveType = new Button(driver, 7, IButton.ButtonType.Toggle);
-        btnToggleShift1 = new Button(driver, 9, IButton.ButtonType.Toggle);
-        btnToggleShift2 = new Button(driver, 10, IButton.ButtonType.Toggle);
-        btnToggleClimb = new MultiButton(driver, new int[] {5, 6}, IButton.ButtonType.Toggle);
-
         leftDrive2.follow(leftDrive1);
         rightDrive2.follow(rightDrive1);
         driveSystem.reset();
     }
 
     public void fmsUpdateTeleop() {
-        if(btnToggleDriveType.isPressed()) {
+        if(Controls.Drivebase.DriveSystem.driveConfig.isPressed()) {
             driveSystem.toggleControlsType();
         }
 
-        if(btnToggleShift1.isPressed() || btnToggleShift2.isPressed()) {
+        if(Controls.Drivebase.DriveSystem.shift.isPressed()) {
             driveSystem.toggleShift();
         }
 
-        if(btnToggleClimb.isPressed()) {
+        if(Controls.Drivebase.Climber.activateClimb.isPressed()) {
             climber.turnClimbModeOn();
         }
 

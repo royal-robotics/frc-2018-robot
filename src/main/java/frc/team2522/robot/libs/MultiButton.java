@@ -3,15 +3,21 @@ package frc.team2522.robot.libs;
 import edu.wpi.first.wpilibj.Joystick;
 
 public class MultiButton implements IButton {
+    public enum MultiButtonType {
+        EitherButton,
+        BothButton
+    }
     private Joystick stick;
     private int[] buttonIds;
     private ButtonType type;
+    private MultiButtonType multiType;
     private boolean prevValue;
 
-    public MultiButton(Joystick stick, int[] buttonIds, ButtonType type) {
+    public MultiButton(Joystick stick, int[] buttonIds, ButtonType type, MultiButtonType multiType) {
         this.stick = stick;
         this.buttonIds = buttonIds;
         this.type = type;
+        this.multiType = multiType;
         this.prevValue = false;
     }
 
@@ -36,9 +42,28 @@ public class MultiButton implements IButton {
     }
 
     private synchronized boolean getPosition() {
-        boolean result = true;
+        boolean result =  false;
+        switch(multiType){
+            case BothButton: {
+                result = true;
+                break;
+            }
+            case EitherButton: {
+                result = false;
+                break;
+            }
+        }
         for (int buttonId : buttonIds) {
-            result = result && stick.getRawButton(buttonId);
+            switch(multiType) {
+                case BothButton: {
+                    result = result && stick.getRawButton(buttonId);
+                    break;
+                }
+                case EitherButton: {
+                    result = result || stick.getRawButton(buttonId);
+                    break;
+                }
+            }
         }
 
         return result;
