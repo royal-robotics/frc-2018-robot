@@ -34,3 +34,7 @@ gradle-app.setting
 #Dashboard
 node_modules/
 bower_components/
+
+# scripts
+temp/
+build/
