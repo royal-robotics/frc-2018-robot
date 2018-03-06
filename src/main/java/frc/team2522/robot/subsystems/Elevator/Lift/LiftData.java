@@ -25,7 +25,7 @@ public class LiftData {
     CircularList<Double> lastVelocities = new CircularList<>(5);
 
     //Robot components
-    private Encoder encoder = new Encoder(14, 15);
+    public Encoder encoder = new Encoder(14, 15);
 
     //Position state
     double offset = Double.NaN;

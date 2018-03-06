@@ -8,6 +8,10 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.Controls;
+import frc.team2522.robot.libs.TrajectoryFollower;
+import jaci.pathfinder.Pathfinder;
+import jaci.pathfinder.Trajectory;
+import jaci.pathfinder.Waypoint;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -49,6 +53,8 @@ public class Lift {
             fmsUpdateTeleopEncoderMode();
     }
 
+    TrajectoryFollower follower = null;
+
     private void fmsUpdateTeleopManualMode() {
         if(Controls.Elevator.Lift.liftUp.isPressed()) {
             brake.set(DoubleSolenoid.Value.kReverse);
@@ -69,6 +75,31 @@ public class Lift {
 
         if(Controls.Elevator.Lift.calibrate.isPressed()) {
             calibrate();
+        }
+
+        if(Controls.Elevator.Lift.moveLift.isPressed()) {
+            if(follower == null) {
+                Waypoint[] points = new Waypoint[] {
+                    new Waypoint(data.getPosition(), 0.0, Pathfinder.d2r(0)),
+                    new Waypoint(data.getPosition() + 20, 0.0, Pathfinder.d2r(0))
+                };
+                Trajectory.Config config = new Trajectory.Config(
+                        Trajectory.FitMethod.HERMITE_CUBIC,
+                        Trajectory.Config.SAMPLES_FAST,
+                        0.01, //10ms
+                        20,
+                        50,
+                        100.0);
+
+                Trajectory trajectory = Pathfinder.generate(points, config);
+                follower = new TrajectoryFollower(trajectory, data.encoder, liftMotors, .016, 0.0, 0.2, 0.0, 0.0);
+                follower.start();
+            }
+        } else {
+            if(follower != null) {
+                follower.stop();
+                follower = null;
+            }
         }
     }
 
