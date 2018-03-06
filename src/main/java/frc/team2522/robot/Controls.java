@@ -21,6 +21,7 @@ public class Controls {
         public static class Lift {
             public static IButton liftUp = new POVButton(operator, 0);
             public static IButton liftdown = new POVButton(operator, 180);
+            public static Button calibrate = new Button(operator, 4, Button.ButtonType.Toggle); // X Button
         }
     }
     public static class Drivebase {
