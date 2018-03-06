@@ -34,3 +34,11 @@ gradle-app.setting
 #Dashboard
 node_modules/
 bower_components/
+
+# scripts
+temp/
+build/
+
+#there shouldn't be any package-lock.json files
+scripts/generateMotionProfile/package-lock.json
+

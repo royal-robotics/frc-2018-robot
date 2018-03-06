@@ -18,8 +18,7 @@ sendFiles();
 
 function generateProfiles() {
     fs.readdir(motionProfilePath, async function(err, files) {
-
-        var generateJarPath = basePath + "generate/build/libs/generate.jar";
+        var generateJarPath = basePath + "build/libs/generateMotionProfile.jar";
 
         for(var i = 0; i < files.length; i++) {
             var file = files[i];

@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: Pathfinder-Java-1.8.jar json-simple-1.1.1.jar junit-4.10.j
- ar hamcrest-core-1.1.jar
-Main-Class: MotionProfile.Generate
-

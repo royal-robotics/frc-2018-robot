@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "jaci.openrio.gradle.GradleRIO" version "2018.01.11"
+    id "com.moowork.node" version "1.2.0"
 }
 
 repositories {
@@ -25,4 +26,19 @@ jar {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.4'
+}
+
+node { 
+    version = '8.9.1'
+    download = true;
+}
+
+task generateMotionProfile(type: NodeTask) {
+  dependsOn 'build'
+  dependsOn 'npmInstall'
+  script = file( 'motionProfile.js')
+  execOverrides {
+    it.ignoreExitValue = true
+    it.workingDir = './'
+  }
 }
