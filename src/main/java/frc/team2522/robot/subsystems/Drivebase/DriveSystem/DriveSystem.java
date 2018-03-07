@@ -18,7 +18,7 @@ public class DriveSystem {
     DriveData driveDataLeft = new DriveData(10, 11, true);
     DriveData driveDataRight = new DriveData(12,13, false);
 
-    private DriveType driveType = DriveType.TankDrive;
+    private DriveType driveType = DriveType.CheesyDrive;
 
     public DriveSystem(TankDrive tankDrive, DiffDrive diffDrive) {
         this.tankDrive = tankDrive;

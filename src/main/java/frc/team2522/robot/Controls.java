@@ -10,9 +10,9 @@ public class Controls {
 
     public static class Elevator {
         public static class Intake {
-            public static Button pickup = new Button(operator, 1, Button.ButtonType.Toggle); // A Button
-            public static Button closed = new Button(operator, 2, Button.ButtonType.Toggle); // B Button
-            public static Button open = new Button(operator, 3, Button.ButtonType.Toggle); // X Button
+            public static IButton pickup = new Button(operator, 1, Button.ButtonType.Toggle); // A Button
+            public static IButton closed = new Button(operator, 2, Button.ButtonType.Toggle); // B Button
+            public static IButton open = new Button(operator, 3, Button.ButtonType.Toggle); // X Button
 
             //If both of these buttons are on rotate runs (we should make a multi-button that handles this)
             public static IButton pullCube = new Axis(operator, 2, 0.1); // Left Trigger
@@ -28,7 +28,8 @@ public class Controls {
             public static IButton activateClimb = new MultiButton(operator, new int[] {5,6}, IButton.ButtonType.Toggle, MultiButton.MultiButtonType.BothButton);
         }
         public static class DriveSystem {
-            public static Button driveConfig = new Button(driver, 7, IButton.ButtonType.Toggle);
-            public static IButton shift = new MultiButton(driver, new int [] {9,10}, IButton.ButtonType.Toggle, MultiButton.MultiButtonType.EitherButton);   }
+            public static IButton driveConfig = new Button(driver, 7, IButton.ButtonType.Toggle);
+            public static IButton shift = new Button(driver, 1, IButton.ButtonType.Toggle);
+        }
     }
 }

@@ -23,47 +23,59 @@ function updateTunablesList(changefilter) {
 
     let selected = $("#filter").val();
     let selectedValue = subtypes[selected];
+    let mappedValue = [];
     if(selectedValue)
-        var mappedValue = selectedValue.map(function(value) {
+        mappedValue = selectedValue.map(function(value) {
             return selected + "/" + value;
     });
 
+    let allKeys = [];
     for(let key in tunables) {
         // True if either the key starts with the filter or the All filter is selected
+        console.log(key);
         let filtered = selected == "" || mappedValue.includes(key);
         if (filtered) {
-            let value = tunables[key];
-            let type = typeof(value);
-
-            let div = null;
-            switch(type) {
-                case "string":
-                    div = $("#tunable-string").clone();
-                    let inputSt = div.find(".tunable-value");
-                    inputSt.change(function() { console.log($(this).val())});
-                    inputSt.attr("value", value);
-                    break;
-                case "number":
-                    div = $("#tunable-number").clone();
-                    let inputNu = div.find(".tunable-value");
-                    inputNu.change(function() {
-                        console.log($(this).val());
-                        console.log("/SmartDashboard/" + key);
-                        NetworkTables.putValue("/SmartDashboard/" + key, parseFloat($(this).val()));
-                    });
-                    inputNu.attr("value", value);
-                    break;
-                case "boolean":
-                    div = $("#tunable-boolean").clone();
-                    let inputBo = div.find(".tunable-value");
-                    value ? inputBo.attr("checked", "") : inputBo.removeAttr("checked");
-                    inputBo.change(function() { console.log($(this).prop("checked")); });
-                    break;
-            }
-
-            div.id = key; //consider prefixing this id with a unique identifier
-            div.find(".tunable-key").append(document.createTextNode(key));
-            $("#value-list").append(div);
+            allKeys.push(key);
         }
+    }
+
+    console.log(allKeys[0]);
+    let sortedKeys = allKeys.sort();
+    console.log(sortedKeys[0]);
+
+    for (let key in sortedKeys) {
+        let keyValue = sortedKeys[key];
+        let value = tunables[keyValue];
+        let type = typeof(value);
+
+        let div = null;
+        switch(type) {
+            case "string":
+                div = $("#tunable-string").clone();
+                let inputSt = div.find(".tunable-value");
+                inputSt.change(function() { console.log($(this).val())});
+                inputSt.attr("value", value);
+                break;
+            case "number":
+                div = $("#tunable-number").clone();
+                let inputNu = div.find(".tunable-value");
+                inputNu.change(function() {
+                    console.log($(this).val());
+                    console.log("/SmartDashboard/" + keyValue);
+                    NetworkTables.putValue("/SmartDashboard/" + keyValue, parseFloat($(this).val()));
+                });
+                inputNu.attr("value", value);
+                break;
+            case "boolean":
+                div = $("#tunable-boolean").clone();
+                let inputBo = div.find(".tunable-value");
+                value ? inputBo.attr("checked", "") : inputBo.removeAttr("checked");
+                inputBo.change(function() { console.log($(this).prop("checked")); });
+                break;
+        }
+
+        div.id = keyValue; //consider prefixing this id with a unique identifier
+        div.find(".tunable-key").append(document.createTextNode(keyValue));
+        $("#value-list").append(div);
     }
 }
