@@ -68,26 +68,52 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putNumber("robot/uptime/", robotStopwatch.getElapsedTime().getSeconds());
     }
 
+    /**
+     * Initialization code for disabled mode.
+     *
+     * <p>This code will be called every time the robot enters disabled mode.
+     */
     @Override
     public void disabledInit() {
+
     }
 
+    /**
+     * Periodic code for disabled mode should go here.
+     */
     @Override
     public void disabledPeriodic() { }
 
-    @Override
-    public void autonomousPeriodic() { }
-
+    /**
+     * Initialization code for autonomous mode.
+     *
+     * <p>This code will be called every time the robot enters autonomous mode.
+     */
     @Override
     public void autonomousInit() {
         drivebase.reset();
     }
-    
+
+    /**
+     * Periodic code for autonomous mode should go here.
+     */
+    public void autonomousPeriodic() {
+
+    }
+
+    /**
+     * Initialization code for teleop mode.
+     *
+     * <p>This code will be called every time the robot enters teleop mode.
+     */
     @Override
     public void teleopInit() {
         drivebase.reset();
     }
 
+    /**
+     * Periodic code for teleop mode should go here.
+     */
     @Override
     public void teleopPeriodic() {
         drivebase.fmsUpdateTeleop();

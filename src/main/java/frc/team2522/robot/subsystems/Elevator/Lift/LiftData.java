@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.libs.CircularList;
+import jaci.pathfinder.Pathfinder;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,22 +22,21 @@ public class LiftData {
     private Timer timer = new Timer();
     private double lastPosition = 0;
     private CircularList<Double> lastPositionDiffs = new CircularList<>(10);
-    CircularList<Double> lastVelocities = new CircularList<>(10);
+    CircularList<Double> lastVelocities = new CircularList<>(5);
 
     //Robot components
-    private Encoder encoder = new Encoder(14, 15);
-    private DigitalInput hallEffect = new DigitalInput(0);
+    public Encoder encoder = new Encoder(14, 15);
 
-    //Reset state
-    private boolean isCalibrated = false;
-    private boolean lastHallEffect = hallEffect.get();
+    //Position state
+    double offset = Double.NaN;
 
     public LiftData() {
         final double inchesPerPulse = (3.7 * Math.PI) / 256.0;
 
         encoder.setDistancePerPulse(inchesPerPulse);
         encoder.setReverseDirection(false);
-        encoder.reset();
+
+        reset(Double.NaN);
 
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
@@ -55,31 +55,19 @@ public class LiftData {
         double newVelocity = changeInPosition / (msUpdate / 1000.0);
         lastVelocities.add(newVelocity);
 
-
-        //update hall effect (false is when we're by the magnet)
-        boolean hallEffectReading = hallEffect.get();
-
-        boolean isHallEffectEdge = hallEffectReading == false && lastHallEffect == true;
-        //On an edge + negative velocity we reset.
-        //TODO: instead of resetting to 0, reset to the average of the last 2 position readings
-        if(isHallEffectEdge && getVelocity() < -1.0) {
-            encoder.reset();
-        }
-
-        //going false -> true means we hit an edge
-        //Do something with the reading
-        lastHallEffect = hallEffectReading;
-
-
         //dashboard update
         SmartDashboard.putNumber("Lift/Data/position", getPosition());
         SmartDashboard.putNumber("Lift/Data/velocity", getVelocity());
-        SmartDashboard.putBoolean("Lift/Data/hallEffect", hallEffectReading);
-        //System.out.println(getPosition());
     }
 
+    public void reset(double offset) {
+        this.offset = offset;
+        encoder.reset();
+    }
+
+
     public double getPosition() {
-        return encoder.getDistance();
+        return encoder.getDistance() + offset;
     }
 
     public double getVelocity() {
