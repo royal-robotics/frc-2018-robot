@@ -65,7 +65,7 @@ public class Lift {
             liftMotors.set(ControlMode.PercentOutput, -0.25);
             SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
         } else {
-            if(!isCalibrating()) {
+            if(!isCalibrating() && follower == null) {
                 brake.set(DoubleSolenoid.Value.kForward);
                 liftMotors.set(ControlMode.PercentOutput, 0.0);
             } else {
@@ -99,6 +99,15 @@ public class Lift {
             if(follower != null) {
                 follower.stop();
                 follower = null;
+            }
+        }
+
+        if (!isCalibrating() && follower != null) {
+            if (follower.isFinished()) {
+                brake.set(DoubleSolenoid.Value.kForward);
+                liftMotors.set(ControlMode.PercentOutput, 0.0);
+            } else {
+                brake.set(DoubleSolenoid.Value.kReverse);
             }
         }
     }

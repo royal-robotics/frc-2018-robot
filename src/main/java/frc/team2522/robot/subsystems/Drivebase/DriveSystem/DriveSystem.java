@@ -51,8 +51,8 @@ public class DriveSystem {
 
             tankDrive.set(DriveMode.PercentOutput, -left.getValue(), right.getValue());
         } else {  // currentDriveType == DriveType.CheesyDrive
-            double forwardPower = turn.getValue();
-            double turnPower = left.getValue()/2;
+            double forwardPower = (3*turn.getValue())/4;
+            double turnPower = left.getValue();
 
             double leftPower =  forwardPower - turnPower;
             double rightPower = forwardPower + turnPower;

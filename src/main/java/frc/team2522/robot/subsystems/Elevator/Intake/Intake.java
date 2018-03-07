@@ -131,7 +131,7 @@ public class Intake {
     }
 
     private void setStop() {
-        carriage.set(ControlMode.PercentOutput, 0);
+        carriage.set(ControlMode.PercentOutput, -0.20);
         leftIntake.set(ControlMode.PercentOutput, 0);
         rightIntake.set(ControlMode.PercentOutput, 0);
     }
