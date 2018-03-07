@@ -109,7 +109,7 @@ public class TrajectoryFollower {
 
                 if (segmentIndex < this.trajectories.get(i).length()) {
                     Trajectory.Segment segment = this.trajectories.get(i).get(segmentIndex);
-                    double error = segment.position - position - this.startPositions[i];
+                    double error = segment.position - position;
 
                     result = this.distanceProportional * error +
                             this.distanceDerivative * ((error - this.lastErrors[i]) / (time - this.startTime)) +

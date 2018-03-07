@@ -13,6 +13,7 @@ import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
 
+import javax.naming.ldap.Control;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,20 +57,24 @@ public class Lift {
     TrajectoryFollower follower = null;
 
     private void fmsUpdateTeleopManualMode() {
-        if(Controls.Elevator.Lift.liftUp.isPressed()) {
+//        System.out.println("encoder:" + data.encoder.getDistance());
+        if(Controls.Elevator.Lift.liftAxis.isPressed()) {
             brake.set(DoubleSolenoid.Value.kReverse);
-            SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
-            liftMotors.set(ControlMode.PercentOutput, 0.5);
-        } else if(Controls.Elevator.Lift.liftdown.isPressed()) {
-            brake.set(DoubleSolenoid.Value.kReverse);
-            liftMotors.set(ControlMode.PercentOutput, -0.25);
-            SmartDashboard.putNumber("Lift/Motors1/current", liftMotors.getOutputCurrent());
+            double power = -Controls.Elevator.Lift.liftAxis.getValue();
+            if(power > 0)
+                power *= 0.5;
+            else
+                power *= 0.25;
+
+            liftMotors.set(ControlMode.PercentOutput, power);
         } else {
-            if(!isCalibrating() && follower == null) {
+            if(isCalibrating()) {
+                System.out.println("Calibrating: " + liftMotors.getOutputCurrent());
+            } else if(follower != null) {
+                System.out.println("Following: ");
+            } else {
                 brake.set(DoubleSolenoid.Value.kForward);
                 liftMotors.set(ControlMode.PercentOutput, 0.0);
-            } else {
-                System.out.println("Calibrating: " + liftMotors.getOutputCurrent());
             }
         }
 
@@ -116,17 +121,16 @@ public class Lift {
 
     }
 
-
     public void calibrate() {
         final long msCalibrateTick = 10;
-        final double hallEffectOffset = 5.95;
+        final double hallEffectOffset = 5.5;
         final double floorOffset = 0.0;
 
         final double stallCurrent = 13.8;
 
         if(!isCalibrating()) {
             brake.set(DoubleSolenoid.Value.kReverse);
-            liftMotors.set(ControlMode.PercentOutput, -0.25);
+            liftMotors.set(ControlMode.PercentOutput, -0.20);
 
             calibrationTimer = new Timer();
             calibrationTimer.scheduleAtFixedRate(new TimerTask() {

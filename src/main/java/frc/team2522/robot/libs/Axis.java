@@ -26,11 +26,11 @@ public class Axis implements IButton{
     }
 
     public boolean isPressed() {
-        return isPressed(defaultEdge);
+        return isPressed(deadband);
     }
 
     public boolean isPressed(double edge) {
-        return getValue() > edge;
+        return Math.abs(getValue()) > edge;
     }
 
     public boolean isToggled(double edge) {
