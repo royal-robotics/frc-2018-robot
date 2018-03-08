@@ -20,19 +20,24 @@ public class Climber {
         this.isClimbingMode = isClimbingMode;
         ratchet.set(DoubleSolenoid.Value.kReverse);
         pto.set(DoubleSolenoid.Value.kReverse);
+        SmartDashboard.putBoolean("Climber/climbOn", false);
     }
 
     public void turnClimbModeOn() {
-        isClimbingMode = true;
-        ratchet.set(DoubleSolenoid.Value.kForward);
-        pto.set(DoubleSolenoid.Value.kForward);
+        //isClimbingMode = true;
+        boolean climbOn = false;
+        if (ratchet.get() == DoubleSolenoid.Value.kReverse) {
+            ratchet.set(DoubleSolenoid.Value.kForward);
+            pto.set(DoubleSolenoid.Value.kForward);
+           climbOn = true;
+        } else {
+            ratchet.set(DoubleSolenoid.Value.kReverse);
+            pto.set(DoubleSolenoid.Value.kReverse);
+        }
     }
 
-    public void climb(Axis left, Axis right) {
-        double leftPower = left.getValue();
-        double rightPower = right.getValue();
-
-        double power = (leftPower + rightPower) / 2;
+    public void climb(Axis axis) {
+        double power = axis.getValue();
 
         SmartDashboard.putNumber("Drive/ClimbDrive/Percent", power);
 

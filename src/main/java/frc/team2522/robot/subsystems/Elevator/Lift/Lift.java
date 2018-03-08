@@ -56,65 +56,78 @@ public class Lift {
 
     TrajectoryFollower follower = null;
 
+    boolean climbOn = false;
     private void fmsUpdateTeleopManualMode() {
-//        System.out.println("encoder:" + data.encoder.getDistance());
-        if(Controls.Elevator.Lift.liftAxis.isPressed()) {
+        if (Controls.Drivebase.Climber.isActiveClimb()) {
+            climbOn = true;
+        } else {
+            climbOn = false;
+        }
+
+        if (climbOn) {
             brake.set(DoubleSolenoid.Value.kReverse);
-            double power = -Controls.Elevator.Lift.liftAxis.getValue();
-            if(power > 0)
-                power *= 0.5;
-            else
-                power *= 0.25;
-
-            liftMotors.set(ControlMode.PercentOutput, power);
         } else {
-            if(isCalibrating()) {
-                System.out.println("Calibrating: " + liftMotors.getOutputCurrent());
-            } else if(follower != null) {
-                System.out.println("Following: ");
-            } else {
-                brake.set(DoubleSolenoid.Value.kForward);
-                liftMotors.set(ControlMode.PercentOutput, 0.0);
-            }
-        }
-
-        if(Controls.Elevator.Lift.calibrate.isPressed()) {
-            calibrate();
-        }
-
-        if(Controls.Elevator.Lift.moveLift.isPressed()) {
-            if(follower == null) {
-                Waypoint[] points = new Waypoint[] {
-                    new Waypoint(data.getPosition(), 0.0, Pathfinder.d2r(0)),
-                    new Waypoint(data.getPosition() + 20, 0.0, Pathfinder.d2r(0))
-                };
-                Trajectory.Config config = new Trajectory.Config(
-                        Trajectory.FitMethod.HERMITE_CUBIC,
-                        Trajectory.Config.SAMPLES_FAST,
-                        0.01, //10ms
-                        20,
-                        50,
-                        100.0);
-
-                Trajectory trajectory = Pathfinder.generate(points, config);
-                follower = new TrajectoryFollower(trajectory, data.encoder, liftMotors, .016, 0.0, 0.2, 0.0, 0.0);
-                follower.start();
-            }
-        } else {
-            if(follower != null) {
-                follower.stop();
-                follower = null;
-            }
-        }
-
-        if (!isCalibrating() && follower != null) {
-            if (follower.isFinished()) {
-                brake.set(DoubleSolenoid.Value.kForward);
-                liftMotors.set(ControlMode.PercentOutput, 0.0);
-            } else {
+//        System.out.println("encoder:" + data.encoder.getDistance());
+            if(Controls.Elevator.Lift.liftAxis.isPressed()) {
                 brake.set(DoubleSolenoid.Value.kReverse);
+                double power = -Controls.Elevator.Lift.liftAxis.getValue();
+                if(power > 0)
+                    power *= 0.5;
+                else
+                    power *= 0.25;
+
+                liftMotors.set(ControlMode.PercentOutput, power);
+            } else {
+                if(isCalibrating()) {
+                    System.out.println("Calibrating: " + liftMotors.getOutputCurrent());
+                } else if(follower != null) {
+                    System.out.println("Following: ");
+                } else {
+                    brake.set(DoubleSolenoid.Value.kForward);
+                    liftMotors.set(ControlMode.PercentOutput, 0.0);
+                }
+            }
+
+            if(Controls.Elevator.Lift.calibrate.isPressed()) {
+                calibrate();
+            }
+
+            if(Controls.Elevator.Lift.moveLift.isPressed()) {
+                if(follower == null) {
+                    Waypoint[] points = new Waypoint[] {
+                            new Waypoint(data.getPosition(), 0.0, Pathfinder.d2r(0)),
+                            new Waypoint(data.getPosition() + 20, 0.0, Pathfinder.d2r(0))
+                    };
+                    Trajectory.Config config = new Trajectory.Config(
+                            Trajectory.FitMethod.HERMITE_CUBIC,
+                            Trajectory.Config.SAMPLES_FAST,
+                            0.01, //10ms
+                            20,
+                            50,
+                            100.0);
+
+                    Trajectory trajectory = Pathfinder.generate(points, config);
+                    follower = new TrajectoryFollower(trajectory, data.encoder, liftMotors, .016, 0.0, 0.2, 0.0, 0.0);
+                    follower.start();
+                }
+            } else {
+                if(follower != null) {
+                    follower.stop();
+                    follower = null;
+                }
+            }
+
+            if (!isCalibrating() && follower != null) {
+                if (follower.isFinished()) {
+                    brake.set(DoubleSolenoid.Value.kForward);
+                    liftMotors.set(ControlMode.PercentOutput, 0.0);
+                } else {
+                    brake.set(DoubleSolenoid.Value.kReverse);
+                }
             }
         }
+
+        SmartDashboard.putBoolean("Climb/LiftThinksClimbOn", climbOn);
     }
 
     private void fmsUpdateTeleopEncoderMode() {

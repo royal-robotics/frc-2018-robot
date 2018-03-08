@@ -59,6 +59,7 @@ public class Drivebase {
         rightDrive1.setNeutralMode(NeutralMode.Brake);
     }
 
+    boolean climbOn = false;
     public void fmsUpdateTeleop() {
         if(Controls.Drivebase.DriveSystem.driveConfig.isPressed()) {
             driveSystem.toggleControlsType();
@@ -68,13 +69,17 @@ public class Drivebase {
             driveSystem.toggleShift();
         }
 
-        if(Controls.Drivebase.Climber.activateClimb.isPressed()) {
+        if(Controls.Drivebase.Climber.isActiveClimb()) {
             climber.turnClimbModeOn();
+            climbOn = true;
+        } else {
+            climbOn = false;
         }
+        SmartDashboard.putBoolean("Climber/climbOn", climbOn);
 
         //TODO: Make an `Axis` type and pass that in instead of driver
-        if (isClimbingMode) {
-            //climber.climb(left, right);
+        if (climbOn) {
+            climber.climb(Controls.Elevator.Lift.liftAxis);
         } else {  // !isClimbingMode
             driveSystem.drive(left, right, turn);
         }

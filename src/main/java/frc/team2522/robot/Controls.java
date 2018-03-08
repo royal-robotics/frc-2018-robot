@@ -29,7 +29,17 @@ public class Controls {
     }
     public static class Drivebase {
         public static class Climber {
-            public static IButton activateClimb = new MultiButton(operator, new int[] {5,6}, IButton.ButtonType.Toggle, MultiButton.MultiButtonType.BothButton);
+            private static IButton activateClimb = new MultiButton(operator, new int[] {5,6}, IButton.ButtonType.Toggle, MultiButton.MultiButtonType.BothButton);
+
+            private static boolean _isActiveClimb = false;
+
+            public static boolean isActiveClimb() {
+                if(activateClimb.isPressed())
+                    _isActiveClimb = !_isActiveClimb;
+
+                return _isActiveClimb;
+
+            }
         }
         public static class DriveSystem {
             public static IButton driveConfig = new Button(driver, 7, IButton.ButtonType.Toggle);
