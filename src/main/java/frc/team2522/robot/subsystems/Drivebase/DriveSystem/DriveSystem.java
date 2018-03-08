@@ -23,6 +23,7 @@ public class DriveSystem {
     public DriveSystem(TankDrive tankDrive, DiffDrive diffDrive) {
         this.tankDrive = tankDrive;
         this.diffDrive = diffDrive;
+        shift.set(DoubleSolenoid.Value.kForward);
     }
 
     public DriveType getDriveType() {
