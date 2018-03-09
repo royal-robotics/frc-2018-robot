@@ -13,7 +13,6 @@ import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
 
-import javax.naming.ldap.Control;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -30,9 +29,6 @@ public class Lift {
 
     Joystick driver;
 
-    //If we fail to calibrate, or detect a problem switch to manual mode
-    boolean isManualMode = true;
-
     //Calibration state
     private DigitalInput hallEffect = new DigitalInput(0);
     private boolean lastHallEffect = hallEffect.get();
@@ -48,77 +44,74 @@ public class Lift {
     }
 
     public void fmsUpdateTeleop() {
-        if(isManualMode)
-            fmsUpdateTeleopManualMode();
-        else
-            fmsUpdateTeleopEncoderMode();
+        fmsUpdateTeleopManualMode();
     }
 
     TrajectoryFollower follower = null;
 
     private void fmsUpdateTeleopManualMode() {
-//        System.out.println("encoder:" + data.encoder.getDistance());
         if(Controls.Elevator.Lift.liftAxis.isPressed()) {
-            brake.set(DoubleSolenoid.Value.kReverse);
-            double power = -Controls.Elevator.Lift.liftAxis.getValue();
-            if(power > 0)
-                power *= 0.5;
-            else
-                power *= 0.25;
+            stopFollower();
+            stopCalibration();
 
+            double power = -Controls.Elevator.Lift.liftAxis.getValue();
+            power *= power > 0 ? 0.5 : 0.25;
+
+            brake.set(DoubleSolenoid.Value.kReverse);
             liftMotors.set(ControlMode.PercentOutput, power);
-        } else {
-            if(isCalibrating()) {
-                System.out.println("Calibrating: " + liftMotors.getOutputCurrent());
-            } else if(follower != null) {
-                System.out.println("Following: ");
-            } else {
-                brake.set(DoubleSolenoid.Value.kForward);
-                liftMotors.set(ControlMode.PercentOutput, 0.0);
-            }
+        } else if (!isCalibrating() && !isFollowing()) {
+            brake.set(DoubleSolenoid.Value.kForward);
+            liftMotors.set(ControlMode.PercentOutput, 0.0);
         }
 
         if(Controls.Elevator.Lift.calibrate.isPressed()) {
             calibrate();
         }
 
-        if(Controls.Elevator.Lift.moveLift.isPressed()) {
-            if(follower == null) {
-                Waypoint[] points = new Waypoint[] {
-                    new Waypoint(data.getPosition(), 0.0, Pathfinder.d2r(0)),
-                    new Waypoint(data.getPosition() + 20, 0.0, Pathfinder.d2r(0))
-                };
-                Trajectory.Config config = new Trajectory.Config(
-                        Trajectory.FitMethod.HERMITE_CUBIC,
-                        Trajectory.Config.SAMPLES_FAST,
-                        0.01, //10ms
-                        20,
-                        50,
-                        100.0);
-
-                Trajectory trajectory = Pathfinder.generate(points, config);
-                follower = new TrajectoryFollower(trajectory, data.encoder, liftMotors, .016, 0.0, 0.2, 0.0, 0.0);
-                follower.start();
-            }
-        } else {
-            if(follower != null) {
-                follower.stop();
-                follower = null;
-            }
+        if(Controls.Elevator.Lift.moveBottom.isPressed()) {
+            brake.set(DoubleSolenoid.Value.kReverse);
+            createFollower(0);
+        } else if(Controls.Elevator.Lift.moveSwitch.isPressed()) {
+            brake.set(DoubleSolenoid.Value.kReverse);
+            createFollower(20);
+        } else if(Controls.Elevator.Lift.moveScale.isPressed()) {
+            brake.set(DoubleSolenoid.Value.kReverse);
+            createFollower(60);
+        } else if(!isCalibrating()) {
+            stopFollower();
         }
 
-        if (!isCalibrating() && follower != null) {
-            if (follower.isFinished()) {
-                brake.set(DoubleSolenoid.Value.kForward);
-                liftMotors.set(ControlMode.PercentOutput, 0.0);
-            } else {
-                brake.set(DoubleSolenoid.Value.kReverse);
-            }
+        if(isFollowing() && follower.isFinished()) {
+            stopFollower();
         }
     }
 
-    private void fmsUpdateTeleopEncoderMode() {
+    private void createFollower(double moveTo) {
+        // Instead of ignoring follow requests when we're already following we should cancel/slow down
+        // and then start the requested follower.
+        if(isCalibrated && !isCalibrating() && follower == null) {
+            Waypoint[] points = new Waypoint[] {
+                    new Waypoint(data.getPosition(), 0.0, Pathfinder.d2r(0)),
+                    new Waypoint(moveTo, 0.0, Pathfinder.d2r(0))
+            };
+            Trajectory.Config config = new Trajectory.Config(
+                    Trajectory.FitMethod.HERMITE_CUBIC,
+                    Trajectory.Config.SAMPLES_FAST,
+                    0.01, //10ms
+                    20,
+                    50,
+                    100.0);
 
+            long nanoGenerateStart = System.nanoTime();
+            Trajectory trajectory = Pathfinder.generate(points, config);
+            System.out.println("Gen Time: " + (double)(nanoGenerateStart - System.nanoTime()) / 1000000.0);
+            follower = new TrajectoryFollower(trajectory, data.encoder, liftMotors, .016, 0.0, 0.2, 0.0, 0.0);
+            follower.start();
+        }
+    }
+
+    private boolean isFollowing() {
+        return follower != null;
     }
 
     public void calibrate() {
@@ -155,10 +148,22 @@ public class Lift {
     }
 
     public void stopCalibration() {
-        calibrationTimer.cancel();
+        System.out.println("stop calibration");
+
+        if(calibrationTimer != null) {
+            calibrationTimer.cancel();
+        }
         calibrationTimer = null;
 
-        System.out.println("stop calibration");
+        brake.set(DoubleSolenoid.Value.kForward);
+        liftMotors.set(ControlMode.PercentOutput, 0.0);
+    }
+
+    public void stopFollower() {
+        if(follower != null) {
+            follower.stop();
+        }
+        follower = null;
 
         brake.set(DoubleSolenoid.Value.kForward);
         liftMotors.set(ControlMode.PercentOutput, 0.0);
@@ -166,5 +171,9 @@ public class Lift {
 
     public boolean isCalibrating() {
         return calibrationTimer != null;
+    }
+
+    public double getPosition() {
+        return data.getPosition();
     }
 }

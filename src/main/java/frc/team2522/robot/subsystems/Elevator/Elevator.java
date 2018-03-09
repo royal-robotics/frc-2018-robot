@@ -2,9 +2,13 @@ package frc.team2522.robot.subsystems.Elevator;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
+import frc.team2522.robot.Controls;
 import frc.team2522.robot.libs.ObservableBoolean;
 import frc.team2522.robot.subsystems.Elevator.Intake.Intake;
 import frc.team2522.robot.subsystems.Elevator.Lift.Lift;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Elevator {
     Joystick driver;
@@ -21,6 +25,8 @@ public class Elevator {
 
         intake = new Intake(driver, carriage);
         lift = new Lift(driver, carriage);
+
+        setupIntakeManager();
     }
 
     public void fmsUpdateTeleop() {
@@ -31,5 +37,42 @@ public class Elevator {
 
         intake.fmsUpdateTeleop();
         lift.fmsUpdateTeleop();
+    }
+
+    Timer autoIntakeMovementTimer = null;
+    boolean isAutoIntakeMode = true;
+    boolean isManualModeClosed = true;
+
+    private void setupIntakeManager() {
+        final long msAutoLiftTick = 100;
+        autoIntakeMovementTimer = new Timer();
+        autoIntakeMovementTimer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                if(Controls.Elevator.Intake.toggleIntake.isPressed()) {
+                    isAutoIntakeMode = false;
+                    isManualModeClosed = !isManualModeClosed;
+                }
+
+                if(Controls.Elevator.Intake.autoIntakeMode.isPressed()) {
+                    isAutoIntakeMode = true;
+                }
+
+                boolean liftOpen = true;
+                if(isAutoIntakeMode && lift.getPosition() < 20) {
+                    liftOpen = false;
+                } else if (!isAutoIntakeMode && !isManualModeClosed) {
+                    liftOpen = false;
+                }
+
+                //TODO: Checking intake buttons is a kludge, better to ask intake if it's running
+                if(liftOpen) {
+                    intake.setOpen();
+                } else if(Controls.Elevator.Intake.pullCube.isPressed() || Controls.Elevator.Intake.pushCube.isPressed()) {
+                    intake.setPickup();
+                } else {
+                    intake.setClosed();
+                }
+            }
+        }, msAutoLiftTick, msAutoLiftTick);
     }
 }

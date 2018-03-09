@@ -10,20 +10,20 @@ public class Controls {
 
     public static class Elevator {
         public static class Intake {
-            public static IButton pickup = new Button(operator, 1, Button.ButtonType.Toggle); // A Button
-            public static IButton closed = new Button(operator, 2, Button.ButtonType.Toggle); // B Button
-            public static IButton open = new Button(operator, 3, Button.ButtonType.Toggle); // X Button
+            public static IButton toggleIntake = new Button(operator, 1, Button.ButtonType.Toggle); // A Button
+            public static IButton autoIntakeMode = new Button(operator, 1, Button.ButtonType.Toggle); // B Button
 
             //If both of these buttons are on rotate runs (we should make a multi-button that handles this)
             public static IButton pullCube = new Axis(operator, 2, 0.1); // Left Trigger
             public static IButton pushCube = new Axis(operator, 3, 0.1); // Right Trigger
         }
         public static class Lift {
-            public static IButton liftUp = new POVButton(operator, 0);
-            public static IButton liftdown = new POVButton(operator, 180);
+            public static IButton moveBottom = new POVButton(operator, 0);
+            public static IButton moveSwitch = new POVButton(operator, 90);
+            public static IButton moveScale = new POVButton(operator, 180);
             public static Axis liftAxis = new Axis(operator, 1, 0.1);
-
             public static Button calibrate = new Button(operator, 4, Button.ButtonType.Toggle); // Y Button
+
             public static Button moveLift = new Button(driver, 4, Button.ButtonType.Hold); // Y Button
         }
     }

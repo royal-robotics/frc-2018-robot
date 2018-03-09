@@ -102,7 +102,6 @@ public class TrajectoryFollower {
 
         if (! this.isFinished) {
             for(int i = 0; i < this.trajectories.size(); i++) {
-
                 double position = this.encoders.get(i).getDistance() - this.startPositions[i];
 
                 int segmentIndex = (int) Math.round(time / this.trajectoryInterval);

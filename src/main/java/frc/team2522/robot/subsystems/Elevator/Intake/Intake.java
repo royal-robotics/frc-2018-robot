@@ -38,42 +38,12 @@ public class Intake {
         SmartDashboard.putNumber("Intake/Rotate/right", -0.2);
 
         SmartDashboard.putNumber("Intake/Rotate/interval", 333);
-        SmartDashboard.putBoolean("Intake/Position/Pickup", false);
-        SmartDashboard.putBoolean("Intake/Position/In", false);
-        SmartDashboard.putBoolean("Intake/Position/Out", false);
+//        SmartDashboard.putBoolean("Intake/Position/Pickup", false);
+//        SmartDashboard.putBoolean("Intake/Position/In", false);
+//        SmartDashboard.putBoolean("Intake/Position/Out", false);
     }
 
-    boolean isPickup = false;
-    boolean isIn = false;
-    boolean isOut = false;
     public void fmsUpdateTeleop() {
-        if (Controls.Elevator.Intake.pickup.isPressed()) {
-            inHi.set(DoubleSolenoid.Value.kReverse);
-            inLo.set(DoubleSolenoid.Value.kReverse);
-            isPickup = true;
-            isIn = false;
-            isOut = false;
-        }
-
-        if (Controls.Elevator.Intake.closed.isPressed()) {
-            inHi.set(DoubleSolenoid.Value.kForward);
-            inLo.set(DoubleSolenoid.Value.kReverse);
-            isIn = true;
-            isOut =  false;
-            isPickup = false;
-        }
-
-        if (Controls.Elevator.Intake.open.isPressed()) {
-            inHi.set(DoubleSolenoid.Value.kReverse);
-            inLo.set(DoubleSolenoid.Value.kForward);
-            isOut = true;
-            isIn = false;
-            isPickup = false;
-        }
-        SmartDashboard.putBoolean("Intake/Position/Pickup", isPickup);
-        SmartDashboard.putBoolean("Intake/Position/In", isIn);
-        SmartDashboard.putBoolean("Intake/Position/Out", isOut);
-
         if(Controls.Elevator.Intake.pullCube.isPressed() && Controls.Elevator.Intake.pushCube.isPressed()) {
             makeRotateTimer();
         }
@@ -135,4 +105,21 @@ public class Intake {
         leftIntake.set(ControlMode.PercentOutput, 0);
         rightIntake.set(ControlMode.PercentOutput, 0);
     }
+
+    public void setClosed() {
+        inHi.set(DoubleSolenoid.Value.kForward);
+        inLo.set(DoubleSolenoid.Value.kReverse);
+    }
+
+    public void setPickup() {
+        inHi.set(DoubleSolenoid.Value.kReverse);
+        inLo.set(DoubleSolenoid.Value.kReverse);
+    }
+
+    public void setOpen() {
+        inHi.set(DoubleSolenoid.Value.kReverse);
+        inLo.set(DoubleSolenoid.Value.kForward);
+    }
+
+
 }
