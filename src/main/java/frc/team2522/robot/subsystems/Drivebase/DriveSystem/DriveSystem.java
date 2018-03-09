@@ -45,23 +45,20 @@ public class DriveSystem {
         }
     }
 
-    public void drive(Axis left, Axis right, Axis turn) {
+    public void drive(double left, double right, double turn) {
         if (driveType == DriveType.TankDrive) {
-            SmartDashboard.putNumber("DriveSystem/TankDrive/LeftPercent", left.getValue());
-            SmartDashboard.putNumber("DriveSystem/TankDrive/RightPercent", right.getValue());
+            SmartDashboard.putNumber("DriveSystem/TankDrive/LeftPercent", left);
+            SmartDashboard.putNumber("DriveSystem/TankDrive/RightPercent", right);
 
-            tankDrive.set(DriveMode.PercentOutput, -left.getValue(), right.getValue());
+            tankDrive.set(DriveMode.PercentOutput, -left, right);
         } else {  // currentDriveType == DriveType.CheesyDrive
-            double forwardPower = (3*turn.getValue())/4;
-            double turnPower = left.getValue();
+            double forwardPower = left;
+            double turnPower = (3*turn)/4;
 
-            double leftPower =  forwardPower - turnPower;
-            double rightPower = forwardPower + turnPower;
+            SmartDashboard.putNumber("Drive/CheesyDrive/forwardPercent", forwardPower);
+            SmartDashboard.putNumber("Drive/CheesyDrive/turnPercent", turnPower);
 
-            SmartDashboard.putNumber("Drive/CheesyDrive/LeftPercent", leftPower);
-            SmartDashboard.putNumber("Drive/CheesyDrive/RightPercent", rightPower);
-
-            tankDrive.set(DriveMode.PercentOutput, leftPower, rightPower);
+            diffDrive.set(DriveMode.PercentOutput, forwardPower, turnPower);
         }
     }
 

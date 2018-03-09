@@ -74,7 +74,7 @@ public class Intake {
         SmartDashboard.putBoolean("Intake/Position/In", isIn);
         SmartDashboard.putBoolean("Intake/Position/Out", isOut);
 
-        if(Controls.pullCubePressed && Controls.pushCubePressed) {
+        if(Controls.rotateCubePressed) {
             makeRotateTimer();
         }
         else if (Controls.pullCubePressed) {

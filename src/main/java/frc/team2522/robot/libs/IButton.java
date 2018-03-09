@@ -13,5 +13,6 @@ public interface IButton {
         Toggle, //isPressed function returns true a single time until button is toggled up and back down
     }
 
+    boolean getPosition();
     boolean isPressed();
 }

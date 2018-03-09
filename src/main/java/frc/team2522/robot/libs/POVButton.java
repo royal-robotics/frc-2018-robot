@@ -11,6 +11,10 @@ public class POVButton implements IButton {
         this.povAngle =  povAngle;
     }
 
+    public boolean getPosition() {
+        return isPressed();
+    }
+
     public boolean isPressed(){
         int currentPov = driver.getPOV();
         return this.povAngle == currentPov;

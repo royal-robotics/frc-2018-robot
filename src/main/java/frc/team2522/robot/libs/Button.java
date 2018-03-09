@@ -1,24 +1,25 @@
 package frc.team2522.robot.libs;
 
 import edu.wpi.first.wpilibj.Joystick;
+import frc.team2522.robot.Controls;
 
 public class Button implements IButton {
     protected final ButtonType type;
     protected final Joystick stick;
-    protected final int buttonId;
+    protected final Controls.Buttons button;
     protected boolean previousValue;
 
     /***
      * Create a standard Joystick button instance.
      *
      * @param stick 	The Joystick that the button is on.
-     * @param buttonId	The Id/Index of the button.
+     * @param button	The Id/Index of the button.
      * @param type		The type of button to create.
      */
-    public Button(Joystick stick, int buttonId, ButtonType type)
+    public Button(Joystick stick, Controls.Buttons button, ButtonType type)
     {
         this.stick = stick;
-        this.buttonId = buttonId;
+        this.button = button;
         this.type = type;
         this.previousValue = false;
     }
@@ -28,9 +29,9 @@ public class Button implements IButton {
      *
      * @return true if the button is pressed and false otherwise.
      */
-    protected synchronized boolean getPosition()
+    public boolean getPosition()
     {
-        return this.stick.getRawButton(this.buttonId);
+        return this.stick.getRawButton(this.button.id);
     }
 
     /***
@@ -38,7 +39,7 @@ public class Button implements IButton {
      *
      * @return	true if button action should happen, false otherwise.
      */
-    public synchronized boolean isPressed()
+    public boolean isPressed()
     {
         boolean value = this.getPosition();
         boolean retValue = false;

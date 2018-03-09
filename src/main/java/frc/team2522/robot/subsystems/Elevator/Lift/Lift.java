@@ -59,9 +59,7 @@ public class Lift {
     boolean climbOn = false;
     private void fmsUpdateTeleopManualMode() {
         if (Controls.activateClimbPressed) {
-            climbOn = true;
-        } else {
-            climbOn = false;
+            climbOn = !climbOn;
         }
 
         if (climbOn) {

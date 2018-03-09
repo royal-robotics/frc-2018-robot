@@ -24,7 +24,6 @@ import frc.team2522.robot.subsystems.Drivebase.DriveSystem.DriveSystem;
     teleop 'modes'
  */
 public class Drivebase {
-    Joystick driver;
     Boolean isClimbingMode;
 
     TalonSRX leftDrive1 = new TalonSRX(0);
@@ -41,17 +40,9 @@ public class Drivebase {
     DriveSystem driveSystem = new DriveSystem(tankDrive, differentialDrive);
     Climber climber = new Climber(tankDrive, isClimbingMode);
 
-    Axis left;
-    Axis right;
-    Axis turn;
-
-    public Drivebase(Joystick driver, Boolean isClimbingMode) {
-        this.driver = driver;
+    public Drivebase(Boolean isClimbingMode) {
         this.isClimbingMode = isClimbingMode;
 
-        left = new Axis(driver, 1, 0.1);
-        right = new Axis(driver, 5, 0.1);
-        turn = new Axis(driver, 4, 0.1);
         leftDrive2.follow(leftDrive1);
         rightDrive2.follow(rightDrive1);
         driveSystem.reset();
@@ -81,7 +72,7 @@ public class Drivebase {
         if (climbOn) {
             climber.climb(Controls.liftAxisValue);
         } else {  // !isClimbingMode
-            driveSystem.drive(left, right, turn);
+            driveSystem.drive(Controls.driveValue, Controls.tankRightDriveValue, Controls.turnValue);
         }
         //driveSystem.writeToDashboard();
         //climber.writeToDashboard();

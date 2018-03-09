@@ -55,13 +55,11 @@ public class Robot extends IterativeRobot {
     Boolean isClimbingMode = new Boolean(false);
 
     Stopwatch robotStopwatch = Stopwatch.StartNew();
-    Drivebase drivebase = new Drivebase(Controls.driver, isClimbingMode);
+    Drivebase drivebase = new Drivebase(isClimbingMode);
     Elevator elevator = new Elevator(Controls.driver, new ObservableBoolean(isClimbingMode));
 
     @Override
     public void robotInit() {
-        Controls.initialize(true);
-
         //gyro.reset();
     }
 

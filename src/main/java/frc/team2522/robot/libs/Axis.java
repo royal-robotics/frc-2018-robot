@@ -1,29 +1,32 @@
 package frc.team2522.robot.libs;
 
 import edu.wpi.first.wpilibj.Joystick;
+import frc.team2522.robot.Controls;
 
 public class Axis implements IButton{
     private Joystick joystick;
-    private int axisIndex;
+    private Controls.Axes axis;
     private double deadband;
 
     private double defaultEdge = 0.25;
     private double lastReading = 0.0;
 
-    public Axis(Joystick joystick, int axisIndex, double deadband) {
+    public Axis(Joystick joystick, Controls.Axes axis, double deadband) {
         this.joystick = joystick;
-        this.axisIndex = axisIndex;
+        this.axis = axis;
         this.deadband = deadband;
     }
 
     public double getValue() {
-        double value = joystick.getRawAxis(axisIndex);
+        double value = joystick.getRawAxis(axis.id);
         if (value < deadband && value > -deadband) {
             value = 0.0;
         }
         lastReading = value;
         return lastReading;
     }
+
+    public boolean getPosition() { return isPressed(deadband); }
 
     public boolean isPressed() {
         return isPressed(deadband);
