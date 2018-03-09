@@ -47,7 +47,7 @@ public class Intake {
     boolean isIn = false;
     boolean isOut = false;
     public void fmsUpdateTeleop() {
-        if (Controls.Elevator.Intake.pickup.isPressed()) {
+        if (Controls.pickupPressed) {
             inHi.set(DoubleSolenoid.Value.kReverse);
             inLo.set(DoubleSolenoid.Value.kReverse);
             isPickup = true;
@@ -55,7 +55,7 @@ public class Intake {
             isOut = false;
         }
 
-        if (Controls.Elevator.Intake.closed.isPressed()) {
+        if (Controls.closedPressed) {
             inHi.set(DoubleSolenoid.Value.kForward);
             inLo.set(DoubleSolenoid.Value.kReverse);
             isIn = true;
@@ -63,7 +63,7 @@ public class Intake {
             isPickup = false;
         }
 
-        if (Controls.Elevator.Intake.open.isPressed()) {
+        if (Controls.openPressed) {
             inHi.set(DoubleSolenoid.Value.kReverse);
             inLo.set(DoubleSolenoid.Value.kForward);
             isOut = true;
@@ -74,13 +74,13 @@ public class Intake {
         SmartDashboard.putBoolean("Intake/Position/In", isIn);
         SmartDashboard.putBoolean("Intake/Position/Out", isOut);
 
-        if(Controls.Elevator.Intake.pullCube.isPressed() && Controls.Elevator.Intake.pushCube.isPressed()) {
+        if(Controls.pullCubePressed && Controls.pushCubePressed) {
             makeRotateTimer();
         }
-        else if (Controls.Elevator.Intake.pullCube.isPressed()) {
+        else if (Controls.pullCubePressed) {
             stopRotateTimer();
             setPull();
-        } else if (Controls.Elevator.Intake.pushCube.isPressed()) {
+        } else if (Controls.pushCubePressed) {
             stopRotateTimer();
             setPush();
         } else {

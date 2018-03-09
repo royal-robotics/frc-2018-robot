@@ -58,7 +58,7 @@ public class Lift {
 
     boolean climbOn = false;
     private void fmsUpdateTeleopManualMode() {
-        if (Controls.Drivebase.Climber.isActiveClimb()) {
+        if (Controls.activateClimbPressed) {
             climbOn = true;
         } else {
             climbOn = false;
@@ -68,9 +68,9 @@ public class Lift {
             brake.set(DoubleSolenoid.Value.kReverse);
         } else {
 //        System.out.println("encoder:" + data.encoder.getDistance());
-            if(Controls.Elevator.Lift.liftAxis.isPressed()) {
+            if(Controls.liftAxisPressed) {
                 brake.set(DoubleSolenoid.Value.kReverse);
-                double power = -Controls.Elevator.Lift.liftAxis.getValue();
+                double power = -Controls.liftAxisValue;
                 if(power > 0)
                     power *= 0.5;
                 else
@@ -88,11 +88,11 @@ public class Lift {
                 }
             }
 
-            if(Controls.Elevator.Lift.calibrate.isPressed()) {
+            if(Controls.calibratePressed) {
                 calibrate();
             }
 
-            if(Controls.Elevator.Lift.moveLift.isPressed()) {
+            if(Controls.moveliftPressed) {
                 if(follower == null) {
                     Waypoint[] points = new Waypoint[] {
                             new Waypoint(data.getPosition(), 0.0, Pathfinder.d2r(0)),

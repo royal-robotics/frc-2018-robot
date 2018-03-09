@@ -60,6 +60,8 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void robotInit() {
+        Controls.initialize(true);
+
         //gyro.reset();
     }
 
@@ -116,6 +118,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void teleopPeriodic() {
+        Controls.readController();
         drivebase.fmsUpdateTeleop();
         elevator.fmsUpdateTeleop();
     }

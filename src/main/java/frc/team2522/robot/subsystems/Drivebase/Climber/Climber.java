@@ -36,8 +36,7 @@ public class Climber {
         }
     }
 
-    public void climb(Axis axis) {
-        double power = axis.getValue();
+    public void climb(double power) {
 
         SmartDashboard.putNumber("Drive/ClimbDrive/Percent", power);
 
