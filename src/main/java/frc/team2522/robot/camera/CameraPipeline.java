@@ -26,9 +26,9 @@ public class CameraPipeline {
             Mat frame = new Mat();
 
             while (!Thread.interrupted()) {
-                if (joystick.getRawButton(1))
-                    cubeFilter.grabFrame(frame);
-                else
+                //if (joystick.getRawButton(1))
+                //    cubeFilter.grabFrame(frame);
+                //else
                     cameraStream.grabFrame(frame);
 
                 outputStream.putFrame(frame);
