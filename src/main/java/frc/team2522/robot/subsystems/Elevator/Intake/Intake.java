@@ -89,7 +89,7 @@ public class Intake {
     }
 
     private void setPush() {
-        carriage.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Pull/carriage", 0.75));
+        carriage.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Pull/carriage", 1.00));
         leftIntake.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Pull/left", 0.8));
         rightIntake.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Pull/right", 0.8));
     }
@@ -101,7 +101,7 @@ public class Intake {
     }
 
     private void setStop() {
-        carriage.set(ControlMode.PercentOutput, -0.20);
+        carriage.set(ControlMode.PercentOutput, 0);
         leftIntake.set(ControlMode.PercentOutput, 0);
         rightIntake.set(ControlMode.PercentOutput, 0);
     }

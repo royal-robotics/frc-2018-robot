@@ -26,8 +26,10 @@ public class Elevator {
         intake = new Intake(driver, carriage);
         lift = new Lift(driver, carriage);
 
-        setupIntakeManager();
+        //setupIntakeManager();
     }
+
+    boolean liftOpenManual = false;
 
     public void fmsUpdateTeleop() {
         //TODO: intake and lift shouldn't have fmsUpdate functions, and shouldn't
@@ -37,12 +39,26 @@ public class Elevator {
 
         intake.fmsUpdateTeleop();
         lift.fmsUpdateTeleop();
+
+        if(Controls.Elevator.Intake.toggleIntake.isPressed()) {
+            liftOpenManual = !liftOpenManual;
+        }
+
+        //TODO: Checking intake buttons is a kludge, better to ask intake if it's running
+        if(!liftOpenManual) {
+            intake.setClosed();
+        } else if(Controls.Elevator.Intake.pullCube.isPressed() || Controls.Elevator.Intake.pushCube.isPressed()) {
+            intake.setPickup();
+        } else {
+            intake.setOpen();
+        }
     }
 
-    Timer autoIntakeMovementTimer = null;
-    boolean isAutoIntakeMode = true;
+    // This is code to manage the intake position based on the lift height
+    // It's disabled because we think cassidy is more reliable than the encoder :)
+    /*Timer autoIntakeMovementTimer = null;
+    boolean isAutoIntakeMode = false;
     boolean isManualModeClosed = true;
-
     private void setupIntakeManager() {
         final long msAutoLiftTick = 100;
         autoIntakeMovementTimer = new Timer();
@@ -64,7 +80,6 @@ public class Elevator {
                     liftOpen = false;
                 }
 
-                //TODO: Checking intake buttons is a kludge, better to ask intake if it's running
                 if(liftOpen) {
                     intake.setOpen();
                 } else if(Controls.Elevator.Intake.pullCube.isPressed() || Controls.Elevator.Intake.pushCube.isPressed()) {
@@ -75,4 +90,5 @@ public class Elevator {
             }
         }, msAutoLiftTick, msAutoLiftTick);
     }
+    */
 }

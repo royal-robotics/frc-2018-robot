@@ -29,28 +29,27 @@ public class Controls {
 
     }
     public static Joystick driver = new Joystick(0);
-    public static Joystick operator = new Joystick (1);
+    private static Joystick operator = new Joystick (1);
 
-/*
     public static class Elevator {
         public static class Intake {
             public static IButton toggleIntake = new Button(operator, 1, Button.ButtonType.Toggle); // A Button
-            public static IButton autoIntakeMode = new Button(operator, 1, Button.ButtonType.Toggle); // B Button
+            public static IButton autoIntakeMode = new Button(operator, 2, Button.ButtonType.Toggle); // B Button
 
             //If both of these buttons are on rotate runs (we should make a multi-button that handles this)
             public static IButton pullCube = new Axis(operator, 2, 0.1); // Left Trigger
             public static IButton pushCube = new Axis(operator, 3, 0.1); // Right Trigger
         }
+
         public static class Lift {
             public static IButton moveBottom = new POVButton(operator, 0);
             public static IButton moveSwitch = new POVButton(operator, 90);
             public static IButton moveScale = new POVButton(operator, 180);
             public static Axis liftAxis = new Axis(operator, 1, 0.1);
             public static Button calibrate = new Button(operator, 4, Button.ButtonType.Toggle); // Y Button
-
-            public static Button moveLift = new Button(driver, 4, Button.ButtonType.Hold); // Y Button
         }
-*/
+    }
+
     private static IButton pickup;
     private static IButton closed;
     private static IButton open;
@@ -75,10 +74,11 @@ public class Controls {
     public static boolean shiftPressed = false;
     public static double liftAxisValue = 0;
 
-    private static boolean onePersonMode = true;
+    public static IButton moveBottom = new POVButton(operator, 0);
+    public static IButton moveSwitch = new POVButton(operator, 90);
+    public static IButton moveScale = new POVButton(operator, 180);
 
     public static void initialize(boolean onePersonMode) {
-        Controls.onePersonMode = onePersonMode;
         pickup = new Button(operator,1, IButton.ButtonType.Toggle);
         closed = new Button(operator,2, IButton.ButtonType.Toggle);
         open = new Button(operator, 3, IButton.ButtonType.Toggle);

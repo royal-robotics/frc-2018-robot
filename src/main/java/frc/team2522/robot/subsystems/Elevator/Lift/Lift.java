@@ -50,6 +50,15 @@ public class Lift {
     TrajectoryFollower follower = null;
 
     private void fmsUpdateTeleopManualMode() {
+        //TODO: save climber mode state inside of controls
+        if(Controls.activateClimbPressed) {
+            stopFollower();
+            stopCalibration();
+            brake.set(DoubleSolenoid.Value.kReverse);
+            liftMotors.set(ControlMode.PercentOutput, 0.0);
+            return;
+        }
+
         if(Controls.Elevator.Lift.liftAxis.isPressed()) {
             stopFollower();
             stopCalibration();
@@ -82,7 +91,8 @@ public class Lift {
         }
 
         if(isFollowing() && follower.isFinished()) {
-            stopFollower();
+            brake.set(DoubleSolenoid.Value.kForward);
+            liftMotors.set(ControlMode.PercentOutput, 0.0);
         }
     }
 
@@ -93,6 +103,7 @@ public class Lift {
             Waypoint[] points = new Waypoint[] {
                     new Waypoint(data.getPosition(), 0.0, Pathfinder.d2r(0)),
                     new Waypoint(moveTo, 0.0, Pathfinder.d2r(0))
+//                    new Waypoint(data.getPosition() + 20, 0.0, Pathfinder.d2r(0))
             };
             Trajectory.Config config = new Trajectory.Config(
                     Trajectory.FitMethod.HERMITE_CUBIC,
@@ -104,6 +115,14 @@ public class Lift {
 
             long nanoGenerateStart = System.nanoTime();
             Trajectory trajectory = Pathfinder.generate(points, config);
+
+            //Position seems to always go from 0 to end point... so we might have to invert it.
+//            boolean invertPosition = data.getPosition() > moveTo;
+//            for (int i = 0; i < trajectory.segments.length; i++) {
+//                if(invertPosition)
+//                    trajectory.segments[i].position = -trajectory.segments[i].position;
+//            }
+
             System.out.println("Gen Time: " + (double)(nanoGenerateStart - System.nanoTime()) / 1000000.0);
             follower = new TrajectoryFollower(trajectory, data.encoder, liftMotors, .016, 0.0, 0.2, 0.0, 0.0);
             follower.start();
@@ -123,7 +142,7 @@ public class Lift {
 
         if(!isCalibrating()) {
             brake.set(DoubleSolenoid.Value.kReverse);
-            liftMotors.set(ControlMode.PercentOutput, -0.20);
+            liftMotors.set(ControlMode.PercentOutput, -0.10);
 
             calibrationTimer = new Timer();
             calibrationTimer.scheduleAtFixedRate(new TimerTask() {
@@ -148,25 +167,21 @@ public class Lift {
     }
 
     public void stopCalibration() {
-        System.out.println("stop calibration");
-
         if(calibrationTimer != null) {
             calibrationTimer.cancel();
+            brake.set(DoubleSolenoid.Value.kForward);
+            liftMotors.set(ControlMode.PercentOutput, 0.0);
+            calibrationTimer = null;
         }
-        calibrationTimer = null;
-
-        brake.set(DoubleSolenoid.Value.kForward);
-        liftMotors.set(ControlMode.PercentOutput, 0.0);
     }
 
     public void stopFollower() {
         if(follower != null) {
             follower.stop();
+            brake.set(DoubleSolenoid.Value.kForward);
+            liftMotors.set(ControlMode.PercentOutput, 0.0);
+            follower = null;
         }
-        follower = null;
-
-        brake.set(DoubleSolenoid.Value.kForward);
-        liftMotors.set(ControlMode.PercentOutput, 0.0);
     }
 
     public boolean isCalibrating() {
