@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.Controls;
 import frc.team2522.robot.libs.*;
+import jaci.pathfinder.Pathfinder;
+import jaci.pathfinder.Trajectory;
+import jaci.pathfinder.Waypoint;
 
 import java.util.TimerTask;
 
@@ -140,23 +143,45 @@ public class DriveController {
             this.drive(-Controls.liftAxis.getValue(), -Controls.liftAxis.getValue());
         }
         else {
-            if (Controls.DriveSystem.getDriveType() == DriveType.TankDrive) {
-                this.drive(Controls.DriveSystem.TankDrive.getLeftThrottleValue(), Controls.DriveSystem.TankDrive.getRightThrottleValue());
-            }
-            else { // DriveType.DiffDrive
-                double forwardPower = Controls.DriveSystem.DiffDrive.getThrottleValue();
-                double turnPower = Controls.DriveSystem.DiffDrive.getTurnValue() * Controls.DriveSystem.DiffDrive.turnDampener();
-                this.drive(forwardPower + turnPower, forwardPower - turnPower);
+
+            if (Controls.showFilter()) {
+                final Trajectory.Config config = new Trajectory.Config(
+                        Trajectory.FitMethod.HERMITE_CUBIC,
+                        Trajectory.Config.SAMPLES_HIGH,
+                        0.01, //0.01=10ms
+                        150,
+                        300,
+                        500);
+
+                final Waypoint[] points = new Waypoint[] {
+                        new Waypoint(0, 0, Pathfinder.d2r(0)),
+                        new Waypoint(30, 0, Pathfinder.d2r (0)),
+                };
+
+
+
             }
 
-            if (Controls.DriveSystem.isHighGear()) {
-                if (this.getGear() != Gear.High) {
-                    this.setGear(Gear.High);
-                }
+            if (false /* isFollowing()*/) {
+
             }
             else {
-                if (this.getGear() != Gear.Low) {
-                    this.setGear(Gear.Low);
+                if (Controls.DriveSystem.getDriveType() == DriveType.TankDrive) {
+                    this.drive(Controls.DriveSystem.TankDrive.getLeftThrottleValue(), Controls.DriveSystem.TankDrive.getRightThrottleValue());
+                } else { // DriveType.DiffDrive
+                    double forwardPower = Controls.DriveSystem.DiffDrive.getThrottleValue();
+                    double turnPower = Controls.DriveSystem.DiffDrive.getTurnValue() * Controls.DriveSystem.DiffDrive.turnDampener();
+                    this.drive(forwardPower + turnPower, forwardPower - turnPower);
+                }
+
+                if (Controls.DriveSystem.isHighGear()) {
+                    if (this.getGear() != Gear.High) {
+                        this.setGear(Gear.High);
+                    }
+                } else {
+                    if (this.getGear() != Gear.Low) {
+                        this.setGear(Gear.Low);
+                    }
                 }
             }
         }

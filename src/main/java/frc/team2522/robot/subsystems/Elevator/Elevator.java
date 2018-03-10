@@ -40,7 +40,19 @@ public class Elevator {
                 intake.setPickup();
             }
         }
+        else if(Controls.Elevator.Intake.pushCube() && this.intake.getArmsOut()) {
+            if (Controls.Elevator.Intake.armsOpen()) {
+                intake.setOpen();
+            }
+            else {
+                intake.setPickup();
+            }
+        }
         else if (Controls.Elevator.Intake.armsOpen()) {
+            intake.setOpen();
+        }
+
+        if (!Controls.Elevator.Intake.pullCube() && !Controls.Elevator.Intake.pushCube() && this.intake.getArmsOut()) {
             intake.setOpen();
         }
 

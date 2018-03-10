@@ -21,6 +21,7 @@ public class Intake {
 
     Timer timer = null;
     boolean rotateMode;
+    boolean armsOut = false;
 
     public Intake(IMotorController elevatorIntakeMotor, IMotorController leftIntakeMotor, IMotorController rightIntakeMotor, DoubleSolenoid intakeHi, DoubleSolenoid intakeLo) {
         this.elevatorIntakeMotor = elevatorIntakeMotor;
@@ -106,23 +107,27 @@ public class Intake {
 
     public void setClosed() {
         SmartDashboard.putString("Intake/State", "Closed");
-
+        this.armsOut = false;
         intakeHi.set(DoubleSolenoid.Value.kForward);
         intakeLo.set(DoubleSolenoid.Value.kReverse);
     }
 
     public void setPickup() {
         SmartDashboard.putString("Intake/State", "Pickup");
-
+        this.armsOut = true;
         intakeHi.set(DoubleSolenoid.Value.kReverse);
         intakeLo.set(DoubleSolenoid.Value.kReverse);
     }
 
     public void setOpen() {
         SmartDashboard.putString("Intake/State", "Open");
-
+        this.armsOut = true;
         intakeHi.set(DoubleSolenoid.Value.kReverse);
         intakeLo.set(DoubleSolenoid.Value.kForward);
+    }
+
+    public boolean getArmsOut() {
+        return this.armsOut;
     }
 
 }
