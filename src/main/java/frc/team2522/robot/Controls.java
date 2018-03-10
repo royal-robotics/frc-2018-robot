@@ -5,28 +5,35 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.libs.*;
 
 public class Controls {
-    public static class Logitech310Button {
-        public static int A = 1;
-        public static int B = 2;
-        public static int X = 3;
-        public static int Y = 4;
-        public static int LeftBumper = 5;
-        public static int RightBumper = 6;
-        public static int Back = 7;
-        public static int Start = 8;
-        public static int LeftStickPress = 9;
-        public static int RightStickPress = 10;
+    public enum Logitech310Button {
+        A (1),
+        B (2),
+        X (3),
+        Y (4),
+        LeftBumper (5),
+        RightBumper (6),
+        Back (7),
+        Start (8),
+        LeftStickPress (9),
+        RightStickPress (10);
+        public int id;
+        Logitech310Button(int id) {
+            this.id = id;
+        }
     }
+    public enum Logitech310Axis {
+        LeftStickX (0),
+        LeftStickY (1),
+        LeftTrigger (2),
+        RightTrigger (3),
+        RightStickX (4),
+        RightStickY (5);
+        public int id;
+        Logitech310Axis(int id) {
+            this.id = id;
+        }
 
-    public static class Logitech310Axis {
-        public static int LeftStickX = 0;
-        public static int LeftStickY = 1;
-        public static int LeftTrigger = 2;
-        public static int RightTrigger = 3;
-        public static int RightStickX = 4;
-        public static int RightStickY = 5;
     }
-
 
     public static class DriveSystem {
         public static DriveType getDriveType() { return driveType; }
@@ -139,10 +146,10 @@ public class Controls {
     private static IButton armsCloseButton = new Button(operator,Logitech310Button.A, IButton.ButtonType.Hold);
     private static IButton armsOpenButton = new Button(operator,Logitech310Button.B, IButton.ButtonType.Hold);
     // X is not used
-    private static IButton calibrateButton = new Button(operator,Logitech310Button.Y, IButton.ButtonType.Hold);
+    private static IButton calibrateButton = new Button(operator,Logitech310Button.Y, IButton.ButtonType.Toggle);
 
     private static IButton toggleClimberStateButton = new MultiButton(operator,
-            new int[] {Logitech310Button.LeftBumper, Logitech310Button.RightBumper},
+            new Logitech310Button[] {Logitech310Button.LeftBumper, Logitech310Button.RightBumper},
             IButton.ButtonType.Toggle,
             MultiButton.MultiButtonType.BothButton);
 
