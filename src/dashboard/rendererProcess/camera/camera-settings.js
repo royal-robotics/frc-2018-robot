@@ -18,9 +18,6 @@ function updateValues() {
     NetworkTables.putValue("/SmartDashboard/Camera/Detector", $("#detector option:selected").val());
     NetworkTables.putValue("/SmartDashboard/Camera/Filter", $("#filters option:selected").val());
 
-    console.log("kernel: " + $("#blur-kernel").val());
-    console.log("sigma: " + $("#blur-sigma").val() );
-
     NetworkTables.putValue("/SmartDashboard/Camera/Filter/blob/blur/kernelSize", $("#blur-kernel").val());
     NetworkTables.putValue("/SmartDashboard/Camera/Filter/blob/blur/sigma", $("#blur-sigma").val());
 }

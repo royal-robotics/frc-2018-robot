@@ -10,6 +10,10 @@ import org.opencv.core.Mat;
 
 public class CameraPipeline {
 
+    static {
+        SmartDashboard.putString("Camera/Filter", "raw");
+    }
+
     //Setup image pipe
     CvSink cameraStream = createCameraStream();
     BlurFilter blurFilter = new BlurFilter(cameraStream);
@@ -31,8 +35,6 @@ public class CameraPipeline {
     }
 
     private CvSink getFilter(String filter) {
-        System.out.println("filter: " + filter);
-        System.out.println("sigmaaaa: " + SmartDashboard.getNumber("Camera/Filter/blob/blur/sigma", 0.123));
         if(filter.equals("blur"))
             return blurFilter;
         else if(filter.equals("threshold"))

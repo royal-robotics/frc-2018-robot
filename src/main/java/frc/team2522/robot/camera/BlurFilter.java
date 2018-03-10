@@ -15,6 +15,9 @@ public class BlurFilter extends CvSink{
     public BlurFilter(CvSink cvSink) {
         super("Blur-Filter");
         this.cvInputSink = cvSink;
+
+        SmartDashboard.putNumber("Camera/Filter/blob/blur/kernelSize", 5);
+        SmartDashboard.putNumber("Camera/Filter/blob/blur/sigma", 0.1);
     }
 
     @Override
@@ -27,10 +30,7 @@ public class BlurFilter extends CvSink{
         if(kernelSize % 2 == 0)
             kernelSize++; // Kernel must be an odd number
 
-        double sigma = 0.1;SmartDashboard.getNumber("Camera/Filter/blob/blur/sigma", 0.1);
-
-        System.out.println("Kernel: " + kernelSize);
-        System.out.println("Sigma: " + sigma);
+        double sigma = SmartDashboard.getNumber("Camera/Filter/blob/blur/sigma", 0.1);
 
         Imgproc.GaussianBlur(inputFrame, outputFrame, new Size(kernelSize, kernelSize), sigma);
 
