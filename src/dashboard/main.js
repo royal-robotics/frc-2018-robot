@@ -36,8 +36,8 @@ function createWindow() {
                 attempting = false;
                 if(!client.isConnected()) {
                     client.start((connected, err, is2_0) => {
-                        if(err != null) console.log("err: " + err);
-                        mainWindow.webContents.send('connected', client.isConnected());
+                        if (err != null) console.log("err: " + err);
+                        if (mainWindow != null) mainWindow.webContents.send('connected', client.isConnected());
                     }, ip);
                 }
             }, function(errorMessage) {
