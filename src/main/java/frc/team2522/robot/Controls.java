@@ -60,7 +60,7 @@ public class Controls {
             public static boolean moveScale() { return moveScale; }
             public static boolean moveClimb() { return moveClimb; }
 
-            public static boolean doCalibrate() { return calibrate; }
+            public static boolean startCalibration() { return calibrate; }
             public static boolean debugMoveLift() { return debugMoveLift;}
         }
     }
@@ -93,6 +93,7 @@ public class Controls {
         showTargets = showTargetsButton.isPressed();
         calibrate = calibrateButton.isPressed();
         debugMoveLift = moveLiftButton.isPressed() && DebugMode;
+
 
         if (toggleClimberStateButton.isPressed()) {
             inClimberMode = ! inClimberMode;
@@ -139,16 +140,16 @@ public class Controls {
     private static IButton armsCloseButton = new Button(operator,Logitech310Button.A, IButton.ButtonType.Hold);
     private static IButton armsOpenButton = new Button(operator,Logitech310Button.B, IButton.ButtonType.Hold);
     // X is not used
-    private static IButton calibrateButton = new Button(operator,Logitech310Button.Y, IButton.ButtonType.Hold);
+    private static IButton calibrateButton = new Button(operator,Logitech310Button.Y, IButton.ButtonType.Toggle);
 
     private static IButton toggleClimberStateButton = new MultiButton(operator,
             new int[] {Logitech310Button.LeftBumper, Logitech310Button.RightBumper},
             IButton.ButtonType.Toggle,
             MultiButton.MultiButtonType.BothButton);
 
-    public static IButton moveBottomButton = new POVButton(operator, 0);
+    public static IButton moveBottomButton = new POVButton(operator, 180);
     public static IButton moveSwitchButton = new POVButton(operator, 90);
-    public static IButton moveScaleButton = new POVButton(operator, 180);
+    public static IButton moveScaleButton = new POVButton(operator, 0);
     public static IButton moveClimbButton = new POVButton(operator, 270);
 
     public static Axis liftAxis = new Axis(operator, Logitech310Axis.LeftStickY, 0.1);
