@@ -70,4 +70,7 @@ public class Elevator {
             intake.setStop();
         }
     }
+    public void robotPeriodic() {
+        lift.writeToDashboard();
+    }
 }
