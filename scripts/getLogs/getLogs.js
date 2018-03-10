@@ -19,7 +19,7 @@ sftp.connect({
     for(var i = 0; i < files.length; i++) {
         var file = files[i];
 
-        if(file.name.endsWith(".txt")) {
+        if(file.name.endsWith(".csv")) {
             var name = file.name;
             var data = await sftp.get(name);
             var dataString = await toString(data);
