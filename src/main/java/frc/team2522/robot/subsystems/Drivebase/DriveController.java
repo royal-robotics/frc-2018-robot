@@ -11,6 +11,7 @@ import frc.team2522.robot.libs.*;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
+import jaci.pathfinder.modifiers.TankModifier;
 
 import java.util.TimerTask;
 
@@ -21,10 +22,10 @@ public class DriveController {
 
     // TODO: calculate these values
     //
-    public static final double kHighGearMaxVelocity = 175.0;    // inches / second
-    public static final double kHighGearDistancePerPulse = 6.0 * Math.PI / 256.0;
+    public static final double kHighGearMaxVelocity = 161.0;    // inches / second
+    public static final double kHighGearDistancePerPulse = 0.3429 * 6.0 * Math.PI / 256.0;
     public static final double kLowGearMaxVelocity = 100.0;     // inches / second
-    public static final double kLowGearDistancePerPulse = 6.0 * Math.PI / 256.0;
+    public static final double kLowGearDistancePerPulse = 0.1667 * 6.0 * Math.PI / 256.0;
 
     public static final double kUpdateFrequency = 0.01;  // 100 times per second
     public static final double kProportionalFactor = 0.4;
@@ -53,7 +54,8 @@ public class DriveController {
     TankDrive tankDrive;
 
     private java.util.Timer timer = null;
-    private long lastUpdateTime = System.nanoTime();
+    private long leftLastUpdateTime = System.nanoTime();
+    private long rightLastUpdateTime = System.nanoTime();
 
     private double leftPower = 0.0;
     private double leftVelocity = 0.0;
@@ -64,6 +66,9 @@ public class DriveController {
     private double rightVelocity = 0.0;
     private double rightLastDistance = 0.0;
     private double rightLastVelocity = 0.0;
+
+    private double maxDetectedVelocity = 0.0;
+    private TrajectoryFollower follower = null;
 
 
     public DriveController(IMotorController leftDriveMotor, Encoder leftDriveEncoder, IMotorController rightDriveMotor, Encoder rightDriveEncoder, DoubleSolenoid shifter, DoubleSolenoid pto) {
@@ -83,7 +88,7 @@ public class DriveController {
 
         this.reset();
 
-        this.lastUpdateTime = System.nanoTime();
+        this.leftLastUpdateTime = System.nanoTime();
         this.timer = new java.util.Timer();
         this.timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
@@ -98,8 +103,10 @@ public class DriveController {
     public void reset() {
         this.setGear(Gear.High);
         this.setPTO(false);
+        this.setGear(Gear.High);
         this.leftEncoder.reset();
         this.rightEncoder.reset();
+        this.maxDetectedVelocity = 0.0;
     }
 
     /**
@@ -110,17 +117,32 @@ public class DriveController {
         double leftDistance = this.leftEncoder.getDistance();
         double rightDistance = this.rightEncoder.getDistance();
 
-        double dt = (double)(time - this.lastUpdateTime) / 1000000000.0;
+        double lDt = (double)(time - this.leftLastUpdateTime) / 1000000000.0;
+        double lDp = leftDistance - this.leftLastDistance;
+        if ((lDp > 0.00001) || (lDp < -0.00001)) {
+            this.leftVelocity = lDp / lDt;
+            this.leftLastUpdateTime = time;
+            this.leftLastDistance = leftDistance;
+        }
 
+        double rDt = (double)(time - this.rightLastUpdateTime) / 1000000000.0;
+        double rDp = rightDistance - this.rightLastDistance;
+        if ((lDp > 0.00001) || (lDp < -0.00001)) {
+            this.rightVelocity = lDp / lDt;
+            this.rightLastUpdateTime = time;
+            this.rightLastDistance = rightDistance;
+        }
 
+        if (this.leftVelocity > this.maxDetectedVelocity) {
+            this.maxDetectedVelocity = this.leftVelocity;
+            SmartDashboard.putNumber("DriveController/MaxVelocity", this.maxDetectedVelocity);
+        }
+        SmartDashboard.putNumber("DriveController/LeftVelocity", this.leftLastVelocity);
+        SmartDashboard.putNumber("DriveController/LeftDistance", this.leftLastDistance);
+        SmartDashboard.putNumber("DriveController/RightVelocity", this.rightVelocity);
+        SmartDashboard.putNumber("DriveController/RightDistance", this.rightLastDistance);
 
         // TODO write to log file
-
-        this.leftLastDistance = leftDistance;
-        this.leftLastVelocity = leftVelocity;
-        this.rightLastDistance = rightDistance;
-        this.rightLastVelocity = rightVelocity;
-        this.lastUpdateTime = time;
     }
 
     public void robotPeriodic() {
@@ -144,28 +166,40 @@ public class DriveController {
         }
         else {
 
-            if (Controls.showFilter()) {
-                final Trajectory.Config config = new Trajectory.Config(
-                        Trajectory.FitMethod.HERMITE_CUBIC,
-                        Trajectory.Config.SAMPLES_HIGH,
-                        0.01, //0.01=10ms
-                        150,
-                        300,
-                        500);
+            if (Controls.debugDriveForward()) {
+                if (this.follower == null) {
+                    final Trajectory.Config config = new Trajectory.Config(
+                            Trajectory.FitMethod.HERMITE_CUBIC,
+                            Trajectory.Config.SAMPLES_HIGH,
+                            0.01, //0.01=10ms
+                            150,
+                            300,
+                            500);
 
-                final Waypoint[] points = new Waypoint[] {
-                        new Waypoint(0, 0, Pathfinder.d2r(0)),
-                        new Waypoint(30, 0, Pathfinder.d2r (0)),
-                };
+                    final Waypoint[] points = new Waypoint[]{
+                            new Waypoint(0, 0, Pathfinder.d2r(0)),
+                            new Waypoint(Controls.getMoveDistance(), 0, Pathfinder.d2r(0)),
+                    };
 
+                    Trajectory trajectory = Pathfinder.generate(points, config);
 
+                    final double wheelbase_width = 31.25;
+                    TankModifier modifier = new TankModifier(trajectory).modify(wheelbase_width);
+                    Trajectory[] trajectories = new Trajectory[]{modifier.getLeftTrajectory(), modifier.getRightTrajectory()};
+                    Encoder[] encoders = new Encoder[]{this.leftEncoder, this.rightEncoder};
+                    IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
 
-            }
-
-            if (false /* isFollowing()*/) {
-
+System.out.println("Starting Move Distance of " + Controls.getMoveDistance() + " ETA: " + ((double)trajectories[0].length() * 0.01));
+                    this.follower = new TrajectoryFollower(trajectories, Controls.getMoveDistance() < 0.0, encoders, motors, 1.0 / 161.0, 0.0, 0.8, 0.0, 0.0);
+                    this.follower.start();
+                }
             }
             else {
+                if (this.follower != null) {
+                    this.follower.stop();
+                    this.follower = null;
+                }
+
                 if (Controls.DriveSystem.getDriveType() == DriveType.TankDrive) {
                     this.drive(Controls.DriveSystem.TankDrive.getLeftThrottleValue(), Controls.DriveSystem.TankDrive.getRightThrottleValue());
                 } else { // DriveType.DiffDrive

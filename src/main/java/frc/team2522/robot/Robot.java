@@ -88,7 +88,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void robotPeriodic() {
-        SmartDashboard.putNumber("robot/uptime/", robotStopwatch.getElapsedTime().getSeconds());
+        //SmartDashboard.putNumber("robot/uptime/", robotStopwatch.getElapsedTime().getSeconds());
 
         Controls.updateControls();
 

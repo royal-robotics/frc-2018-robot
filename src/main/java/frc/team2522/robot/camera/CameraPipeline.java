@@ -1,14 +1,8 @@
 package frc.team2522.robot.camera;
 
-import java.io.OutputStream;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Filter;
-
 import edu.wpi.cscore.*;
 import frc.team2522.robot.Controls;
 import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
 
 public class CameraPipeline {
 
@@ -23,7 +17,7 @@ public class CameraPipeline {
             Mat frame = new Mat();
 
             while (!Thread.interrupted()) {
-                if (Controls.showFilter())
+                if (Controls.debugDriveForward())
                     cubeFilter.grabFrame(frame);
                 else
                     cameraStream.grabFrame(frame);
