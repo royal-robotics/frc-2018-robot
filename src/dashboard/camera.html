@@ -1,8 +1,34 @@
+<link rel="stylesheet" type="text/css" href="rendererProcess/camera/lib/bootstrap.colorpickersliders.min.css">
+<script src="rendererProcess/camera/lib/bootstrap.colorpickersliders.min.js"></script>
+
 <link href="rendererProcess/camera/camera.css" rel="stylesheet">
-<script src="rendererProcess/camera/camera.js"></script>
+<script src="rendererProcess/camera/camera-connect.js"></script>
+<script src="rendererProcess/camera/camera-settings.js"></script>
 
 <h2>Camera Tuning</h2>
 
-<div id="camera">
-    <img src="images/noCamera.png" />
+<div class="col-sm-4">
+    <div id="camera">
+        <img src="images/noCamera.png" />
+    </div>
+</div>
+<div class="col-sm-4">
+    <div>
+        <select id="detector">
+            <option value="blob">Simple Blob Detector</option>
+        </select>
+
+        <select id="filters">
+            <option value="raw">Raw Image</option>
+            <option value="blur">Blur Filter</option>
+            <option value="threshold">Threshold Filter</option>
+            <option value="blob">Circle Blob</option>
+        </select>
+    </div>
+
+    <div>Blur Kernel: <input type="number" id="blur-kernel" value="5"></div>
+    <div>Blur Sigma: <input type="number" id="blur-sigma" value="0.1"></div>
+
+    <div>Low: <input type="text" id="colorpicker-low" value="fe9810" hidden="hidden"><span>H: xxx S: xxx V: xxx</span></div>
+    <div>High: <input type="text" id="colorpicker-high" value="fe9810" hidden="hidden"><span>H: xxx S: xxx V: xxx</span></div>
 </div>

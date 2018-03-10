@@ -93,6 +93,7 @@ public class Robot extends IterativeRobot {
         Controls.updateControls();
 
         this.drivebase.robotPeriodic();
+        this.elevator.robotPeriodic();
     }
 
     /**

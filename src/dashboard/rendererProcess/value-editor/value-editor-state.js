@@ -22,11 +22,12 @@ NetworkTables.addGlobalListener((key, value, isNew) => {
             subtypes[keyPart1] = [keyPart2];
         }
     }
-
+    
     if(isNew && tunables[keyShort] !== undefined)
         console.log("Warning: new tunable value already defined");
 
     tunables[keyShort] = value;
+    
     //updateTunablesList(isNew); // Only update filter if this is a new value
     if(typeof(updateTunablesList) != "undefined") {
         console.log("updateTunables");
