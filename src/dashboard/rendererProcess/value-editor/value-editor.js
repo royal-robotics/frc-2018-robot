@@ -32,16 +32,13 @@ function updateTunablesList(changefilter) {
     let allKeys = [];
     for(let key in tunables) {
         // True if either the key starts with the filter or the All filter is selected
-        console.log(key);
         let filtered = selected == "" || mappedValue.includes(key);
         if (filtered) {
             allKeys.push(key);
         }
     }
 
-    console.log(allKeys[0]);
     let sortedKeys = allKeys.sort();
-    console.log(sortedKeys[0]);
 
     for (let key in sortedKeys) {
         let keyValue = sortedKeys[key];

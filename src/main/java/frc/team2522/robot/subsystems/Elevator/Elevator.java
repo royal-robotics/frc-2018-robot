@@ -1,56 +1,61 @@
 package frc.team2522.robot.subsystems.Elevator;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.wpilibj.Joystick;
+import com.ctre.phoenix.motorcontrol.IMotorController;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Encoder;
 import frc.team2522.robot.Controls;
-import frc.team2522.robot.libs.ObservableBoolean;
-import frc.team2522.robot.subsystems.Elevator.Intake.Intake;
-import frc.team2522.robot.subsystems.Elevator.Lift.Lift;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Elevator {
-    Joystick driver;
-    ObservableBoolean isClimbingMode;
+    private Intake intake;
+    private Lift lift;
 
-    TalonSRX carriage = new TalonSRX(8);
 
-    Intake intake;
-    Lift lift;
-
-    public Elevator(Joystick driver, ObservableBoolean isClimbingMode) {
-        this.driver = driver;
-        this.isClimbingMode = isClimbingMode;
-
-        intake = new Intake(driver, carriage);
-        lift = new Lift(driver, carriage);
+    public Elevator(Intake intake, Lift lift) {
+        this.intake = intake;
+        this.lift = lift;
 
         //setupIntakeManager();
     }
 
-    boolean liftOpenManual = false;
+    public void reset() {
+        this.intake.reset();
+        this.lift.reset();
+    }
 
-    public void fmsUpdateTeleop() {
-        //TODO: intake and lift shouldn't have fmsUpdate functions, and shouldn't
-        //take joystick values in. Since they both control the carriage it could lead
-        //to conflicting modes. Elevator should control all the modes and who should
-        // be doing what.
+    public void teleopPeriodic() {
+        intake.teleopPeriodic();
+        lift.teleopPeriodic();
 
-        intake.fmsUpdateTeleop();
-        lift.fmsUpdateTeleop();
-
-        if(Controls.Elevator.Intake.toggleIntake.isPressed()) {
-            liftOpenManual = !liftOpenManual;
+        if(Controls.Elevator.Intake.armsClose()) {
+            intake.setStop();
+            intake.setClosed();
         }
 
-        //TODO: Checking intake buttons is a kludge, better to ask intake if it's running
-        if(!liftOpenManual) {
-            intake.setClosed();
-        } else if(Controls.Elevator.Intake.pullCube.isPressed() || Controls.Elevator.Intake.pushCube.isPressed()) {
-            intake.setPickup();
-        } else {
+        if(Controls.Elevator.Intake.pullCube() || Controls.Elevator.Intake.pushCube()) {
+            if (Controls.Elevator.Intake.armsOpen()) {
+                intake.setOpen();
+            }
+            else {
+                intake.setPickup();
+            }
+        }
+        else if (Controls.Elevator.Intake.armsOpen()) {
             intake.setOpen();
+        }
+
+        if(Controls.Elevator.Intake.pullCube() && Controls.Elevator.Intake.pushCube()) {
+            intake.startRotate();
+        }
+        else if (Controls.Elevator.Intake.pullCube()) {
+            intake.stopRotate();
+            intake.setPull();
+        } else if (Controls.Elevator.Intake.pushCube()) {
+            intake.stopRotate();
+            intake.setPush();
+        } else {
+            intake.stopRotate();
+            intake.setStop();
         }
     }
 

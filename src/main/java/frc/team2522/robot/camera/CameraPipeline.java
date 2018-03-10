@@ -1,21 +1,21 @@
 package frc.team2522.robot.camera;
 
 import edu.wpi.cscore.*;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import frc.team2522.robot.Controls;
 import org.opencv.core.Mat;
 
 public class CameraPipeline {
-
-    Joystick joystick;
 
     //Setup image pipe
     CvSink cameraStream = createCameraStream();
     BlurFilter blurFilter = new BlurFilter(cameraStream);
     ThresholdFilter thresholdFilter = new ThresholdFilter(blurFilter);
 
-    public CameraPipeline(Joystick joystick) {
-        this.joystick = joystick;
+    public CameraPipeline() {
 
         new Thread(() -> {
             CvSource outputStream = createOutputStream();
@@ -24,6 +24,7 @@ public class CameraPipeline {
             while (!Thread.interrupted()) {
                 CvSink sink = getFilter(SmartDashboard.getString("Camera/Filter", "raw"));
                 sink.grabFrame(frame);
+
                 outputStream.putFrame(frame);
             }
         }).start();

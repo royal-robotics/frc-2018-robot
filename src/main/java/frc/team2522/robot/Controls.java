@@ -1,110 +1,183 @@
 package frc.team2522.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.libs.*;
 
 public class Controls {
-    public enum Buttons {
-        A (1),
-        B (2),
-        X (3),
-        Y (4),
-        LeftBumper (5),
-        RightBumper (6),
-        Back (7),
-        Start (8),
-        LeftStickPress (9),
-        RightStickPress (10);
+    public static class Logitech310Button {
+        public static int A = 1;
+        public static int B = 2;
+        public static int X = 3;
+        public static int Y = 4;
+        public static int LeftBumper = 5;
+        public static int RightBumper = 6;
+        public static int Back = 7;
+        public static int Start = 8;
+        public static int LeftStickPress = 9;
+        public static int RightStickPress = 10;
+    }
 
-        private int id;
-        Buttons(int id) {
-            this.id = id;
+    public static class Logitech310Axis {
+        public static int LeftStickX = 0;
+        public static int LeftStickY = 1;
+        public static int LeftTrigger = 2;
+        public static int RightTrigger = 3;
+        public static int RightStickX = 4;
+        public static int RightStickY = 5;
+    }
+
+
+    public static class DriveSystem {
+        public static DriveType getDriveType() { return driveType; }
+        public static boolean isHighGear() { return isHighGear; }
+        public static class DiffDrive {
+            public static double getThrottleValue() { return -throttle.getValue();}
+            public static double getTurnValue() { return turn.getValue();}
+            public static double turnDampener() { return (3.0 / 4.0);}
+        }
+        public static class TankDrive {
+            public static double getLeftThrottleValue() { return -leftThrottle.getValue(); }
+            public static double getRightThrottleValue() { return -rightThrottle.getValue(); }
         }
     }
-
-    public enum Axes {
-        //LeftX (0),
-        //LeftY (1),
-        //LeftTrigger (2),
-
-    }
-    public static Joystick driver = new Joystick(0);
-    private static Joystick operator = new Joystick (1);
 
     public static class Elevator {
         public static class Intake {
-            public static IButton toggleIntake = new Button(operator, 1, Button.ButtonType.Toggle); // A Button
-            public static IButton autoIntakeMode = new Button(operator, 2, Button.ButtonType.Toggle); // B Button
-
-            //If both of these buttons are on rotate runs (we should make a multi-button that handles this)
-            public static IButton pullCube = new Axis(operator, 2, 0.1); // Left Trigger
-            public static IButton pushCube = new Axis(operator, 3, 0.1); // Right Trigger
+            public static boolean pullCube() { return pullCube; }
+            public static boolean pushCube() { return pushCube; }
+            public static boolean rotateCube() { return (pushCube() && pullCube()); }
+            public static boolean armsOpen() { return armsOpen; }
+            public static boolean armsClose() { return armsClose; }
         }
 
         public static class Lift {
-            public static IButton moveBottom = new POVButton(operator, 0);
-            public static IButton moveSwitch = new POVButton(operator, 90);
-            public static IButton moveScale = new POVButton(operator, 180);
-            public static Axis liftAxis = new Axis(operator, 1, 0.1);
-            public static Button calibrate = new Button(operator, 4, Button.ButtonType.Toggle); // Y Button
+            public static double getLiftAxisValue() { return -liftAxis.getValue(); }
+            public static boolean getLiftAxisOn() { return liftAxis.isPressed(); }
+
+            public static boolean moveBottom() { return moveBottom; }
+            public static boolean moveSwitch() { return moveSwitch; }
+            public static boolean moveScale() { return moveScale; }
+            public static boolean moveClimb() { return moveClimb; }
+
+            public static boolean doCalibrate() { return calibrate; }
+            public static boolean debugMoveLift() { return debugMoveLift;}
         }
     }
 
-    private static IButton pickup;
-    private static IButton closed;
-    private static IButton open;
-    private static IButton pullCube;
-    private static IButton pushCube;
-    private static Axis liftAxis;
-    private static IButton calibrate;
-    private static IButton moveLift;
-    private static IButton activateClimb;
-    private static  IButton driveConfig;
-    private static IButton shift;
-    public static boolean pickupPressed = false;
-    public static boolean closedPressed = false;
-    public static boolean openPressed = false;
-    public static boolean pullCubePressed = false;
-    public static boolean pushCubePressed = false;
-    public static boolean liftAxisPressed = false;
-    public static boolean calibratePressed = false;
-    public static boolean moveliftPressed = false;
-    public static boolean activateClimbPressed = false;
-    public static boolean driveConfigPressed = false;
-    public static boolean shiftPressed = false;
-    public static double liftAxisValue = 0;
+    public static boolean inClimberMode() {return inClimberMode; }
 
-    public static IButton moveBottom = new POVButton(operator, 0);
-    public static IButton moveSwitch = new POVButton(operator, 90);
-    public static IButton moveScale = new POVButton(operator, 180);
+    public static boolean showFilter() { return showFilter; }
 
-    public static void initialize(boolean onePersonMode) {
-        pickup = new Button(operator,1, IButton.ButtonType.Toggle);
-        closed = new Button(operator,2, IButton.ButtonType.Toggle);
-        open = new Button(operator, 3, IButton.ButtonType.Toggle);
-        pullCube = new Axis(operator,2,0.1);
-        pushCube = new Axis(operator,3,0.1);
-        liftAxis = new Axis(operator, 1,0.1);
-        calibrate = new Button(operator,4, IButton.ButtonType.Toggle);
-        moveLift = new Button(driver,4, IButton.ButtonType.Hold);
-        activateClimb = new MultiButton(operator,new int[] {5,6}, IButton.ButtonType.Toggle, MultiButton.MultiButtonType.BothButton);
-        driveConfig = new Button(driver, 7, IButton.ButtonType.Toggle);
-        shift = new Button(driver, 1, IButton.ButtonType.Toggle);
+    public static boolean showTargets() { return showTargets; }
+
+
+    public static void initialize() {
+        SmartDashboard.putBoolean("Controls/Debugging", false);
     }
 
-    public static void readController() {
-        pickupPressed = pickup.isPressed();
-        closedPressed = closed.isPressed();
-        openPressed = open.isPressed();
-        pullCubePressed = pullCube.isPressed();
-        pushCubePressed = pushCube.isPressed();
-        liftAxisPressed = liftAxis.isPressed();
-        calibratePressed = calibrate.isPressed();
-        moveliftPressed = moveLift.isPressed();
-        activateClimbPressed = activateClimb.isPressed();
-        driveConfigPressed = driveConfig.isPressed();
-        shiftPressed = shift.isPressed();
-        liftAxisValue = liftAxis.getValue();
+    public static void updateControls() {
+        DebugMode = SmartDashboard.getBoolean("Controls/Debugging", false);
 
+        armsClose = armsCloseButton.isPressed();
+        armsOpen = armsOpenButton.isPressed();
+        pullCube = pullCubeButton.isPressed();
+        pushCube = pushCubeButton.isPressed();
+
+        moveBottom = moveBottomButton.isPressed();
+        moveSwitch = moveSwitchButton.isPressed();
+        moveScale = moveScaleButton.isPressed();
+        moveClimb = moveClimbButton.isPressed();
+
+        showFilter = showFilterButton.isPressed();
+        showTargets = showTargetsButton.isPressed();
+        calibrate = calibrateButton.isPressed();
+        debugMoveLift = moveLiftButton.isPressed() && DebugMode;
+
+        if (toggleClimberStateButton.isPressed()) {
+            inClimberMode = ! inClimberMode;
+        }
+
+        if (toggleDrive.isPressed()) {
+            if (driveType == DriveType.DiffDrive) {
+                driveType = DriveType.TankDrive;
+            }
+            else {
+                driveType = DriveType.DiffDrive;
+            }
+        }
+
+        if (shiftToggleButton.isPressed()) {
+            isHighGear = !isHighGear;
+        }
+
+        SmartDashboard.putBoolean("Controls/ClimberEnabled", inClimberMode());
     }
+
+    // Driver Joystick Configuration
+    //
+    private static Joystick driver = new Joystick(0);
+
+    private static IButton shiftToggleButton = new Button(driver, Logitech310Button.A, IButton.ButtonType.Toggle);
+    private static IButton moveLiftButton = new Button(driver,Logitech310Button.B, IButton.ButtonType.Hold);
+    private static IButton showTargetsButton = new Button(driver, Logitech310Button.X, IButton.ButtonType.Hold);
+    private static IButton showFilterButton = new Button(driver, Logitech310Button.Y, IButton.ButtonType.Hold);
+    private static IButton toggleDrive = new Button(driver, Logitech310Button.Back, IButton.ButtonType.Toggle);
+
+    // Tank Drive
+    private static Axis leftThrottle = new Axis(driver, Logitech310Axis.LeftStickY, 0.1);
+    private static Axis rightThrottle = new Axis(driver, Logitech310Axis.RightStickY, 0.1);
+
+    // Diff Drive
+    private static Axis throttle = new Axis(driver, Logitech310Axis.LeftStickY, 0.1);
+    private static Axis turn = new Axis(driver, Logitech310Axis.RightStickX, 0.1);
+
+
+    // Operator Joystick Configuration
+    //
+    private static Joystick operator = new Joystick (1);
+    private static IButton armsCloseButton = new Button(operator,Logitech310Button.A, IButton.ButtonType.Hold);
+    private static IButton armsOpenButton = new Button(operator,Logitech310Button.B, IButton.ButtonType.Hold);
+    // X is not used
+    private static IButton calibrateButton = new Button(operator,Logitech310Button.Y, IButton.ButtonType.Hold);
+
+    private static IButton toggleClimberStateButton = new MultiButton(operator,
+            new int[] {Logitech310Button.LeftBumper, Logitech310Button.RightBumper},
+            IButton.ButtonType.Toggle,
+            MultiButton.MultiButtonType.BothButton);
+
+    public static IButton moveBottomButton = new POVButton(operator, 0);
+    public static IButton moveSwitchButton = new POVButton(operator, 90);
+    public static IButton moveScaleButton = new POVButton(operator, 180);
+    public static IButton moveClimbButton = new POVButton(operator, 270);
+
+    public static Axis liftAxis = new Axis(operator, Logitech310Axis.LeftStickY, 0.1);
+
+    private static IButton pullCubeButton = new Axis(operator,Logitech310Axis.LeftTrigger, 0.1);
+    private static IButton pushCubeButton = new Axis(operator,Logitech310Axis.RightTrigger,0.1);
+
+    //
+    //
+    private static boolean DebugMode = false;
+
+    private static DriveType driveType = DriveType.DiffDrive;
+    private static boolean isHighGear = true;
+
+    private static boolean pushCube = false;
+    private static boolean pullCube = false;
+    private static boolean armsClose = false;
+    private static boolean armsOpen = false;
+
+    private static boolean moveScale = false;
+    private static boolean moveSwitch = false;
+    private static boolean moveBottom = false;
+    private static boolean moveClimb = false;
+
+    private static boolean inClimberMode = false;
+
+    private static boolean calibrate = false;
+    private static boolean debugMoveLift = false;
+
+    private static boolean showFilter = false;
+    private static boolean showTargets = false;
 }
