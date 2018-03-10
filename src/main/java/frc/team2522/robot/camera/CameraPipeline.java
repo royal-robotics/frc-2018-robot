@@ -6,16 +6,13 @@ import java.util.TimerTask;
 import java.util.logging.Filter;
 
 import edu.wpi.cscore.*;
-import edu.wpi.first.wpilibj.Joystick;
+import frc.team2522.robot.Controls;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 public class CameraPipeline {
 
-    Joystick joystick;
-
-    public CameraPipeline(Joystick joystick) {
-        this.joystick = joystick;
+    public CameraPipeline() {
 
         new Thread(() -> {
             CvSink cameraStream = createCameraStream();
@@ -26,9 +23,9 @@ public class CameraPipeline {
             Mat frame = new Mat();
 
             while (!Thread.interrupted()) {
-                //if (joystick.getRawButton(1))
-                //    cubeFilter.grabFrame(frame);
-                //else
+                if (Controls.showFilter())
+                    cubeFilter.grabFrame(frame);
+                else
                     cameraStream.grabFrame(frame);
 
                 outputStream.putFrame(frame);

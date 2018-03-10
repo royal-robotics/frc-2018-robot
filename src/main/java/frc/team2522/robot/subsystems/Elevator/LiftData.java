@@ -1,4 +1,4 @@
-package frc.team2522.robot.subsystems.Elevator.Lift;
+package frc.team2522.robot.subsystems.Elevator;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;

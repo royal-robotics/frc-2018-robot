@@ -1,17 +1,17 @@
 package frc.team2522.robot.autonomous;
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.team2522.robot.subsystems.Drivebase.Drivebase;
+import frc.team2522.robot.subsystems.Drivebase.DriveController;
 
 public class AutoDrive extends AutoStep {
 
     private final Timer timer = new Timer();
-    private final Drivebase drivebase;
+    private final DriveController drivecontroller;
 
     private boolean isCompleted = false;
 
-    public AutoDrive(Drivebase drivebase) {
-        this.drivebase = drivebase;
+    public AutoDrive(DriveController drivecontroller) {
+        this.drivecontroller = drivecontroller;
     }
 
     @Override

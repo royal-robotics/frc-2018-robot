@@ -43,6 +43,7 @@ public class MultiButton implements IButton {
 
     private synchronized boolean getPosition() {
         boolean result =  false;
+
         switch(multiType){
             case BothButton: {
                 result = true;
@@ -53,6 +54,7 @@ public class MultiButton implements IButton {
                 break;
             }
         }
+
         for (int buttonId : buttonIds) {
             switch(multiType) {
                 case BothButton: {
