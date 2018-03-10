@@ -3,10 +3,6 @@ var exec = require('child_process').exec
 let Client = require('ssh2-sftp-client');
 var toString = require('stream-to-string');
 
-if (!fs.existsSync("./temp")){
-    fs.mkdirSync("./temp");
-}
-
 let sftp = new Client();
 sftp.connect({
     host: '10.25.22.2',
@@ -20,10 +16,9 @@ sftp.connect({
         var file = files[i];
 
         if(file.name.endsWith(".csv")) {
+            console.log("Deleting: " + file.name);
             var name = file.name;
-            var data = await sftp.get(name);
-            var dataString = await toString(data);
-            fs.writeFileSync("./temp/" + name, dataString)
+            await sftp.delete(name);
         }
     }
     process.exit();

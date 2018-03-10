@@ -1,11 +1,12 @@
 package frc.team2522.robot.libs;
 
 import edu.wpi.first.wpilibj.Joystick;
+import frc.team2522.robot.Controls;
 
 public class Button implements IButton {
     protected final ButtonType type;
     protected final Joystick stick;
-    protected final int buttonId;
+    protected final Controls.Logitech310Button buttonId;
     protected boolean previousValue;
 
     /***
@@ -15,7 +16,7 @@ public class Button implements IButton {
      * @param buttonId	The Id/Index of the button.
      * @param type		The type of button to create.
      */
-    public Button(Joystick stick, int buttonId, ButtonType type)
+    public Button(Joystick stick, Controls.Logitech310Button buttonId, ButtonType type)
     {
         this.stick = stick;
         this.buttonId = buttonId;
@@ -30,7 +31,7 @@ public class Button implements IButton {
      */
     protected synchronized boolean getPosition()
     {
-        return this.stick.getRawButton(this.buttonId);
+        return this.stick.getRawButton(this.buttonId.id);
     }
 
     /***

@@ -5,6 +5,9 @@ import com.ctre.phoenix.motorcontrol.IMotorController;
 import jaci.pathfinder.Trajectory;
 import edu.wpi.first.wpilibj.Encoder;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -19,6 +22,7 @@ public class TrajectoryFollower {
     private boolean isFinished;
 
     private double trajectoryInterval;
+    private double invert;
 
     private double accelerationFeed;
     private double velocityFeed;
@@ -36,7 +40,9 @@ public class TrajectoryFollower {
     private List<Encoder> encoders = new ArrayList<Encoder>();
     private List<IMotorController> controllers = new ArrayList<IMotorController>();
 
-    public TrajectoryFollower(Trajectory trajectory, Encoder encoder, IMotorController controller, double kV, double kA, double kP, double kI, double kD) {
+    PrintStream ps = null;
+
+    public TrajectoryFollower(Trajectory trajectory, boolean reverse, Encoder encoder, IMotorController controller, double kVf, double kAf, double kP, double kI, double kD) {
         this.trajectories.add(trajectory);
         this.encoders.add(encoder);
         this.controllers.add(controller);
@@ -46,12 +52,17 @@ public class TrajectoryFollower {
         this.isRunning = false;
         this.isFinished = false;
 
-        this.velocityFeed = kV;
-        this.accelerationFeed = kA;
+        this.velocityFeed = kVf;
+        this.accelerationFeed = kAf;
 
         this.distanceProportional = kP;
         this.distanceIntegral = kI;
         this.distanceDerivative = kD;
+
+        this.invert = 1.0;
+        if (reverse) {
+            this.invert = -1.0;
+        }
     }
 
     public void start() {
@@ -66,6 +77,25 @@ public class TrajectoryFollower {
             this.lastPowers[i] = 0.0;
             this.lastErrors[i] = 0.0;
         }
+
+        File f = new File("/home/lvuser/TrajectoryFollower_0.csv");
+        for(int i = 0;f.exists();i++)
+        {
+            f = new File("/home/lvuser/TrajectoryFollower_" + i + ".csv");
+        }
+
+        try
+        {
+            this.ps = new PrintStream(f);
+            System.out.println("Created LogFile: " + f.getName());
+            this.ps.println("Time,Index,Expected Velocity,Expected Distance,Actual Distance,Error,Power");
+        }
+        catch(IOException e)
+        {
+            this.ps = null;
+            e.printStackTrace();
+        }
+
 
         this.isRunning = true;
         this.isFinished = false;
@@ -85,6 +115,11 @@ public class TrajectoryFollower {
         for(int i = 0; i < controllers.size(); i++) {
             controllers.get(i).set(ControlMode.PercentOutput, 0.0);
         }
+
+        if (this.ps != null) {
+            this.ps.close();
+            this.ps = null;
+        }
     }
 
     public boolean isFinished() {
@@ -97,12 +132,12 @@ public class TrajectoryFollower {
      * @return  Motor power that should be set.
      */
     public void followPath() {
-        double result = 0.0;
         double time = this.getTime();
 
         if (! this.isFinished) {
             for(int i = 0; i < this.trajectories.size(); i++) {
-                double position = this.encoders.get(i).getDistance() - this.startPositions[i];
+                double result = 0.0;
+                double position = (this.encoders.get(i).getDistance() - this.startPositions[i]) * this.invert;
 
                 int segmentIndex = (int) Math.round(time / this.trajectoryInterval);
 
@@ -114,6 +149,12 @@ public class TrajectoryFollower {
                             this.distanceDerivative * ((error - this.lastErrors[i]) / (time - this.startTime)) +
                             this.velocityFeed * segment.velocity +
                             this.accelerationFeed * segment.acceleration;
+
+                    result = result * this.invert;
+
+                    if (this.ps != null) {
+                        this.ps.println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+","+error+","+result);
+                    }
 
                     this.lastTime = time;
                     this.lastPositions[i] = position;

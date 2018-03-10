@@ -39,6 +39,11 @@ public class Lift {
         this.liftBrake = liftBrake;
         this.liftRatchet = liftRatchet;
 
+        final double inchesPerPulse = (3.7 * Math.PI) / 256.0;
+
+        this.liftEncoder.setDistancePerPulse(inchesPerPulse);
+        this.liftEncoder.setReverseDirection(false);
+
         this.reset();
     }
 
@@ -72,12 +77,12 @@ public class Lift {
                 this.setPower(0.0);
             }
 
-            if (Controls.Elevator.Lift.doCalibrate()) {
+            if (Controls.Elevator.Lift.startCalibration()) {
                 if (!this.isCalibrating()) {
                     startCalibration();
+                } else {
+                    this.stopCalibration();
                 }
-            } else {
-                this.stopCalibration();
             }
 
             if (Controls.Elevator.Lift.moveBottom()) {
@@ -85,13 +90,13 @@ public class Lift {
                 createFollower(0.0);
             } else if (Controls.Elevator.Lift.moveSwitch()) {
                 this.setBreak(false);
-                createFollower(20.0);
+                createFollower(40.0);
             } else if (Controls.Elevator.Lift.moveScale()) {
                 this.setBreak(false);
-                createFollower(75.0);
+                createFollower(82.0);
             } else if (Controls.Elevator.Lift.moveClimb()) {
                 this.setBreak(false);
-                createFollower(65.0);
+                createFollower(68.0);
             } else if (!isCalibrating()) {
                 stopFollower();
             }
@@ -103,6 +108,10 @@ public class Lift {
         }
 
         this.writeToDashboard();
+    }
+
+    public double getPosition() {
+        return this.liftEncoder.getDistance();
     }
 
     public void setPower(double power) {
@@ -155,15 +164,15 @@ public class Lift {
                     Trajectory.FitMethod.HERMITE_CUBIC,
                     Trajectory.Config.SAMPLES_FAST,
                     0.01, //10ms
-                    20,
-                    50,
-                    100.0);
+                    100,
+                    300.0,
+                    500.0);
 
-            long nanoGenerateStart = System.nanoTime();
             Trajectory trajectory = Pathfinder.generate(points, config);
-            System.out.println("Lift Gen Time: " + (double)(nanoGenerateStart - System.nanoTime()) / 1000000.0);
+            System.out.println("Generated path from " + this.getPosition() + " to " + moveTo + " ETA: " + (trajectory.length() * 0.01));
+//            Pathfinder.writeToCSV();
 
-            follower = new TrajectoryFollower(trajectory, this.liftEncoder, this.liftMotor, .02, 0.0, 0.4, 0.0, 0.0);
+            follower = new TrajectoryFollower(trajectory, this.getPosition() > moveTo,this.liftEncoder, this.liftMotor, .04, 0.0, 0.8, 0.0, 0.0);
             follower.start();
         }
     }
@@ -175,29 +184,29 @@ public class Lift {
     public void startCalibration() {
         final long msCalibrateTick = 10;
 
-        final double stallCurrent = 13.8;
-
         if(!isCalibrating()) {
             this.setBreak(false);
-            this.setPower(25.0);
+            this.setPower(0.25);
 
             calibrationStartTime = System.nanoTime();
             calibrationTimer = new Timer();
             calibrationTimer.scheduleAtFixedRate(new TimerTask() {
                 public void run() {
-                    double dt = Math.round((double)(System.nanoTime() - calibrationStartTime) / 1000000000.0);
+                    final double upTime = 0.3;
 
-                    if (dt > 0.25) {
+                    double dt = (double)(System.nanoTime() - calibrationStartTime) / 1000000000.0;
+
+                    if (dt > upTime) {
                         intake.setOpen();
+                        setPower(-0.10);
                     }
 
-                    if (dt > 0.5) {
-                        setPower(-10.0);
-                    }
 
-                    if((dt > 1.0) && liftMotor.getOutputCurrent() > stallCurrent) {
+                    System.out.println("Calibrate Time: " + dt + " Calibrate Current: " + liftMotor.getOutputCurrent());
+                    if(dt > 1.0) {
                         liftEncoder.reset();
                         isCalibrated = true;
+                        System.out.println("Calibrate Time: " + dt + " Calibrate Current: " + liftMotor.getOutputCurrent());
                         stopCalibration();
                     }
                 }
@@ -231,9 +240,5 @@ public class Lift {
 
     public boolean isCalibrating() {
         return calibrationTimer != null;
-    }
-
-    public double getPosition() {
-        return this.liftEncoder.getDistance();
     }
 }
