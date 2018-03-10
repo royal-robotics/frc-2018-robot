@@ -32,7 +32,15 @@ public class Elevator {
             intake.setClosed();
         }
 
-        if(Controls.Elevator.Intake.pullCube() || Controls.Elevator.Intake.pushCube()) {
+        if(Controls.Elevator.Intake.pullCube()) {
+            if (Controls.Elevator.Intake.armsOpen()) {
+                intake.setOpen();
+            }
+            else {
+                intake.setPickup();
+            }
+        }
+        else if(Controls.Elevator.Intake.pushCube() && this.intake.getArmsOut()) {
             if (Controls.Elevator.Intake.armsOpen()) {
                 intake.setOpen();
             }
@@ -41,6 +49,10 @@ public class Elevator {
             }
         }
         else if (Controls.Elevator.Intake.armsOpen()) {
+            intake.setOpen();
+        }
+
+        if (!Controls.Elevator.Intake.pullCube() && !Controls.Elevator.Intake.pushCube() && this.intake.getArmsOut()) {
             intake.setOpen();
         }
 
@@ -58,42 +70,7 @@ public class Elevator {
             intake.setStop();
         }
     }
-
-    // This is code to manage the intake position based on the lift height
-    // It's disabled because we think cassidy is more reliable than the encoder :)
-    /*Timer autoIntakeMovementTimer = null;
-    boolean isAutoIntakeMode = false;
-    boolean isManualModeClosed = true;
-    private void setupIntakeManager() {
-        final long msAutoLiftTick = 100;
-        autoIntakeMovementTimer = new Timer();
-        autoIntakeMovementTimer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                if(Controls.Elevator.Intake.toggleIntake.isPressed()) {
-                    isAutoIntakeMode = false;
-                    isManualModeClosed = !isManualModeClosed;
-                }
-
-                if(Controls.Elevator.Intake.autoIntakeMode.isPressed()) {
-                    isAutoIntakeMode = true;
-                }
-
-                boolean liftOpen = true;
-                if(isAutoIntakeMode && lift.getPosition() < 20) {
-                    liftOpen = false;
-                } else if (!isAutoIntakeMode && !isManualModeClosed) {
-                    liftOpen = false;
-                }
-
-                if(liftOpen) {
-                    intake.setOpen();
-                } else if(Controls.Elevator.Intake.pullCube.isPressed() || Controls.Elevator.Intake.pushCube.isPressed()) {
-                    intake.setPickup();
-                } else {
-                    intake.setClosed();
-                }
-            }
-        }, msAutoLiftTick, msAutoLiftTick);
+    public void robotPeriodic() {
+        lift.writeToDashboard();
     }
-    */
 }
