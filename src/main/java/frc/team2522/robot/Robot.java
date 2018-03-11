@@ -1,7 +1,6 @@
 package frc.team2522.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.camera.CameraPipeline;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -10,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
 
 import frc.team2522.robot.libs.Stopwatch;
+import frc.team2522.robot.libs.TrajectoryFollower;
 import frc.team2522.robot.subsystems.Drivebase.DriveController;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
 import frc.team2522.robot.subsystems.Elevator.Intake;
@@ -53,7 +53,7 @@ public class Robot extends IterativeRobot {
     Stopwatch robotStopwatch = Stopwatch.StartNew();
 
     // Subsystem Definitions
-    DriveController drivebase;
+    private DriveController driveController;
     Elevator elevator;
 
     @Override
@@ -75,7 +75,7 @@ public class Robot extends IterativeRobot {
         leftDriveEncoder.setReverseDirection(true);
         rightDriveEncoder.setReverseDirection(false);
 
-        this.drivebase = new DriveController(leftDriveMotor1, leftDriveEncoder, rightDriveMotor1, rightDriveEncoder, shifter, pto);
+        this.driveController = new DriveController(leftDriveMotor1, leftDriveEncoder, rightDriveMotor1, rightDriveEncoder, shifter, pto);
 
         // Setup Elevator subsystem
         //
@@ -92,7 +92,7 @@ public class Robot extends IterativeRobot {
 
         Controls.updateControls();
 
-        this.drivebase.robotPeriodic();
+        this.driveController.robotPeriodic();
         this.elevator.robotPeriodic();
     }
 
@@ -111,7 +111,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void disabledPeriodic() {
-        this.drivebase.disablePeriodic();
+        this.driveController.disablePeriodic();
     }
 
     /**
@@ -121,14 +121,14 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void autonomousInit() {
-        drivebase.reset();
+        driveController.reset();
     }
 
     /**
      * Periodic code for autonomous mode should go here.
      */
     public void autonomousPeriodic() {
-        this.drivebase.autonomousPeriodic();
+        this.driveController.autonomousPeriodic();
     }
 
     /**
@@ -138,7 +138,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void teleopInit() {
-        this.drivebase.reset();
+        this.driveController.reset();
     }
 
     /**
@@ -146,7 +146,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void teleopPeriodic() {
-        drivebase.teleopPeriodic();
+        driveController.teleopPeriodic();
         elevator.teleopPeriodic();
     }
 }

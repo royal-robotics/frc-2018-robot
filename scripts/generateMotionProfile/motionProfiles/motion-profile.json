@@ -1,21 +1,22 @@
 {
-    "wheelbase-width": 31.25,
+    "wheelbase-width": 25.00,
     "waypoints" : [
-        {"x": 0.0, "y": 0.0, "angle": 0.0},
-        {"x": 80.0, "y": 0.0, "angle": 0.0}
+        {"x": 0.0, "y": 0.0, "angle": 90.0},
+        {"x": 10.0, "y": 40.0, "angle": 90.0},
+        {"x": 10.0, "y": 80.0, "angle": 90.0}
     ],
     "config": {
         "fit-method": "HERMITE_CUBIC",
-        "numSamples": 10000,
+        "numSamples": 100000,
         "dt": 0.01,
-        "max-velocity": 150.0,
-        "max-acceleration": 150.0,
-        "max-jerk": 600.0
+        "max-velocity": 50.0,
+        "max-acceleration": 100.0,
+        "max-jerk": 300.0
     },
     "output-center-csv" : "temp/motion-profile-center.csv",
     "output-center-bin" : "temp/motion-profile-center.bin",
-    "output-left-csv" : null,
-    "output-left-bin" : null,
-    "output-right-csv" : null,
-    "output-right-bin" : null
+    "output-left-csv" : "temp/motion-profile-left.csv",
+    "output-left-bin" : "temp/motion-profile-left.bin",
+    "output-right-csv" : "temp/motion-profile-right.csv",
+    "output-right-bin" : "temp/motion-profile-right.bin"
 }

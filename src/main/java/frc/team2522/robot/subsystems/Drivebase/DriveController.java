@@ -13,6 +13,7 @@ import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
 import jaci.pathfinder.modifiers.TankModifier;
 
+import java.io.File;
 import java.util.TimerTask;
 
 /**
@@ -22,13 +23,15 @@ public class DriveController {
 
     // TODO: calculate these values
     //
-    public static final double kHighGearMaxVelocity = 161.0;    // inches / second
+    public static final double kWheelbaseWidth = 25.0;
+    public static final double kHighGearMaxVelocity = 160.0;    // inches / second
     public static final double kHighGearDistancePerPulse = 0.3429 * 6.0 * Math.PI / 256.0;
-    public static final double kLowGearMaxVelocity = 100.0;     // inches / second
+    public static final double kLowGearMaxVelocity = 90.0;     // inches / second
     public static final double kLowGearDistancePerPulse = 0.1667 * 6.0 * Math.PI / 256.0;
 
     public static final double kUpdateFrequency = 0.01;  // 100 times per second
     public static final double kProportionalFactor = 0.4;
+    public static final double kIntegralFactor = 0.0;
     public static final double kDifferentialFactor = 0.0;
 
     public enum Gear {
@@ -103,7 +106,6 @@ public class DriveController {
     public void reset() {
         this.setGear(Gear.High);
         this.setPTO(false);
-        this.setGear(Gear.High);
         this.leftEncoder.reset();
         this.rightEncoder.reset();
         this.maxDetectedVelocity = 0.0;
@@ -168,37 +170,18 @@ public class DriveController {
 
             if (Controls.debugDriveForward()) {
                 if (this.follower == null) {
-                    final Trajectory.Config config = new Trajectory.Config(
-                            Trajectory.FitMethod.HERMITE_CUBIC,
-                            Trajectory.Config.SAMPLES_HIGH,
-                            0.01, //0.01=10ms
-                            150,
-                            300,
-                            500);
-
-                    final Waypoint[] points = new Waypoint[]{
-                            new Waypoint(0, 0, Pathfinder.d2r(0)),
-                            new Waypoint(Controls.getMoveDistance(), 0, Pathfinder.d2r(0)),
-                    };
-
-                    Trajectory trajectory = Pathfinder.generate(points, config);
-
-                    final double wheelbase_width = 31.25;
-                    TankModifier modifier = new TankModifier(trajectory).modify(wheelbase_width);
-                    Trajectory[] trajectories = new Trajectory[]{modifier.getLeftTrajectory(), modifier.getRightTrajectory()};
-                    Encoder[] encoders = new Encoder[]{this.leftEncoder, this.rightEncoder};
-                    IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
-
-System.out.println("Starting Move Distance of " + Controls.getMoveDistance() + " ETA: " + ((double)trajectories[0].length() * 0.01));
-                    this.follower = new TrajectoryFollower(trajectories, Controls.getMoveDistance() < 0.0, encoders, motors, 1.0 / 161.0, 0.0, 0.8, 0.0, 0.0);
-                    this.follower.start();
+//                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
+                    this.drivePath("motion-profile", false);
+//                    this.driveRotate(90.0, 50, 100, 300);
+                }
+                else if (this.follower.isFinished()) {
+//                    this.driveDistance(-Controls.getMoveDistance(), 150, 100, 300);
+//                    this.drivePath("motion-profile", true);
+//                    this.driveRotate(-90.0, 50, 100, 300);
                 }
             }
             else {
-                if (this.follower != null) {
-                    this.follower.stop();
-                    this.follower = null;
-                }
+                this.stopFollowing();
 
                 if (Controls.DriveSystem.getDriveType() == DriveType.TankDrive) {
                     this.drive(Controls.DriveSystem.TankDrive.getLeftThrottleValue(), Controls.DriveSystem.TankDrive.getRightThrottleValue());
@@ -220,6 +203,109 @@ System.out.println("Starting Move Distance of " + Controls.getMoveDistance() + "
             }
         }
     }
+
+    public void drivePath(String pathName, boolean reverse) {
+        this.stopFollowing();
+
+        final String pathDirectory = "/home/lvuser/";
+
+        File leftFile = new File(pathDirectory+pathName+"-left.bin");
+        File rightFile = new File(pathDirectory+pathName+"-right.bin");
+
+        if (!leftFile.exists()) {
+            System.out.println("Missing path file: " + leftFile.getName());
+            return;
+        }
+
+        if (!rightFile.exists()) {
+            System.out.println("Missing path file: " + rightFile.getName());
+            return;
+        }
+
+        Trajectory leftTrajectory = Pathfinder.readFromFile(leftFile);
+        Trajectory rightTrajectory = Pathfinder.readFromFile(rightFile);
+
+        System.out.println("drivePath: " + pathName + " ETA: " + ((double)leftTrajectory.length() * leftTrajectory.get(0).dt) + " seconds.");
+
+        this.follower = new TrajectoryFollower(pathName, reverse,
+                Pathfinder.readFromFile(leftFile), leftEncoder, leftMotor, 1.0,
+                Pathfinder.readFromFile(rightFile), rightEncoder, rightMotor, -1.0,
+                1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
+
+        this.follower.start();
+    }
+
+    public void driveDistance(double distance, double maxVelocity, double maxAcceleration, double maxJerk) {
+        this.stopFollowing();
+
+        final Trajectory.Config config = new Trajectory.Config(
+                Trajectory.FitMethod.HERMITE_CUBIC,
+                Trajectory.Config.SAMPLES_FAST,
+                kUpdateFrequency,
+                maxVelocity,
+                maxAcceleration,
+                maxJerk);
+
+        final Waypoint[] points = new Waypoint[]{
+                new Waypoint(0, 0, Pathfinder.d2r(0)),
+                new Waypoint(Math.abs(distance), 0, Pathfinder.d2r(0)),
+        };
+
+        Trajectory trajectory = Pathfinder.generate(points, config);
+        TankModifier modifier = new TankModifier(trajectory).modify(kWheelbaseWidth);
+        Trajectory[] trajectories = new Trajectory[]{modifier.getLeftTrajectory(), modifier.getRightTrajectory()};
+        Encoder[] encoders = new Encoder[]{this.leftEncoder, this.rightEncoder};
+        double[] distanceScales = new double[] {(distance < 0.0)?-1.0:1.0, (distance < 0.0)?-1.0:1.0};
+        IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
+        double[] motorScales = new double[] {1.0, -1.0};
+
+        System.out.println("driveDistance: " + distance + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
+        this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"}, trajectories, encoders, distanceScales, motors, motorScales,
+                1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
+        this.follower.start();
+    }
+
+    public void driveRotate(double angle, double maxVelocity, double maxAcceleration, double maxJerk) {
+        this.stopFollowing();
+
+        final Trajectory.Config config = new Trajectory.Config(
+                Trajectory.FitMethod.HERMITE_CUBIC,
+                Trajectory.Config.SAMPLES_FAST,
+                kUpdateFrequency,
+                maxVelocity,
+                maxAcceleration,
+                maxJerk);
+
+        double distance = 80.0 * (angle / 360.0);
+
+        final Waypoint[] points = new Waypoint[]{
+                new Waypoint(0, 0, Pathfinder.d2r(0)),
+                new Waypoint(Math.abs(distance), 0, Pathfinder.d2r(0)),
+        };
+
+        Trajectory trajectory = Pathfinder.generate(points, config);
+        TankModifier modifier = new TankModifier(trajectory).modify(kWheelbaseWidth);
+        Trajectory[] trajectories = new Trajectory[]{modifier.getLeftTrajectory(), modifier.getRightTrajectory()};
+        Encoder[] encoders = new Encoder[]{this.leftEncoder, this.rightEncoder};
+        double[] distanceScales = new double[] {(distance < 0.0)?-1.0:1.0, (distance < 0.0)?1.0:-1.0};
+        IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
+        double[] motorScales = new double[] {1.0, -1.0};
+
+        System.out.println("driveRotate: " + angle + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
+        this.follower = new TrajectoryFollower(new String[] {"DriveRotate-left", "DriveRotate-right"}, trajectories, encoders, distanceScales, motors, motorScales,
+                1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
+
+        this.follower.start();
+    }
+
+    public void stopFollowing() {
+        if (this.follower != null) {
+            this.follower.stop();
+            this.drive(0.0, 0.0);
+            this.follower = null;
+        }
+    }
+
 
     public void autonomousPeriodic() {
 

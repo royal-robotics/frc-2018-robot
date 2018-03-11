@@ -80,16 +80,16 @@ public class Controls {
 
 
     public static void initialize() {
-        SmartDashboard.putBoolean("Controls/Debugging", false);
-        SmartDashboard.putNumber("Controls/MoveDistance", 30.0);
+        SmartDashboard.putBoolean("Controls/Debugging", true);
+        SmartDashboard.putNumber("Controls/MoveDistance", 60.0);
     }
 
     public static double getMoveDistance() {
-        return SmartDashboard.getNumber("Controls/MoveDistance", 30.0);
+        return SmartDashboard.getNumber("Controls/MoveDistance", 60.0);
     }
 
     public static void updateControls() {
-        DebugMode = SmartDashboard.getBoolean("Controls/Debugging", false);
+        DebugMode = SmartDashboard.getBoolean("Controls/Debugging", true);
 
         armsClose = armsCloseButton.isPressed();
         armsOpen = armsOpenButton.isPressed();
