@@ -169,10 +169,9 @@ public class Lift {
                     500.0);
 
             Trajectory trajectory = Pathfinder.generate(points, config);
-            System.out.println("Generated path from " + this.getPosition() + " to " + moveTo + " ETA: " + (trajectory.length() * 0.01));
-//            Pathfinder.writeToCSV();
+            System.out.println("Generated LiftMove path from " + this.getPosition() + " to " + moveTo + " ETA: " + (trajectory.length() * 0.01));
 
-            follower = new TrajectoryFollower(trajectory, this.getPosition() > moveTo,this.liftEncoder, this.liftMotor, .04, 0.0, 0.8, 0.0, 0.0);
+            follower = new TrajectoryFollower("LiftMove", this.getPosition() > moveTo, trajectory,this.liftEncoder, this.liftMotor, .04, 0.0, 0.8, 0.0, 0.0);
             follower.start();
         }
     }
@@ -202,7 +201,6 @@ public class Lift {
                     }
 
 
-                    System.out.println("Calibrate Time: " + dt + " Calibrate Current: " + liftMotor.getOutputCurrent());
                     if(dt > 1.0) {
                         liftEncoder.reset();
                         isCalibrated = true;

@@ -38,6 +38,7 @@ function updateTunablesList(changefilter) {
         }
     }
 
+    display = allKeys;
     let sortedKeys = allKeys.sort();
 
     for (let key in sortedKeys) {
@@ -50,7 +51,10 @@ function updateTunablesList(changefilter) {
             case "string":
                 div = $("#tunable-string").clone();
                 let inputSt = div.find(".tunable-value");
-                inputSt.change(function() { console.log($(this).val())});
+                inputSt.change(function() {
+                    console.log($(this).val());
+                    NetworkTables.putValue("/SmartDashboard/" + keyValue, $(this).val());
+                });
                 inputSt.attr("value", value);
                 break;
             case "number":
@@ -67,7 +71,10 @@ function updateTunablesList(changefilter) {
                 div = $("#tunable-boolean").clone();
                 let inputBo = div.find(".tunable-value");
                 value ? inputBo.attr("checked", "") : inputBo.removeAttr("checked");
-                inputBo.change(function() { console.log($(this).prop("checked")); });
+                inputBo.change(function() {
+                    console.log($(this).prop("checked"));
+                    NetworkTables.putValue("/SmartDashboard/" + keyValue, $(this).prop("checked"));
+                });
                 break;
         }
 

@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,7 +20,6 @@ public class TrajectoryFollower {
     private boolean isFinished;
 
     private double trajectoryInterval;
-    private double invert;
 
     private double accelerationFeed;
     private double velocityFeed;
@@ -36,18 +33,44 @@ public class TrajectoryFollower {
     private double[] lastPowers;
     private double[] lastErrors;
 
-    private List<Trajectory> trajectories = new ArrayList<Trajectory>();
-    private List<Encoder> encoders = new ArrayList<Encoder>();
-    private List<IMotorController> controllers = new ArrayList<IMotorController>();
+    private String[] names;
+    private Trajectory[] trajectories = null;
+    private Encoder[] encoders = null;
+    private double[] distanceScales;
+    private IMotorController[] controllers = null;
+    private double[] powerScales = null;
 
-    PrintStream ps = null;
+    PrintStream ps[] = null;
 
-    public TrajectoryFollower(Trajectory trajectory, boolean reverse, Encoder encoder, IMotorController controller, double kVf, double kAf, double kP, double kI, double kD) {
-        this.trajectories.add(trajectory);
-        this.encoders.add(encoder);
-        this.controllers.add(controller);
 
-        this.trajectoryInterval = trajectory.get(1).dt;
+    public TrajectoryFollower(String name, boolean reverse,
+                              Trajectory trajectory, Encoder encoder, IMotorController controller,
+                              double kVf, double kAf, double kP, double kI, double kD)
+    {
+        this(new String[] {name}, new Trajectory[] {trajectory}, new Encoder[] { encoder }, new double[] {reverse ? -1.0: 1.0}, new IMotorController[] { controller }, new double[] {1.0}, kVf, kAf, kP, kI, kD);
+    }
+
+    public TrajectoryFollower(String name, boolean reverse,
+                              Trajectory leftTrajectory, Encoder leftEncoder, IMotorController leftMotor, double leftMotorScale,
+                              Trajectory rightTrajectory, Encoder rightEncoder, IMotorController rightMotor, double rightMotorScale,
+                              double kVf, double kAf, double kP, double kI, double kD)
+    {
+        this(new String[] {name+"-left", name+"-right"},
+                new Trajectory[] {leftTrajectory, rightTrajectory},
+                new Encoder[] { leftEncoder, rightEncoder }, new double[] {reverse ? -1.0: 1.0,reverse ? -1.0: 1.0},
+                new IMotorController[] { leftMotor, rightMotor }, new double[] {1.0, -1.0},
+                kVf, kAf, kP, kI, kD);
+    }
+
+    public TrajectoryFollower(String[] names, Trajectory[] trajectories, Encoder[] encoders, double[] distanceScales, IMotorController[] controllers, double[] powerScales, double kVf, double kAf, double kP, double kI, double kD) {
+        this.names = names;
+        this.trajectories = trajectories;
+        this.encoders = encoders;
+        this.distanceScales = distanceScales;
+        this.controllers = controllers;
+        this.powerScales = powerScales;
+
+        this.trajectoryInterval = trajectories[0].get(1).dt;
 
         this.isRunning = false;
         this.isFinished = false;
@@ -58,44 +81,39 @@ public class TrajectoryFollower {
         this.distanceProportional = kP;
         this.distanceIntegral = kI;
         this.distanceDerivative = kD;
-
-        this.invert = 1.0;
-        if (reverse) {
-            this.invert = -1.0;
-        }
     }
 
     public void start() {
-        this.startPositions = new double[trajectories.size()];
-        this.lastPositions = new double[trajectories.size()];
-        this.lastPowers = new double[trajectories.size()];
-        this.lastErrors = new double[trajectories.size()];
+        this.startPositions = new double[trajectories.length];
+        this.lastPositions = new double[trajectories.length];
+        this.lastPowers = new double[trajectories.length];
+        this.lastErrors = new double[trajectories.length];
+        this.ps = new PrintStream[trajectories.length];
 
-        for(int i = 0; i < this.trajectories.size(); i++) {
-            this.startPositions[i] = this.encoders.get(i).getDistance();
+        for(int i = 0; i < this.trajectories.length; i++) {
+            this.startPositions[i] = this.encoders[i].getDistance();
             this.lastPositions[i] = 0.0;
             this.lastPowers[i] = 0.0;
             this.lastErrors[i] = 0.0;
-        }
 
-        File f = new File("/home/lvuser/TrajectoryFollower_0.csv");
-        for(int i = 0;f.exists();i++)
-        {
-            f = new File("/home/lvuser/TrajectoryFollower_" + i + ".csv");
-        }
+            File f = new File("/home/lvuser/" + this.names[i]+ "_0.csv");
+            for(int j = 0;f.exists();j++)
+            {
+                f = new File("/home/lvuser/" + this.names[i] + "_" + j + ".csv");
+            }
 
-        try
-        {
-            this.ps = new PrintStream(f);
-            System.out.println("Created LogFile: " + f.getName());
-            this.ps.println("Time,Index,Expected Velocity,Expected Distance,Actual Distance,Error,Power");
+            try
+            {
+                this.ps[i] = new PrintStream(f);
+                System.out.println("Created LogFile: " + f.getName());
+                this.ps[i].println("Time,Index,Expected Velocity,Expected Distance,Actual Distance,Error,Power");
+            }
+            catch(IOException e)
+            {
+                this.ps[i] = null;
+                e.printStackTrace();
+            }
         }
-        catch(IOException e)
-        {
-            this.ps = null;
-            e.printStackTrace();
-        }
-
 
         this.isRunning = true;
         this.isFinished = false;
@@ -112,13 +130,13 @@ public class TrajectoryFollower {
     public void stop() {
         this.timer.cancel();
         this.timer = null;
-        for(int i = 0; i < controllers.size(); i++) {
-            controllers.get(i).set(ControlMode.PercentOutput, 0.0);
-        }
+        for(int i = 0; i < controllers.length; i++) {
+            controllers[i].set(ControlMode.PercentOutput, 0.0);
 
-        if (this.ps != null) {
-            this.ps.close();
-            this.ps = null;
+            if (this.ps[i] != null) {
+                this.ps[i].close();
+                this.ps[i] = null;
+            }
         }
     }
 
@@ -135,14 +153,14 @@ public class TrajectoryFollower {
         double time = this.getTime();
 
         if (! this.isFinished) {
-            for(int i = 0; i < this.trajectories.size(); i++) {
+            for(int i = 0; i < this.trajectories.length; i++) {
                 double result = 0.0;
-                double position = (this.encoders.get(i).getDistance() - this.startPositions[i]) * this.invert;
+                double position = (this.encoders[i].getDistance() - this.startPositions[i]) * this.distanceScales[i];
 
                 int segmentIndex = (int) Math.round(time / this.trajectoryInterval);
 
-                if (segmentIndex < this.trajectories.get(i).length()) {
-                    Trajectory.Segment segment = this.trajectories.get(i).get(segmentIndex);
+                if (segmentIndex < this.trajectories[i].length()) {
+                    Trajectory.Segment segment = this.trajectories[i].get(segmentIndex);
                     double error = segment.position - position;
 
                     result = this.distanceProportional * error +
@@ -150,10 +168,10 @@ public class TrajectoryFollower {
                             this.velocityFeed * segment.velocity +
                             this.accelerationFeed * segment.acceleration;
 
-                    result = result * this.invert;
+                    result = result * this.distanceScales[i];
 
-                    if (this.ps != null) {
-                        this.ps.println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+","+error+","+result);
+                    if (this.ps[i] != null) {
+                        this.ps[i].println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+","+error+","+result);
                     }
 
                     this.lastTime = time;
@@ -164,7 +182,7 @@ public class TrajectoryFollower {
                     this.isFinished = true;
                 }
 
-                this.controllers.get(i).set(ControlMode.PercentOutput, result);
+                this.controllers[i].set(ControlMode.PercentOutput, result * this.powerScales[i]);
             }
         }
     }

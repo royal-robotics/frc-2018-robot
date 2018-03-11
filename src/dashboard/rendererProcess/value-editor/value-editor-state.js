@@ -1,5 +1,6 @@
 let tunables = []; //TODO: Make this private to this module
 let subtypes = {};
+let display = [];
 
 //Setup tunable listeners, makes sure we have all the tunables and their current values
 NetworkTables.addGlobalListener((key, value, isNew) => {
@@ -14,6 +15,7 @@ NetworkTables.addGlobalListener((key, value, isNew) => {
     let hasKey = subtypes.hasOwnProperty(keyPart1);
 
     if (isNew) {
+        display.push(keyShort);
         if(hasKey) {
             let oldValue = subtypes[keyPart1];
             oldValue.push(keyPart2);
@@ -26,12 +28,11 @@ NetworkTables.addGlobalListener((key, value, isNew) => {
     if(isNew && tunables[keyShort] !== undefined)
         console.log("Warning: new tunable value already defined");
 
+    let areDifferent = display.includes(keyShort) && value != tunables[keyShort];
     tunables[keyShort] = value;
-    
-    //updateTunablesList(isNew); // Only update filter if this is a new value
-    if(typeof(updateTunablesList) != "undefined") {
+    if(typeof(updateTunablesList) != "undefined" && areDifferent) {
         console.log("updateTunables");
-        updateTunablesList();
+        updateTunablesList(isNew);
     }
     
 }, true);

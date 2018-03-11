@@ -74,17 +74,22 @@ public class Controls {
 
     public static boolean inClimberMode() {return inClimberMode; }
 
-    public static boolean showFilter() { return showFilter; }
+    public static boolean debugDriveForward() { return debugDriveForward && DebugMode; }
 
     public static boolean showTargets() { return showTargets; }
 
 
     public static void initialize() {
-        SmartDashboard.putBoolean("Controls/Debugging", false);
+        SmartDashboard.putBoolean("Controls/Debugging", true);
+        SmartDashboard.putNumber("Controls/MoveDistance", 60.0);
+    }
+
+    public static double getMoveDistance() {
+        return SmartDashboard.getNumber("Controls/MoveDistance", 60.0);
     }
 
     public static void updateControls() {
-        DebugMode = SmartDashboard.getBoolean("Controls/Debugging", false);
+        DebugMode = SmartDashboard.getBoolean("Controls/Debugging", true);
 
         armsClose = armsCloseButton.isPressed();
         armsOpen = armsOpenButton.isPressed();
@@ -96,7 +101,7 @@ public class Controls {
         moveScale = moveScaleButton.isPressed();
         moveClimb = moveClimbButton.isPressed();
 
-        showFilter = showFilterButton.isPressed();
+        debugDriveForward = debugDriveForwardButton.isPressed();
         showTargets = showTargetsButton.isPressed();
         calibrate = calibrateButton.isPressed();
         debugMoveLift = moveLiftButton.isPressed() && DebugMode;
@@ -129,7 +134,7 @@ public class Controls {
     private static IButton shiftToggleButton = new Button(driver, Logitech310Button.A, IButton.ButtonType.Toggle);
     private static IButton moveLiftButton = new Button(driver,Logitech310Button.B, IButton.ButtonType.Hold);
     private static IButton showTargetsButton = new Button(driver, Logitech310Button.X, IButton.ButtonType.Hold);
-    private static IButton showFilterButton = new Button(driver, Logitech310Button.Y, IButton.ButtonType.Hold);
+    private static IButton debugDriveForwardButton = new Button(driver, Logitech310Button.Y, IButton.ButtonType.Hold);
     private static IButton toggleDrive = new Button(driver, Logitech310Button.Back, IButton.ButtonType.Toggle);
 
     // Tank Drive
@@ -166,7 +171,7 @@ public class Controls {
 
     //
     //
-    private static boolean DebugMode = false;
+    private static boolean DebugMode = true;
 
     private static DriveType driveType = DriveType.DiffDrive;
     private static boolean isHighGear = true;
@@ -186,6 +191,6 @@ public class Controls {
     private static boolean calibrate = false;
     private static boolean debugMoveLift = false;
 
-    private static boolean showFilter = false;
+    private static boolean debugDriveForward = false;
     private static boolean showTargets = false;
 }
