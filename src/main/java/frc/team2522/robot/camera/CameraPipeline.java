@@ -1,36 +1,46 @@
 package frc.team2522.robot.camera;
 
-import java.io.OutputStream;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Filter;
-
 import edu.wpi.cscore.*;
+
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import frc.team2522.robot.Controls;
 import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
 
 public class CameraPipeline {
+
+    static {
+        SmartDashboard.putString("Camera/Filter", "raw");
+    }
+
+    //Setup image pipe
+    CvSink cameraStream = createCameraStream();
+    BlurFilter blurFilter = new BlurFilter(cameraStream);
+    ThresholdFilter thresholdFilter = new ThresholdFilter(blurFilter);
 
     public CameraPipeline() {
 
         new Thread(() -> {
-            CvSink cameraStream = createCameraStream();
-
-            CubeFilter cubeFilter = new CubeFilter(cameraStream);
-
             CvSource outputStream = createOutputStream();
             Mat frame = new Mat();
 
             while (!Thread.interrupted()) {
-                if (Controls.showFilter())
-                    cubeFilter.grabFrame(frame);
-                else
-                    cameraStream.grabFrame(frame);
+                CvSink sink = getFilter(SmartDashboard.getString("Camera/Filter", "raw"));
+                sink.grabFrame(frame);
 
                 outputStream.putFrame(frame);
             }
         }).start();
+    }
+
+    private CvSink getFilter(String filter) {
+        if(filter.equals("blur"))
+            return blurFilter;
+        else if(filter.equals("threshold"))
+            return thresholdFilter;
+        else //"raw"
+            return cameraStream;
     }
 
     private CvSink createCameraStream() {

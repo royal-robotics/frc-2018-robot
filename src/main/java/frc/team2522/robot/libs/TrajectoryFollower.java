@@ -36,18 +36,22 @@ public class TrajectoryFollower {
     private double[] lastPowers;
     private double[] lastErrors;
 
-    private List<Trajectory> trajectories = new ArrayList<Trajectory>();
-    private List<Encoder> encoders = new ArrayList<Encoder>();
-    private List<IMotorController> controllers = new ArrayList<IMotorController>();
+    private Trajectory[] trajectories = null;
+    private Encoder[] encoders = null;
+    private IMotorController[] controllers = null;
 
     PrintStream ps = null;
 
     public TrajectoryFollower(Trajectory trajectory, boolean reverse, Encoder encoder, IMotorController controller, double kVf, double kAf, double kP, double kI, double kD) {
-        this.trajectories.add(trajectory);
-        this.encoders.add(encoder);
-        this.controllers.add(controller);
+        this(new Trajectory[] {trajectory}, reverse, new Encoder[] { encoder }, new IMotorController[] { controller }, kVf, kAf, kP, kI, kD);
+    }
 
-        this.trajectoryInterval = trajectory.get(1).dt;
+    public TrajectoryFollower(Trajectory[] trajectories, boolean reverse, Encoder[] encoders, IMotorController[] controllers, double kVf, double kAf, double kP, double kI, double kD) {
+        this.trajectories = trajectories;
+        this.encoders = encoders;
+        this.controllers = controllers;
+
+        this.trajectoryInterval = trajectories[0].get(1).dt;
 
         this.isRunning = false;
         this.isFinished = false;
@@ -66,13 +70,13 @@ public class TrajectoryFollower {
     }
 
     public void start() {
-        this.startPositions = new double[trajectories.size()];
-        this.lastPositions = new double[trajectories.size()];
-        this.lastPowers = new double[trajectories.size()];
-        this.lastErrors = new double[trajectories.size()];
+        this.startPositions = new double[trajectories.length];
+        this.lastPositions = new double[trajectories.length];
+        this.lastPowers = new double[trajectories.length];
+        this.lastErrors = new double[trajectories.length];
 
-        for(int i = 0; i < this.trajectories.size(); i++) {
-            this.startPositions[i] = this.encoders.get(i).getDistance();
+        for(int i = 0; i < this.trajectories.length; i++) {
+            this.startPositions[i] = this.encoders[i].getDistance();
             this.lastPositions[i] = 0.0;
             this.lastPowers[i] = 0.0;
             this.lastErrors[i] = 0.0;
@@ -112,8 +116,8 @@ public class TrajectoryFollower {
     public void stop() {
         this.timer.cancel();
         this.timer = null;
-        for(int i = 0; i < controllers.size(); i++) {
-            controllers.get(i).set(ControlMode.PercentOutput, 0.0);
+        for(int i = 0; i < controllers.length; i++) {
+            controllers[i].set(ControlMode.PercentOutput, 0.0);
         }
 
         if (this.ps != null) {
@@ -135,14 +139,14 @@ public class TrajectoryFollower {
         double time = this.getTime();
 
         if (! this.isFinished) {
-            for(int i = 0; i < this.trajectories.size(); i++) {
+            for(int i = 0; i < this.trajectories.length; i++) {
                 double result = 0.0;
-                double position = (this.encoders.get(i).getDistance() - this.startPositions[i]) * this.invert;
+                double position = (this.encoders[i].getDistance() - this.startPositions[i]) * this.invert;
 
                 int segmentIndex = (int) Math.round(time / this.trajectoryInterval);
 
-                if (segmentIndex < this.trajectories.get(i).length()) {
-                    Trajectory.Segment segment = this.trajectories.get(i).get(segmentIndex);
+                if (segmentIndex < this.trajectories[i].length()) {
+                    Trajectory.Segment segment = this.trajectories[i].get(segmentIndex);
                     double error = segment.position - position;
 
                     result = this.distanceProportional * error +
@@ -164,7 +168,7 @@ public class TrajectoryFollower {
                     this.isFinished = true;
                 }
 
-                this.controllers.get(i).set(ControlMode.PercentOutput, result);
+                this.controllers[i].set(ControlMode.PercentOutput, result);
             }
         }
     }

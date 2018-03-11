@@ -63,7 +63,7 @@ function updateTunablesList(changefilter) {
                 inputNu.change(function() {
                     console.log($(this).val());
                     console.log("/SmartDashboard/" + keyValue);
-                    NetworkTables.putValue("/SmartDashboard/" + keyValue, parseFloat($(this).val()));
+                    //NetworkTables.putValue("/SmartDashboard/" + keyValue, parseFloat($(this).val()));
                 });
                 inputNu.attr("value", value);
                 break;

@@ -8,7 +8,6 @@ $(() => {
     connectionChange(NetworkTables.isRobotConnected());
 });
 
-
 function connectionChange(isConnected) {
     if(isConnected)
         connectToCamera();
@@ -27,7 +26,6 @@ function disconnectFromCamera() {
 }
 
 function replaceImage(src) {
-    console.log($("#camera"))
     $("#camera").empty();
     let img = document.createElement("img");
     img.src = src;
