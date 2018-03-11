@@ -18,8 +18,9 @@ public class Generate {
                 throw new IllegalArgumentException("Path to the json file should be the only argument");
 
         //Parse json file
+        File file = new File(args[0]);
         JSONParser parser = new JSONParser();
-        Object obj = parser.parse(new FileReader(args[0]));
+        Object obj = parser.parse(new FileReader(file));
         JSONObject jsonObj = (JSONObject) obj;
 
         //Parse motion profile config file
@@ -36,15 +37,29 @@ public class Generate {
         Trajectory right = modifier.getRightTrajectory();
 
         
+        String fileName = file.getName();
+        int pos = fileName.lastIndexOf(".");
+        if (pos > 0 && pos < (fileName.length() - 1)) { // If '.' is not the first or last character.
+            fileName = fileName.substring(0, pos);
+        }
+
+        JSONObject outputs = (JSONObject)jsonObj.get("outputs");
+        JSONObject csvOutputs = (JSONObject)outputs.get("csv");
+        JSONObject binOutputs = (JSONObject)outputs.get("bin");
+        
+        File genDirectory = new File("motionProfiles/generated");
+        if(!genDirectory.exists())
+            genDirectory.mkdir();
+
         //Write .csv files for analyzing with R/Excel
-        writeCsv(jsonObj, "output-center-csv", trajectory);
-        writeCsv(jsonObj, "output-left-csv", left);
-        writeCsv(jsonObj, "output-right-csv", right);
+        writeCsv(csvOutputs, fileName, "center", trajectory);
+        writeCsv(csvOutputs, fileName, "left", left);
+        writeCsv(csvOutputs, fileName, "right", right);
 
         //Write .bin files to be sent to and deserialized by the RoboRio
-        writeBin(jsonObj, "output-center-bin", trajectory);
-        writeBin(jsonObj, "output-left-bin", left);
-        writeBin(jsonObj, "output-right-bin", right);
+        writeBin(binOutputs, fileName, "center", trajectory);
+        writeBin(binOutputs, fileName, "left", left);
+        writeBin(binOutputs, fileName, "right", right);
     }
 
     private static Waypoint[] parseWaypoints(JSONArray jsonWaypoints) {
@@ -81,15 +96,19 @@ public class Generate {
                 maxJerk);
     }
 
-    private static void writeCsv(JSONObject jsonObj, String config, Trajectory trajectory) {
-        String csv = (String)jsonObj.get(config);
-        if(csv != null)
-                Pathfinder.writeToCSV(new File(csv), trajectory);
+    private static void writeCsv(JSONObject outputs, String profileName, String profileType, Trajectory trajectory) {
+        String basePath = "motionProfiles/generated/";
+        String fileName = basePath + profileName + "-" + profileType + ".csv";
+
+        if(outputs.get(profileType) != null && (boolean)outputs.get(profileType))
+            Pathfinder.writeToCSV(new File(fileName), trajectory);
     }
 
-    private static void writeBin(JSONObject jsonObj, String config, Trajectory trajectory) {
-        String bin = (String)jsonObj.get(config);
-        if(bin != null)
-                Pathfinder.writeToFile(new File(bin), trajectory);
+    private static void writeBin(JSONObject outputs, String profileName, String profileType, Trajectory trajectory) {
+        String basePath = "motionProfiles/generated/";
+        String fileName = basePath + profileName + "-" + profileType + ".bin";
+
+        if(outputs.get(profileType) != null && (boolean)outputs.get(profileType))
+            Pathfinder.writeToFile(new File(fileName), trajectory);
     }
 }
