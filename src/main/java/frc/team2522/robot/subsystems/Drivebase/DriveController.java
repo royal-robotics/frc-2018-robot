@@ -47,6 +47,8 @@ public class DriveController {
     private Gearbox rightMotors;
     private Encoder rightEncoder;
 
+    private ADXRS450_Gyro gyro;
+
     private DoubleSolenoid shifter;
     private DoubleSolenoid pto;
 
@@ -74,7 +76,7 @@ public class DriveController {
     private TrajectoryFollower follower = null;
 
 
-    public DriveController(IMotorController leftDriveMotor, Encoder leftDriveEncoder, IMotorController rightDriveMotor, Encoder rightDriveEncoder, DoubleSolenoid shifter, DoubleSolenoid pto) {
+    public DriveController(IMotorController leftDriveMotor, Encoder leftDriveEncoder, IMotorController rightDriveMotor, Encoder rightDriveEncoder, ADXRS450_Gyro gyro, DoubleSolenoid shifter, DoubleSolenoid pto) {
         this.leftMotor = leftDriveMotor;
         this.leftMotors = new Gearbox(leftDriveMotor);
         this.leftEncoder = leftDriveEncoder;
@@ -82,6 +84,8 @@ public class DriveController {
         this.rightMotor = rightDriveMotor;
         this.rightMotors = new Gearbox(rightDriveMotor);
         this.rightEncoder = rightDriveEncoder;
+
+        this.gyro = gyro;
 
         this.shifter = shifter;
         this.pto = pto;
@@ -109,6 +113,25 @@ public class DriveController {
         this.leftEncoder.reset();
         this.rightEncoder.reset();
         this.maxDetectedVelocity = 0.0;
+
+        this.gyro.reset();
+    }
+
+    /**
+     * This returns the angle in degrees that the robot
+     *
+     * @return angle in accumulative degrees since gyro was last reset.
+     */
+    public double getAngle() {
+        return this.gyro.getAngle();
+    }
+
+    /**
+     *
+     * @return angle in radians
+     */
+    public double getRadians() {
+        return Pathfinder.d2r(this.gyro.getAngle());
     }
 
     /**
@@ -143,6 +166,7 @@ public class DriveController {
         SmartDashboard.putNumber("DriveController/LeftDistance", this.leftLastDistance);
         SmartDashboard.putNumber("DriveController/RightVelocity", this.rightVelocity);
         SmartDashboard.putNumber("DriveController/RightDistance", this.rightLastDistance);
+        SmartDashboard.putNumber("DriveController/RightDistance", this.getAngle());
 
         // TODO write to log file
     }
@@ -204,7 +228,7 @@ public class DriveController {
         }
     }
 
-    public void drivePath(String pathName, boolean reverse) {
+    public TrajectoryFollower drivePath(String pathName, boolean reverse) {
         this.stopFollowing();
 
         final String pathDirectory = "/home/lvuser/";
@@ -214,28 +238,30 @@ public class DriveController {
 
         if (!leftFile.exists()) {
             System.out.println("Missing path file: " + leftFile.getName());
-            return;
+            return null;
         }
 
         if (!rightFile.exists()) {
             System.out.println("Missing path file: " + rightFile.getName());
-            return;
+            return null;
         }
 
         Trajectory leftTrajectory = Pathfinder.readFromFile(leftFile);
         Trajectory rightTrajectory = Pathfinder.readFromFile(rightFile);
 
-        System.out.println("drivePath: " + pathName + " ETA: " + ((double)leftTrajectory.length() * leftTrajectory.get(0).dt) + " seconds.");
+        System.out.println("DrivePath: " + pathName + " ETA: " + ((double)leftTrajectory.length() * leftTrajectory.get(0).dt) + " seconds.");
 
-        this.follower = new TrajectoryFollower(pathName, reverse,
+        this.follower = new TrajectoryFollower(pathName, reverse, this.gyro,
                 Pathfinder.readFromFile(leftFile), leftEncoder, leftMotor, 1.0,
                 Pathfinder.readFromFile(rightFile), rightEncoder, rightMotor, -1.0,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
 
         this.follower.start();
+
+        return this.follower;
     }
 
-    public void driveDistance(double distance, double maxVelocity, double maxAcceleration, double maxJerk) {
+    public TrajectoryFollower driveDistance(double distance, double maxVelocity, double maxAcceleration, double maxJerk) {
         this.stopFollowing();
 
         final Trajectory.Config config = new Trajectory.Config(
@@ -259,13 +285,15 @@ public class DriveController {
         IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
         double[] motorScales = new double[] {1.0, -1.0};
 
-        System.out.println("driveDistance: " + distance + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
-        this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"}, trajectories, encoders, distanceScales, motors, motorScales,
+        System.out.println("DriveDistance: " + distance + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
+        this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"}, this.gyro, trajectories, encoders, distanceScales, motors, motorScales,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
         this.follower.start();
+
+        return this.follower;
     }
 
-    public void driveRotate(double angle, double maxVelocity, double maxAcceleration, double maxJerk) {
+    public TrajectoryFollower driveRotate(double angle, double maxVelocity, double maxAcceleration, double maxJerk) {
         this.stopFollowing();
 
         final Trajectory.Config config = new Trajectory.Config(
@@ -291,11 +319,13 @@ public class DriveController {
         IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
         double[] motorScales = new double[] {1.0, -1.0};
 
-        System.out.println("driveRotate: " + angle + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
-        this.follower = new TrajectoryFollower(new String[] {"DriveRotate-left", "DriveRotate-right"}, trajectories, encoders, distanceScales, motors, motorScales,
+        System.out.println("DriveRotate: " + angle + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
+        this.follower = new TrajectoryFollower(new String[] {"DriveRotate-left", "DriveRotate-right"}, null, trajectories, encoders, distanceScales, motors, motorScales,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
 
         this.follower.start();
+
+        return this.follower;
     }
 
     public void stopFollowing() {

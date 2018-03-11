@@ -2,12 +2,15 @@ package frc.team2522.robot.libs;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.IMotorController;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
 import edu.wpi.first.wpilibj.Encoder;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,30 +43,35 @@ public class TrajectoryFollower {
     private IMotorController[] controllers = null;
     private double[] powerScales = null;
 
+    private ADXRS450_Gyro gyro;
+    private double gyroAngleOffset;
+    private double initalRadiansOffset;
+
     PrintStream ps[] = null;
 
 
-    public TrajectoryFollower(String name, boolean reverse,
+    public TrajectoryFollower(String name, boolean reverse, ADXRS450_Gyro gyro,
                               Trajectory trajectory, Encoder encoder, IMotorController controller,
                               double kVf, double kAf, double kP, double kI, double kD)
     {
-        this(new String[] {name}, new Trajectory[] {trajectory}, new Encoder[] { encoder }, new double[] {reverse ? -1.0: 1.0}, new IMotorController[] { controller }, new double[] {1.0}, kVf, kAf, kP, kI, kD);
+        this(new String[] {name}, gyro, new Trajectory[] {trajectory}, new Encoder[] { encoder }, new double[] {reverse ? -1.0: 1.0}, new IMotorController[] { controller }, new double[] {1.0}, kVf, kAf, kP, kI, kD);
     }
 
-    public TrajectoryFollower(String name, boolean reverse,
+    public TrajectoryFollower(String name, boolean reverse, ADXRS450_Gyro gyro,
                               Trajectory leftTrajectory, Encoder leftEncoder, IMotorController leftMotor, double leftMotorScale,
                               Trajectory rightTrajectory, Encoder rightEncoder, IMotorController rightMotor, double rightMotorScale,
                               double kVf, double kAf, double kP, double kI, double kD)
     {
-        this(new String[] {name+"-left", name+"-right"},
+        this(new String[] {name+"-left", name+"-right"}, gyro,
                 new Trajectory[] {leftTrajectory, rightTrajectory},
                 new Encoder[] { leftEncoder, rightEncoder }, new double[] {reverse ? -1.0: 1.0,reverse ? -1.0: 1.0},
                 new IMotorController[] { leftMotor, rightMotor }, new double[] {1.0, -1.0},
                 kVf, kAf, kP, kI, kD);
     }
 
-    public TrajectoryFollower(String[] names, Trajectory[] trajectories, Encoder[] encoders, double[] distanceScales, IMotorController[] controllers, double[] powerScales, double kVf, double kAf, double kP, double kI, double kD) {
+    public TrajectoryFollower(String[] names,  ADXRS450_Gyro gyro, Trajectory[] trajectories, Encoder[] encoders, double[] distanceScales, IMotorController[] controllers, double[] powerScales, double kVf, double kAf, double kP, double kI, double kD) {
         this.names = names;
+        this.gyro = gyro;
         this.trajectories = trajectories;
         this.encoders = encoders;
         this.distanceScales = distanceScales;
@@ -90,6 +98,11 @@ public class TrajectoryFollower {
         this.lastErrors = new double[trajectories.length];
         this.ps = new PrintStream[trajectories.length];
 
+        if (this.gyro != null) {
+            this.gyroAngleOffset = this.gyro.getAngle();
+            this.initalRadiansOffset = trajectories[0].get(0).heading;
+        }
+
         for(int i = 0; i < this.trajectories.length; i++) {
             this.startPositions[i] = this.encoders[i].getDistance();
             this.lastPositions[i] = 0.0;
@@ -106,7 +119,7 @@ public class TrajectoryFollower {
             {
                 this.ps[i] = new PrintStream(f);
                 System.out.println("Created LogFile: " + f.getName());
-                this.ps[i].println("Time,Index,Expected Velocity,Expected Distance,Actual Distance,Error,Power");
+                this.ps[i].println("Time,Index,Expected Velocity,Expected Distance,Actual Distance,Distance Error,Expected Angle, Actual Angle,Angle Error,Power");
             }
             catch(IOException e)
             {
@@ -140,8 +153,52 @@ public class TrajectoryFollower {
         }
     }
 
+    /**
+     * Returns true after the follower has completed.
+     *
+     * @return boolean has the follower finished.
+     */
     public boolean isFinished() {
         return this.isFinished;
+    }
+
+    /**
+     * Returns the time in seconds since follower was started.
+     *
+     * @return double elapsed time since start of follower.
+     */
+    public double getTime() {
+        return (double)(System.nanoTime() - this.startTime) / 1000000000.0;
+    }
+
+    /**
+     * Get angle in radians that robot is currently oriented.
+     * @return
+     */
+    public double getAngle() {
+        if (this.gyro == null) {
+            return 0.0;
+        }
+
+        return Pathfinder.d2r(Pathfinder.d2r(this.gyro.getAngle() - this.gyroAngleOffset) + this.initalRadiansOffset);
+    }
+
+    /**
+     * Returns the current position in terms of distance along the first trajectory that the follower has traveled.
+     *
+     * @return
+     */
+    public double getPosition() {
+        return this.lastPositions[0];
+    }
+
+    /**
+     * Returns the length in distance traveled of the first trajectory in the list.
+     *
+     * @return
+     */
+    public double getLength() {
+        return this.trajectories[0].get(this.trajectories.length - 1).position;
     }
 
     /**
@@ -168,10 +225,31 @@ public class TrajectoryFollower {
                             this.velocityFeed * segment.velocity +
                             this.accelerationFeed * segment.acceleration;
 
+                    // If we have a gyro then lets adjust power outputs as if motors[0] is left and motors[1] is right
+                    // wheels.
+
+                    double actualAngle = 0.0;
+                    double expectedAngle = 0.0;
+                    double angleError = 0.0;
+                    if (this.gyro != null) {
+                        actualAngle = this.getAngle();
+                        expectedAngle = Pathfinder.r2d(segment.heading);
+                        angleError = Pathfinder.boundHalfDegrees(expectedAngle - actualAngle);
+
+                        double turnAdj = 0.8 * (-1.0 / 80.0) * angleError;
+
+                        if (i == 0) {
+                            result = result + turnAdj;
+                        }
+                        else {
+                            result = result - turnAdj;
+                        }
+                    }
+
                     result = result * this.distanceScales[i];
 
                     if (this.ps[i] != null) {
-                        this.ps[i].println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+","+error+","+result);
+                        this.ps[i].println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+","+error+"," + expectedAngle+","+actualAngle+","+angleError+","+result);
                     }
 
                     this.lastTime = time;
@@ -185,9 +263,5 @@ public class TrajectoryFollower {
                 this.controllers[i].set(ControlMode.PercentOutput, result * this.powerScales[i]);
             }
         }
-    }
-
-    private double getTime() {
-        return (double)(System.nanoTime() - this.startTime) / 1000000000.0;
     }
 }

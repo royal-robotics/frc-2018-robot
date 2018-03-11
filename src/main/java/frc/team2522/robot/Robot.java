@@ -9,7 +9,6 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
 
 import frc.team2522.robot.libs.Stopwatch;
-import frc.team2522.robot.libs.TrajectoryFollower;
 import frc.team2522.robot.subsystems.Drivebase.DriveController;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
 import frc.team2522.robot.subsystems.Elevator.Intake;
@@ -46,6 +45,9 @@ public class Robot extends IterativeRobot {
     private DoubleSolenoid shifter = new DoubleSolenoid(1, 2, 5);
     private DoubleSolenoid intakeLo = new DoubleSolenoid(1, 3, 4);
 
+    // Gyro Configuration
+    private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+
     //
     CameraPipeline camera = new CameraPipeline();
 
@@ -53,14 +55,12 @@ public class Robot extends IterativeRobot {
     Stopwatch robotStopwatch = Stopwatch.StartNew();
 
     // Subsystem Definitions
-    private DriveController driveController;
-    Elevator elevator;
+    public DriveController driveController;
+    public Elevator elevatorController;
 
     @Override
     public void robotInit() {
         Controls.initialize();
-
-        //gyro.reset();
 
         // Setup Drivebase subsystem.
         //
@@ -75,7 +75,7 @@ public class Robot extends IterativeRobot {
         leftDriveEncoder.setReverseDirection(true);
         rightDriveEncoder.setReverseDirection(false);
 
-        this.driveController = new DriveController(leftDriveMotor1, leftDriveEncoder, rightDriveMotor1, rightDriveEncoder, shifter, pto);
+        this.driveController = new DriveController(leftDriveMotor1, leftDriveEncoder, rightDriveMotor1, rightDriveEncoder, gyro, shifter, pto);
 
         // Setup Elevator subsystem
         //
@@ -83,7 +83,7 @@ public class Robot extends IterativeRobot {
         liftMotor3.follow(liftMotor1);
         Intake intake = new Intake(carriageIntakeMotor, leftIntakeMotor, rightIntakeMotor, intakeHi, intakeLo);
         Lift   lift = new Lift(intake, liftMotor1, elevatorLiftEncoder, elevatorLiftHallEffectSensor, liftBrake, liftRatchet);
-        this.elevator = new Elevator(intake, lift);
+        this.elevatorController = new Elevator(intake, lift);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
         Controls.updateControls();
 
         this.driveController.robotPeriodic();
-        this.elevator.robotPeriodic();
+        this.elevatorController.robotPeriodic();
     }
 
     /**
@@ -121,7 +121,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void autonomousInit() {
-        driveController.reset();
+        this.driveController.reset();
     }
 
     /**
@@ -147,6 +147,7 @@ public class Robot extends IterativeRobot {
     @Override
     public void teleopPeriodic() {
         driveController.teleopPeriodic();
-        elevator.teleopPeriodic();
+        elevatorController.teleopPeriodic();
     }
+
 }
