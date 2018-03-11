@@ -28,9 +28,7 @@ NetworkTables.addGlobalListener((key, value, isNew) => {
     if(isNew && tunables[keyShort] !== undefined)
         console.log("Warning: new tunable value already defined");
 
-    console.log(display);
     let areDifferent = display.includes(keyShort) && value != tunables[keyShort];
-    console.log(areDifferent);
     tunables[keyShort] = value;
     if(typeof(updateTunablesList) != "undefined" && areDifferent) {
         console.log("updateTunables");
