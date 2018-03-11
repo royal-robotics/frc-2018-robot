@@ -13,10 +13,16 @@
         "max-acceleration": 100.0,
         "max-jerk": 300.0
     },
-    "output-center-csv" : "temp/motion-profile-center.csv",
-    "output-center-bin" : "temp/motion-profile-center.bin",
-    "output-left-csv" : "temp/motion-profile-left.csv",
-    "output-left-bin" : "temp/motion-profile-left.bin",
-    "output-right-csv" : "temp/motion-profile-right.csv",
-    "output-right-bin" : "temp/motion-profile-right.bin"
+    "outputs": {
+        "csv": {
+            "center": true,
+            "left": true,
+            "right": true
+        },
+        "bin": {
+            "center": true,
+            "left": true,
+            "right": true
+        }
+    }
 }
