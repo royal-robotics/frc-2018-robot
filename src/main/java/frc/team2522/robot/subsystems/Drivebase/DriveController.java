@@ -194,8 +194,8 @@ public class DriveController {
 
             if (Controls.debugDriveForward()) {
                 if (this.follower == null) {
-//                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
-                    this.drivePath("motion-profile", false);
+                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
+//                    this.drivePath("motion-profile", false);
 //                    this.driveRotate(90.0, 50, 100, 300);
                 }
                 else if (this.follower.isFinished()) {

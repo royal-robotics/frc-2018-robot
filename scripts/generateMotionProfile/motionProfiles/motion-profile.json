@@ -2,8 +2,8 @@
     "wheelbase-width": 25.00,
     "waypoints" : [
         {"x": 0.0, "y": 0.0, "angle": 90.0},
-        {"x": 40.0, "y": 80.0, "angle": 90.0},
-        {"x": 40.0, "y": 120.0, "angle": 90.0}
+        {"x": 60.0, "y": 80.0, "angle": 90.0},
+        {"x": 60.0, "y": 120.0, "angle": 90.0}
     ],
     "config": {
         "fit-method": "HERMITE_CUBIC",
