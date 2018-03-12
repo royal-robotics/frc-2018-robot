@@ -285,7 +285,7 @@ public class DriveController {
         double[] motorScales = new double[] {1.0, -1.0};
 
         System.out.println("DriveDistance: " + distance + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
-        this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"}, this.gyro, trajectories, encoders, distanceScales, motors, motorScales,
+        this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"}, null, trajectories, encoders, distanceScales, motors, motorScales,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
         this.follower.start();
 

@@ -128,7 +128,7 @@ public class Robot extends IterativeRobot {
     @Override
     public void autonomousInit() {
         this.driveController.reset();
-        auto = AutoRoutines.SimpleTest(this);
+        auto = AutoRoutines.Right_SwitchOrScale(this);
 //        auto = AutoRoutines.selectAutoMode("SimpleTest", this);
     }
 

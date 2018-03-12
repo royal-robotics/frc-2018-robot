@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.Encoder;
 import frc.team2522.robot.Controls;
 
 public class Elevator {
-    private Intake intake;
-    private Lift lift;
+    public Intake intake;
+    public Lift lift;
 
 
     public Elevator(Intake intake, Lift lift) {

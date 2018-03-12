@@ -22,7 +22,7 @@ public class AutoDrive extends AutoStep {
 
     @Override
     public void initialize() {
-        follower = driveController.driveDistance(distance, 50, 100, 100);
+        follower = driveController.driveDistance(distance, 100, 100, 300);
     }
 
 

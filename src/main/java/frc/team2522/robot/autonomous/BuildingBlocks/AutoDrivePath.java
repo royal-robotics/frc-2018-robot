@@ -4,23 +4,24 @@ import frc.team2522.robot.autonomous.AutoStep;
 import frc.team2522.robot.libs.TrajectoryFollower;
 import frc.team2522.robot.subsystems.Drivebase.DriveController;
 
-public class AutoRotate extends AutoStep {
+public class AutoDrivePath  extends AutoStep {
 
     private TrajectoryFollower follower;
+    private boolean isCompleted = false;
 
     DriveController driveController;
-    double angle;
 
-    public AutoRotate(DriveController driveController, double angle) {
+    String pathName;
+
+    public AutoDrivePath(DriveController driveController, String pathName) {
         this.driveController = driveController;
-        this.angle = angle;
+        this.pathName = pathName;
     }
 
     @Override
     public void initialize() {
-        follower = driveController.driveRotate(angle, 75, 100, 200);
+        follower = driveController.drivePath(this.pathName, false);
     }
-
 
     @Override
     public boolean isCompleted() {
