@@ -1,6 +1,8 @@
 package frc.team2522.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import frc.team2522.robot.autonomous.AutoManager;
+import frc.team2522.robot.autonomous.AutoRoutines;
 import frc.team2522.robot.camera.CameraPipeline;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -58,8 +60,11 @@ public class Robot extends IterativeRobot {
     public DriveController driveController;
     public Elevator elevatorController;
 
+    AutoManager auto;
+
     @Override
     public void robotInit() {
+        AutoRoutines.writeRoutinesToDashboard();
         Controls.initialize();
 
         // Setup Drivebase subsystem.
@@ -88,8 +93,6 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void robotPeriodic() {
-        //SmartDashboard.putNumber("robot/uptime/", robotStopwatch.getElapsedTime().getSeconds());
-
         Controls.updateControls();
 
         this.driveController.robotPeriodic();
@@ -122,6 +125,8 @@ public class Robot extends IterativeRobot {
     @Override
     public void autonomousInit() {
         this.driveController.reset();
+        auto = AutoRoutines.SimpleTest(this);
+//        auto = AutoRoutines.selectAutoMode("SimpleTest", this);
     }
 
     /**

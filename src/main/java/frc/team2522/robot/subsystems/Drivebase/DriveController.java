@@ -56,7 +56,7 @@ public class DriveController {
     private double maxVelocity;
 
     private DriveType driveType = DriveType.DiffDrive;
-    TankDrive tankDrive;
+    public TankDrive tankDrive;
 
     private java.util.Timer timer = null;
     private long leftLastUpdateTime = System.nanoTime();
@@ -324,7 +324,6 @@ public class DriveController {
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
 
         this.follower.start();
-
         return this.follower;
     }
 
