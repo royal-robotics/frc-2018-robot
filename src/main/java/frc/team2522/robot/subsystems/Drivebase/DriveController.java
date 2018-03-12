@@ -54,7 +54,7 @@ public class DriveController {
     private double maxVelocity;
 
     private DriveType driveType = DriveType.DiffDrive;
-    TankDrive tankDrive;
+    public TankDrive tankDrive;
 
     private java.util.Timer timer = null;
     private long leftLastUpdateTime = System.nanoTime();
@@ -235,7 +235,7 @@ public class DriveController {
         this.follower.start();
     }
 
-    public void driveDistance(double distance, double maxVelocity, double maxAcceleration, double maxJerk) {
+    public TrajectoryFollower driveDistance(double distance, double maxVelocity, double maxAcceleration, double maxJerk) {
         this.stopFollowing();
 
         final Trajectory.Config config = new Trajectory.Config(
@@ -263,9 +263,11 @@ public class DriveController {
         this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"}, trajectories, encoders, distanceScales, motors, motorScales,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
         this.follower.start();
+
+        return follower;
     }
 
-    public void driveRotate(double angle, double maxVelocity, double maxAcceleration, double maxJerk) {
+    public TrajectoryFollower driveRotate(double angle, double maxVelocity, double maxAcceleration, double maxJerk) {
         this.stopFollowing();
 
         final Trajectory.Config config = new Trajectory.Config(
@@ -296,6 +298,7 @@ public class DriveController {
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
 
         this.follower.start();
+        return follower;
     }
 
     public void stopFollowing() {

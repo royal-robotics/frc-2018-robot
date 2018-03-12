@@ -1,6 +1,8 @@
 package frc.team2522.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import frc.team2522.robot.autonomous.AutoManager;
+import frc.team2522.robot.autonomous.AutoRoutines;
 import frc.team2522.robot.camera.CameraPipeline;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -9,7 +11,6 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.*;
 
 import frc.team2522.robot.libs.Stopwatch;
-import frc.team2522.robot.libs.TrajectoryFollower;
 import frc.team2522.robot.subsystems.Drivebase.DriveController;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
 import frc.team2522.robot.subsystems.Elevator.Intake;
@@ -53,11 +54,14 @@ public class Robot extends IterativeRobot {
     Stopwatch robotStopwatch = Stopwatch.StartNew();
 
     // Subsystem Definitions
-    private DriveController driveController;
+    public DriveController driveController;
     Elevator elevator;
+
+    AutoManager auto;
 
     @Override
     public void robotInit() {
+        AutoRoutines.writeRoutinesToDashboard();
         Controls.initialize();
 
         //gyro.reset();
@@ -88,8 +92,6 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void robotPeriodic() {
-        //SmartDashboard.putNumber("robot/uptime/", robotStopwatch.getElapsedTime().getSeconds());
-
         Controls.updateControls();
 
         this.driveController.robotPeriodic();
@@ -122,6 +124,8 @@ public class Robot extends IterativeRobot {
     @Override
     public void autonomousInit() {
         driveController.reset();
+        auto = AutoRoutines.SimpleTest(this);
+//        auto = AutoRoutines.selectAutoMode("SimpleTest", this);
     }
 
     /**
