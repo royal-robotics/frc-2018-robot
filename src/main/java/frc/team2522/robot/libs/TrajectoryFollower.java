@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Path;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -45,7 +44,6 @@ public class TrajectoryFollower {
 
     private ADXRS450_Gyro gyro;
     private double gyroAngleOffset;
-    private double initalRadiansOffset;
 
     PrintStream ps[] = null;
 
@@ -99,8 +97,7 @@ public class TrajectoryFollower {
         this.ps = new PrintStream[trajectories.length];
 
         if (this.gyro != null) {
-            this.gyroAngleOffset = this.gyro.getAngle();
-            this.initalRadiansOffset = trajectories[0].get(0).heading;
+            this.gyroAngleOffset = Pathfinder.r2d(trajectories[0].get(0).heading) - this.gyro.getAngle();
         }
 
         for(int i = 0; i < this.trajectories.length; i++) {
@@ -119,7 +116,7 @@ public class TrajectoryFollower {
             {
                 this.ps[i] = new PrintStream(f);
                 System.out.println("Created LogFile: " + f.getName());
-                this.ps[i].println("Time,Index,Expected Velocity,Expected Distance,Actual Distance,Distance Error,Expected Angle, Actual Angle,Angle Error,Power");
+                this.ps[i].println("Time,Index,Expected Velocity,Expected Distance,Actual Distance,Distance Error,Expected Angle, Actual Angle,Angle Error,Power,DistanceAdj,AngleAdj");
             }
             catch(IOException e)
             {
@@ -179,8 +176,7 @@ public class TrajectoryFollower {
         if (this.gyro == null) {
             return 0.0;
         }
-
-        return Pathfinder.d2r(Pathfinder.d2r(this.gyro.getAngle() - this.gyroAngleOffset) + this.initalRadiansOffset);
+        return -this.gyro.getAngle() + this.gyroAngleOffset;
     }
 
     /**
@@ -211,56 +207,60 @@ public class TrajectoryFollower {
 
         if (! this.isFinished) {
             for(int i = 0; i < this.trajectories.length; i++) {
-                double result = 0.0;
+                double power = 0.0;
                 double position = (this.encoders[i].getDistance() - this.startPositions[i]) * this.distanceScales[i];
 
                 int segmentIndex = (int) Math.round(time / this.trajectoryInterval);
 
                 if (segmentIndex < this.trajectories[i].length()) {
                     Trajectory.Segment segment = this.trajectories[i].get(segmentIndex);
-                    double error = segment.position - position;
 
-                    result = this.distanceProportional * error +
-                            this.distanceDerivative * ((error - this.lastErrors[i]) / (time - this.startTime)) +
-                            this.velocityFeed * segment.velocity +
-                            this.accelerationFeed * segment.acceleration;
+                    // Calculate distance error adjustment
+                    //
+                    double distanceError = segment.position - position;
+                    double distanceAdj =
+                            this.distanceProportional * distanceError +
+                            this.distanceDerivative * ((distanceError - this.lastErrors[i]) / (time - this.startTime));
 
-                    // If we have a gyro then lets adjust power outputs as if motors[0] is left and motors[1] is right
-                    // wheels.
-
+                    // Calculate angle error adjustment if we have a gyro.
+                    //
+                    // Assume motors[0] is left and motors[1] is right
+                    //
+                    double expectedAngle = Pathfinder.r2d(segment.heading);;
                     double actualAngle = 0.0;
-                    double expectedAngle = 0.0;
                     double angleError = 0.0;
+                    double angleAdj = 0.0;
                     if (this.gyro != null) {
                         actualAngle = this.getAngle();
                         expectedAngle = Pathfinder.r2d(segment.heading);
                         angleError = Pathfinder.boundHalfDegrees(expectedAngle - actualAngle);
 
-                        double turnAdj = 0.8 * (-1.0 / 80.0) * angleError;
+                        angleAdj = -0.05 * angleError;
 
-                        if (i == 0) {
-                            result = result + turnAdj;
-                        }
-                        else {
-                            result = result - turnAdj;
+                        if (i == 1) {   // Right Motor
+                            angleAdj = -1.0 * angleAdj;
                         }
                     }
 
-                    result = result * this.distanceScales[i];
+                    power = this.velocityFeed * segment.velocity +
+                            this.accelerationFeed * segment.acceleration +
+                            distanceAdj + angleAdj;
+
+                    power = power * this.distanceScales[i];
 
                     if (this.ps[i] != null) {
-                        this.ps[i].println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+","+error+"," + expectedAngle+","+actualAngle+","+angleError+","+result);
+                        this.ps[i].println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+","+distanceError+"," + expectedAngle+","+actualAngle+","+angleError+","+power+","+distanceAdj+","+angleAdj);
                     }
 
                     this.lastTime = time;
                     this.lastPositions[i] = position;
-                    this.lastPowers[i] = result;
-                    this.lastErrors[i] = error;
+                    this.lastPowers[i] = power;
+                    this.lastErrors[i] = distanceError;
                 } else {
                     this.isFinished = true;
                 }
 
-                this.controllers[i].set(ControlMode.PercentOutput, result * this.powerScales[i]);
+                this.controllers[i].set(ControlMode.PercentOutput, power * this.powerScales[i]);
             }
         }
     }

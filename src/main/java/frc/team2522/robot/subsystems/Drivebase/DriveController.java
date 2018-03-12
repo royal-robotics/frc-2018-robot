@@ -114,7 +114,9 @@ public class DriveController {
         this.rightEncoder.reset();
         this.maxDetectedVelocity = 0.0;
 
-        this.gyro.reset();
+        if (this.gyro != null) {
+            this.gyro.reset();
+        }
     }
 
     /**
@@ -123,15 +125,11 @@ public class DriveController {
      * @return angle in accumulative degrees since gyro was last reset.
      */
     public double getAngle() {
-        return this.gyro.getAngle();
-    }
+        if (this.gyro == null) {
+            return 0.0;
+        }
 
-    /**
-     *
-     * @return angle in radians
-     */
-    public double getRadians() {
-        return Pathfinder.d2r(this.gyro.getAngle());
+        return this.gyro.getAngle();
     }
 
     /**
@@ -166,7 +164,7 @@ public class DriveController {
         SmartDashboard.putNumber("DriveController/LeftDistance", this.leftLastDistance);
         SmartDashboard.putNumber("DriveController/RightVelocity", this.rightVelocity);
         SmartDashboard.putNumber("DriveController/RightDistance", this.rightLastDistance);
-        SmartDashboard.putNumber("DriveController/RightDistance", this.getAngle());
+        SmartDashboard.putNumber("DriveController/Gyro", this.getAngle());
 
         // TODO write to log file
     }
@@ -194,8 +192,9 @@ public class DriveController {
 
             if (Controls.debugDriveForward()) {
                 if (this.follower == null) {
-                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
-//                    this.drivePath("motion-profile", false);
+//                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
+//                    this.drivePath("motion-profile", true);
+                    this.drivePath("center-right_side_switch", false);
 //                    this.driveRotate(90.0, 50, 100, 300);
                 }
                 else if (this.follower.isFinished()) {
