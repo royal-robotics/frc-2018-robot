@@ -12,6 +12,10 @@ public class AutoSpit  extends AutoStep {
 
     double duration;
 
+    public AutoSpit(Elevator elevatorController) {
+        this(elevatorController, 0.5);
+    }
+
     public AutoSpit(Elevator elevatorController, double duration) {
         this.elevatorController = elevatorController;
         this.duration = duration;

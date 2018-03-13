@@ -18,22 +18,23 @@ public class AutoLift extends AutoStep {
 
     @Override
     public void initialize() {
-        this.elevatorController.lift.setBreak(false);
         this.follower = this.elevatorController.lift.moveTo(this.height);
     }
 
     @Override
     public boolean isCompleted() {
         if (this.follower.isFinished()) {
-            this.elevatorController.lift.setBreak(true);
+            this.elevatorController.lift.stopFollower();
+            return true;
         }
-        return this.follower.isFinished();
+
+        return false;
     }
 
     @Override
     public void periodic() {
         if (this.follower.isFinished()) {
-            this.elevatorController.lift.setBreak(true);
+            this.elevatorController.lift.stopFollower();
         }
     }
 

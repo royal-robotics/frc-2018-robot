@@ -148,6 +148,8 @@ public class TrajectoryFollower {
                 this.ps[i] = null;
             }
         }
+
+        this.isFinished = true;
     }
 
     /**

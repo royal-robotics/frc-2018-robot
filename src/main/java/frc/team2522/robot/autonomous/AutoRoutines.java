@@ -113,15 +113,7 @@ public class AutoRoutines {
         } else {
             steps.add(new AutoDrivePath(robot.driveController, "center-left_side_switch"));
         }
-        steps.add(new AutoSpit(robot.elevatorController, 0.25));
-
-        return new AutoManager(steps);
-    }
-
-    public static AutoManager Test_ElevatorLift(Robot robot) {
-        List<AutoStep> steps = new ArrayList<>();
-
-        steps.add(new AutoLift(robot.elevatorController, 75));
+        steps.add(new AutoSpit(robot.elevatorController));
 
         return new AutoManager(steps);
     }
@@ -133,12 +125,11 @@ public class AutoRoutines {
             steps.add(new AutoDrive(robot.driveController, 155));
             steps.add(new AutoRotate(robot.driveController, -90));
             steps.add(new AutoDrive(robot.driveController, 25.0));
-            steps.add(new AutoSpit(robot.elevatorController, 0.25));
+            steps.add(new AutoSpit(robot.elevatorController));
         } else {
             if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SCALE) == MatchData.OwnedSide.RIGHT) {
-                steps.add(new AutoDrivePath(robot.driveController,"right-scale_right"));
-                // TODO: raise elevator
-                steps.add(new AutoSpit(robot.elevatorController, 0.25));
+                steps.add(new AutoDriveAndLift(robot.driveController, "right-scale_right", robot.elevatorController, 80, 100));
+                steps.add(new AutoSpit(robot.elevatorController));
             } else {
                 steps.add(new AutoDrive(robot.driveController, 190));
                 steps.add(new AutoRotate(robot.driveController, -90));
@@ -146,7 +137,7 @@ public class AutoRoutines {
                 steps.add(new AutoRotate(robot.driveController, 90));
                 // TODO: raise elevator
                 steps.add(new AutoDrive(robot.driveController, 10.0));
-                steps.add(new AutoSpit(robot.elevatorController, 0.25));
+                steps.add(new AutoSpit(robot.elevatorController));
             }
         }
 

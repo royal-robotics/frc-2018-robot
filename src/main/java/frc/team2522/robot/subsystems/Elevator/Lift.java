@@ -32,6 +32,8 @@ public class Lift {
     Timer calibrationTimer = null;
     long calibrationStartTime;
 
+    Timer moveToTimer = null;
+
     public Lift(Intake intake, IMotorController liftMotor, RoyalEncoder liftEncoder, DigitalInput liftSensor, DoubleSolenoid liftBrake, DoubleSolenoid liftRatchet) {
         this.intake = intake;
         this.liftMotor = liftMotor;
@@ -54,7 +56,7 @@ public class Lift {
     }
 
     public void autoCalibrate() {
-        this.liftEncoder.reset(37.0);
+        this.liftEncoder.reset(39.0);
         this.isCalibrated = true;
     }
 
@@ -92,24 +94,15 @@ public class Lift {
             }
 
             if (Controls.Elevator.Lift.moveBottom()) {
-                this.setBreak(false);
                 moveTo(0.0);
             } else if (Controls.Elevator.Lift.moveSwitch()) {
-                this.setBreak(false);
-                moveTo(37.0);
+                moveTo(40.0);
             } else if (Controls.Elevator.Lift.moveScale()) {
-                this.setBreak(false);
-                moveTo(82.0);
+                moveTo(81.0);
             } else if (Controls.Elevator.Lift.moveClimb()) {
-                this.setBreak(false);
-                moveTo(68.0);
+                moveTo(69.0);
             } else if (!isCalibrating()) {
                 stopFollower();
-            }
-
-            if (isFollowing() && follower.isFinished()) {
-                this.setBreak(true);
-                this.setPower(0.0);
             }
         }
 
@@ -178,7 +171,17 @@ public class Lift {
             System.out.println("Generated LiftMove path from " + this.getPosition() + " to " + moveTo + " ETA: " + (trajectory.length() * 0.01));
 
             follower = new TrajectoryFollower("LiftMove", this.getPosition() > moveTo, null, trajectory,this.liftEncoder, this.liftMotor, .04, 0.0, 0.8, 0.0, 0.0);
+            this.setBreak(false);
             follower.start();
+
+            this.moveToTimer = new Timer();
+            this.moveToTimer.scheduleAtFixedRate(new TimerTask() {
+                public void run() {
+                    if (follower.isFinished()) {
+                        stopFollower();
+                    }
+                }
+            }, 0, 10);
         }
 
         return this.follower;
@@ -208,7 +211,6 @@ public class Lift {
                         setPower(-0.10);
                     }
 
-
                     if(dt > 1.0) {
                         liftEncoder.reset();
                         isCalibrated = true;
@@ -236,6 +238,11 @@ public class Lift {
      *
      */
     public void stopFollower() {
+        if (this.moveToTimer != null) {
+            this.moveToTimer.cancel();
+            this.moveToTimer = null;
+        }
+
         if(follower != null) {
             follower.stop();
             this.setBreak(true);
