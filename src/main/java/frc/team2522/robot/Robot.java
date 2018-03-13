@@ -54,9 +54,6 @@ public class Robot extends IterativeRobot {
     private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 
     //
-    CameraPipeline camera = new CameraPipeline();
-
-    //
     Stopwatch robotStopwatch = Stopwatch.StartNew();
 
     // Subsystem Definitions
@@ -67,6 +64,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void robotInit() {
+        CameraPipeline.initialize();
         AutoRoutines.writeRoutinesToDashboard();
         Controls.initialize();
 
