@@ -1,6 +1,7 @@
 package frc.team2522.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.autonomous.AutoManager;
 import frc.team2522.robot.autonomous.AutoRoutines;
 import frc.team2522.robot.camera.CameraPipeline;
@@ -55,9 +56,6 @@ public class Robot extends IterativeRobot {
     private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 
     //
-    CameraPipeline camera = new CameraPipeline();
-
-    //
     Stopwatch robotStopwatch = Stopwatch.StartNew();
 
     // Subsystem Definitions
@@ -68,7 +66,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void robotInit() {
-        AutoRoutines.writeRoutinesToDashboard();
+        CameraPipeline.initialize();
         Controls.initialize();
 
         // Setup Drivebase subsystem.
@@ -119,6 +117,8 @@ public class Robot extends IterativeRobot {
     @Override
     public void disabledPeriodic() {
         this.driveController.disablePeriodic();
+        AutoRoutines.writeRoutinesToDashboard();
+        SmartDashboard.putString("AutoRoutines/SelectedRoutineAck", AutoRoutines.getAutoMode());
     }
 
     /**
@@ -130,8 +130,7 @@ public class Robot extends IterativeRobot {
     public void autonomousInit() {
         this.driveController.reset();
         this.elevatorController.lift.autoCalibrate();
-        auto = AutoRoutines.Test_ElevatorLift(this);
-//        auto = AutoRoutines.selectAutoMode("SimpleTest", this);
+        auto = AutoRoutines.selectAutoMode(AutoRoutines.getAutoMode(), this);
     }
 
     /**

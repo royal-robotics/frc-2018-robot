@@ -10,26 +10,43 @@ import org.opencv.core.Mat;
 
 public class CameraPipeline {
 
-    static {
-        SmartDashboard.putString("Camera/Filter", "raw");
+    //Setup image pipe
+    static CameraPipeline _self;
+    CvSink cameraStream;
+    BlurFilter blurFilter;
+    ThresholdFilter thresholdFilter;
+
+    public static void initialize() {
+        try {
+            _self = new CameraPipeline();
+        } catch (Exception e) {
+            _self = null;
+        }
     }
 
-    //Setup image pipe
-    CvSink cameraStream = createCameraStream();
-    BlurFilter blurFilter = new BlurFilter(cameraStream);
-    ThresholdFilter thresholdFilter = new ThresholdFilter(blurFilter);
-
-    public CameraPipeline() {
-
+    private CameraPipeline() {
+        try {
+            cameraStream = createCameraStream();
+            blurFilter = new BlurFilter(cameraStream);
+            thresholdFilter = new ThresholdFilter(blurFilter);
+        } catch (Exception e) {
+            System.out.println("Camera Exception: " + e.getMessage() + ", " + e.getStackTrace());
+        }
+        
+        SmartDashboard.putString("Camera/Filter", "raw");
         new Thread(() -> {
             CvSource outputStream = createOutputStream();
             Mat frame = new Mat();
 
             while (!Thread.interrupted()) {
-                CvSink sink = getFilter(SmartDashboard.getString("Camera/Filter", "raw"));
-                sink.grabFrame(frame);
+                try {
+                    CvSink sink = getFilter(SmartDashboard.getString("Camera/Filter", "raw"));
+                    sink.grabFrame(frame);
 
-                outputStream.putFrame(frame);
+                    outputStream.putFrame(frame);
+                } catch (Exception e) {
+                    System.out.println("Camera Exception: " + e.getMessage() + ", " + e.getStackTrace());
+                }
             }
         }).start();
     }
