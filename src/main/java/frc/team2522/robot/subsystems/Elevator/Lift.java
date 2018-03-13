@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.Controls;
+import frc.team2522.robot.libs.RoyalEncoder;
 import frc.team2522.robot.libs.TrajectoryFollower;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
@@ -18,7 +19,7 @@ import java.util.TimerTask;
 public class Lift {
     private Intake intake;
     private IMotorController liftMotor;
-    private Encoder liftEncoder;
+    private RoyalEncoder liftEncoder;
     private DoubleSolenoid liftBrake;
     private DoubleSolenoid liftRatchet;
     private DigitalInput liftSensor;
@@ -31,7 +32,7 @@ public class Lift {
     Timer calibrationTimer = null;
     long calibrationStartTime;
 
-    public Lift(Intake intake, IMotorController liftMotor, Encoder liftEncoder, DigitalInput liftSensor, DoubleSolenoid liftBrake, DoubleSolenoid liftRatchet) {
+    public Lift(Intake intake, IMotorController liftMotor, RoyalEncoder liftEncoder, DigitalInput liftSensor, DoubleSolenoid liftBrake, DoubleSolenoid liftRatchet) {
         this.intake = intake;
         this.liftMotor = liftMotor;
         this.liftEncoder = liftEncoder;
@@ -39,7 +40,7 @@ public class Lift {
         this.liftBrake = liftBrake;
         this.liftRatchet = liftRatchet;
 
-        final double inchesPerPulse = (3.7 * Math.PI) / 256.0;
+        final double inchesPerPulse = (3.5 * Math.PI) / 256.0;
 
         this.liftEncoder.setDistancePerPulse(inchesPerPulse);
         this.liftEncoder.setReverseDirection(false);
@@ -50,6 +51,11 @@ public class Lift {
     public void reset() {
         this.setPower(0.0);
         this.setBreak(true);
+    }
+
+    public void autoCalibrate() {
+        this.liftEncoder.reset(37.0);
+        this.isCalibrated = true;
     }
 
     public void teleopPeriodic() {
@@ -87,16 +93,16 @@ public class Lift {
 
             if (Controls.Elevator.Lift.moveBottom()) {
                 this.setBreak(false);
-                createFollower(0.0);
+                moveTo(0.0);
             } else if (Controls.Elevator.Lift.moveSwitch()) {
                 this.setBreak(false);
-                createFollower(40.0);
+                moveTo(37.0);
             } else if (Controls.Elevator.Lift.moveScale()) {
                 this.setBreak(false);
-                createFollower(82.0);
+                moveTo(82.0);
             } else if (Controls.Elevator.Lift.moveClimb()) {
                 this.setBreak(false);
-                createFollower(68.0);
+                moveTo(68.0);
             } else if (!isCalibrating()) {
                 stopFollower();
             }
@@ -151,7 +157,7 @@ public class Lift {
 
     TrajectoryFollower follower = null;
 
-    private void createFollower(double moveTo) {
+    public TrajectoryFollower moveTo(double moveTo) {
         // Instead of ignoring follow requests when we're already following we should cancel/slow down
         // and then start the requested follower.
         if(isCalibrated && !isCalibrating() && follower == null) {
@@ -174,6 +180,8 @@ public class Lift {
             follower = new TrajectoryFollower("LiftMove", this.getPosition() > moveTo, null, trajectory,this.liftEncoder, this.liftMotor, .04, 0.0, 0.8, 0.0, 0.0);
             follower.start();
         }
+
+        return this.follower;
     }
 
     private boolean isFollowing() {

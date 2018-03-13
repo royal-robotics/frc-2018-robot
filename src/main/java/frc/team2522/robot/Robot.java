@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.*;
 
+import frc.team2522.robot.libs.RoyalEncoder;
 import frc.team2522.robot.libs.Stopwatch;
 import frc.team2522.robot.subsystems.Drivebase.DriveController;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
@@ -37,7 +38,7 @@ public class Robot extends IterativeRobot {
 
     private Encoder leftDriveEncoder = new Encoder(10,11, true);        // ENC0
     private Encoder rightDriveEncoder = new Encoder(12,13, false);      // ENC1
-    private Encoder elevatorLiftEncoder = new Encoder(14, 15, false);   // ENC2
+    private RoyalEncoder elevatorLiftEncoder = new RoyalEncoder(14, 15, false);   // ENC2
 //    private Encoder unused = new Encoder(16,17, false);      // ENC3
 //    private Encoder unused = new Encoder(18,19, false);      // ENC4
 //    private Encoder unused = new Encoder(20,21, false);      // ENC5
@@ -128,7 +129,8 @@ public class Robot extends IterativeRobot {
     @Override
     public void autonomousInit() {
         this.driveController.reset();
-        auto = AutoRoutines.Right_SwitchOrScale(this);
+        this.elevatorController.lift.autoCalibrate();
+        auto = AutoRoutines.Test_ElevatorLift(this);
 //        auto = AutoRoutines.selectAutoMode("SimpleTest", this);
     }
 
