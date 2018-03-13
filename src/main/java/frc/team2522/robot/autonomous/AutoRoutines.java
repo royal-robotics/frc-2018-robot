@@ -28,13 +28,22 @@ public class AutoRoutines {
         SmartDashboard.putString("AutoRoutines/RoutinesList", routines.toJSONString());
     }
 
+    public static String getAutoMode() {
+        return SmartDashboard.getString("AutoRoutines/SelectedRoutine", "NoRoutine");
+    }
+
     public static AutoManager selectAutoMode(String autoName, Robot robot) {
         try {
-            return (AutoManager) AutoRoutines.class.getMethod(autoName, Robot.class).invoke(robot);
+            System.out.println("autoName");
+            return (AutoManager) AutoRoutines.class.getMethod(autoName, Robot.class).invoke(null, robot);
         } catch (Exception ex) {
             System.out.println("Failed to select Auto mode");
-            return null;
+            return NoRoutine();
         }
+    }
+
+    public static AutoManager NoRoutine() {
+        return new AutoManager(new ArrayList<>());
     }
 
     public static AutoManager SimpleTest(Robot robot) {

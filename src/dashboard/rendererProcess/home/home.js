@@ -2,6 +2,7 @@ $(() => {
     ipc.on('connected', (ev, isConnected) => connectionChange(isConnected));
     connectionChange(NetworkTables.isRobotConnected());
     redrawMain();
+    renderAutoList();
 });
 
 function connectionChange(isConnected) {
@@ -46,3 +47,5 @@ function redrawMain() {
 
     $("#state").append(stateElements);
 }
+
+renderAutoList();

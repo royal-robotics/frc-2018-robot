@@ -15,10 +15,10 @@ public class AutoManager {
     private final long msPeriodic = 20;
 
     public AutoManager(List<AutoStep> autoSteps) {
-        if(autoSteps.size() < 1)
-            throw new IllegalArgumentException("'autoSteps' must contain at least 1 AutoStep");
-
         this.autoSteps = autoSteps;
+
+        if(autoSteps.size() == 0)
+            return;
 
         autoSteps.get(currentStep).initialize();
 
