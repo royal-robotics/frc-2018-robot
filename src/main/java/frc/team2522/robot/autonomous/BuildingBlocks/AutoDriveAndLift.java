@@ -46,7 +46,7 @@ public class AutoDriveAndLift extends AutoStep {
             driveFollower = driveController.drivePath(this.pathName, false);
         }
         else {
-            driveFollower = driveController.driveDistance(this.driveDistance, 100, 100, 200);
+            driveFollower = driveController.driveDistance(this.driveDistance, 100, 150, 300);
         }
     }
 
@@ -65,7 +65,7 @@ public class AutoDriveAndLift extends AutoStep {
 
     @Override
     public void periodic() {
-        if (driveFollower.getPosition() >= this.liftStart) {
+        if ((this.liftFollower == null) && (driveFollower.getPosition() >= this.liftStart)) {
             this.liftFollower = this.elevatorController.lift.moveTo(this.liftDestination);
         }
     }

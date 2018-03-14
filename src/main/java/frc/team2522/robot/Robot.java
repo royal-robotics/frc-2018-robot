@@ -147,6 +147,9 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void teleopInit() {
+        this.elevatorController.lift.stopFollower();    // just in case the lift is moving during auto switchover
+        this.elevatorController.lift.setBreak(true);
+
         this.driveController.reset();
     }
 

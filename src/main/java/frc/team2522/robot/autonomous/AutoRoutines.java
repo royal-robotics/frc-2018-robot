@@ -76,10 +76,12 @@ public class AutoRoutines {
 
     public static AutoManager selectAutoMode(String autoName, Robot robot) {
         try {
-            System.out.println("autoName");
+            System.out.println("AutoName: " + autoName);
             return (AutoManager) AutoRoutines.class.getMethod(autoName, Robot.class).invoke(null, robot);
         } catch (Exception ex) {
-            System.out.println("Failed to select Auto mode");
+            System.out.println("Failed to select Auto mode.");
+            System.out.println(ex.getMessage());
+            System.out.println(ex.fillInStackTrace());
             return NoRoutine();
         }
     }
@@ -88,20 +90,10 @@ public class AutoRoutines {
         return new AutoManager(new ArrayList<>());
     }
 
-    public static AutoManager SimpleTest(Robot robot) {
+    public static AutoManager Test_MoveLiftDown(Robot robot) {
         List<AutoStep> steps = new ArrayList<>();
-        steps.add(new AutoDrive(robot.driveController, 30));
-        steps.add(new AutoRotate(robot.driveController, 90));
-        steps.add(new AutoDrive(robot.driveController, 30));
-
-        return new AutoManager(steps);
-    }
-
-    public static AutoManager SimpleTest2(Robot robot) {
-        List<AutoStep> steps = new ArrayList<>();
-        steps.add(new AutoDrive(robot.driveController, 50));
-        steps.add(new AutoRotate(robot.driveController, 180));
-        steps.add(new AutoDrive(robot.driveController, 30));
+        steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
+        steps.add(new AutoLift(robot.elevatorController, 12));
 
         return new AutoManager(steps);
     }
@@ -131,12 +123,14 @@ public class AutoRoutines {
                 steps.add(new AutoDriveAndLift(robot.driveController, "right-scale_right", robot.elevatorController, 80, 100));
                 steps.add(new AutoSpit(robot.elevatorController));
             } else {
-                steps.add(new AutoDrive(robot.driveController, 190));
-                steps.add(new AutoRotate(robot.driveController, -90));
-                steps.add(new AutoDrive(robot.driveController, 200));
-                steps.add(new AutoRotate(robot.driveController, 90));
-                // TODO: raise elevator
-                steps.add(new AutoDrive(robot.driveController, 10.0));
+                steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
+                steps.add(new AutoDriveAndLift(robot.driveController, 226, robot.elevatorController, 12, 0));
+                steps.add(new AutoRotate(robot.driveController, -93));
+//                steps.add(new AutoDrive(robot.driveController, 220));
+                steps.add(new AutoDriveAndLift(robot.driveController, 220, robot.elevatorController, 80, 100));
+                steps.add(new AutoRotate(robot.driveController, 120));
+                steps.add(new AutoDrive(robot.driveController, 45));
+//                steps.add(new AutoDriveAndLift(robot.driveController, 50, robot.elevatorController, 80, 0));
                 steps.add(new AutoSpit(robot.elevatorController));
             }
         }

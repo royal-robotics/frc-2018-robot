@@ -276,9 +276,12 @@ public class DriveController {
                 new Waypoint(Math.abs(distance), 0, Pathfinder.d2r(0)),
         };
 
+        long startGeneration = System.nanoTime();
         Trajectory trajectory = Pathfinder.generate(points, config);
         TankModifier modifier = new TankModifier(trajectory).modify(kWheelbaseWidth);
         Trajectory[] trajectories = new Trajectory[]{modifier.getLeftTrajectory(), modifier.getRightTrajectory()};
+        System.out.println("DriveDistance Path Generation Time: " + ((double)(System.nanoTime() - startGeneration) / 1000000000.0) + " seconds.");
+
         Encoder[] encoders = new Encoder[]{this.leftEncoder, this.rightEncoder};
         double[] distanceScales = new double[] {(distance < 0.0)?-1.0:1.0, (distance < 0.0)?-1.0:1.0};
         IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
@@ -310,9 +313,12 @@ public class DriveController {
                 new Waypoint(Math.abs(distance), 0, Pathfinder.d2r(0)),
         };
 
+        long startGeneration = System.nanoTime();
         Trajectory trajectory = Pathfinder.generate(points, config);
         TankModifier modifier = new TankModifier(trajectory).modify(kWheelbaseWidth);
         Trajectory[] trajectories = new Trajectory[]{modifier.getLeftTrajectory(), modifier.getRightTrajectory()};
+        System.out.println("DriveRotate Path Generation Time: " + ((double)(System.nanoTime() - startGeneration) / 1000000000.0) + " seconds.");
+
         Encoder[] encoders = new Encoder[]{this.leftEncoder, this.rightEncoder};
         double[] distanceScales = new double[] {(distance < 0.0)?-1.0:1.0, (distance < 0.0)?1.0:-1.0};
         IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
