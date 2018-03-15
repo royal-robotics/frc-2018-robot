@@ -138,7 +138,9 @@ public class TrajectoryFollower {
     }
 
     public void stop() {
-        this.timer.cancel();
+        if(this.timer != null)
+            this.timer.cancel();
+
         this.timer = null;
         for(int i = 0; i < controllers.length; i++) {
             controllers[i].set(ControlMode.PercentOutput, 0.0);

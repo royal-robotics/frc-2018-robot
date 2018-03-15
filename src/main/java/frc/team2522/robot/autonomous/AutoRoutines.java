@@ -118,14 +118,18 @@ public class AutoRoutines {
             steps.add(new AutoSpit(robot.elevatorController));
         } else {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
-            steps.add(new AutoDriveAndLift(robot.driveController, 226, robot.elevatorController, 12, 0));
-            steps.add(new AutoRotate(robot.driveController, 93));
-//                steps.add(new AutoDrive(robot.driveController, 220));
-            steps.add(new AutoDriveAndLift(robot.driveController, 220, robot.elevatorController, 80, 100));
-            steps.add(new AutoRotate(robot.driveController, 60));
-            steps.add(new AutoDrive(robot.driveController, 45));
-//                steps.add(new AutoDriveAndLift(robot.driveController, 50, robot.elevatorController, 80, 0));
+            steps.add(new AutoDriveAndLift(robot.driveController, "left-scale_right", robot.elevatorController, 12, 0));
+            steps.add(new AutoRotate(robot.driveController, -120));
+            steps.add(new AutoLift(robot.elevatorController, 80.0));
+            steps.add(new AutoDrive(robot.driveController, 30));
             steps.add(new AutoSpit(robot.elevatorController));
+//            steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
+//            steps.add(new AutoDriveAndLift(robot.driveController, 226, robot.elevatorController, 12, 0));
+//            steps.add(new AutoRotate(robot.driveController, 93));
+//            steps.add(new AutoDriveAndLift(robot.driveController, 220, robot.elevatorController, 80, 100));
+//            steps.add(new AutoRotate(robot.driveController, 60));
+//            steps.add(new AutoDrive(robot.driveController, 48));
+//            steps.add(new AutoSpit(robot.elevatorController));
         }
 
         return new AutoManager(steps);
@@ -139,14 +143,18 @@ public class AutoRoutines {
             steps.add(new AutoSpit(robot.elevatorController));
         } else {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
-            steps.add(new AutoDriveAndLift(robot.driveController, 226, robot.elevatorController, 12, 0));
-            steps.add(new AutoRotate(robot.driveController, -93));
-//                steps.add(new AutoDrive(robot.driveController, 220));
-            steps.add(new AutoDriveAndLift(robot.driveController, 220, robot.elevatorController, 80, 100));
+            steps.add(new AutoDriveAndLift(robot.driveController, "right-scale_left", robot.elevatorController, 12, 0));
             steps.add(new AutoRotate(robot.driveController, 120));
-            steps.add(new AutoDrive(robot.driveController, 45));
-//                steps.add(new AutoDriveAndLift(robot.driveController, 50, robot.elevatorController, 80, 0));
+            steps.add(new AutoLift(robot.elevatorController, 80.0));
+            steps.add(new AutoDrive(robot.driveController, 30));
             steps.add(new AutoSpit(robot.elevatorController));
+//            steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
+//            steps.add(new AutoDriveAndLift(robot.driveController, 226, robot.elevatorController, 12, 0));
+//            steps.add(new AutoRotate(robot.driveController, -93));
+//            steps.add(new AutoDriveAndLift(robot.driveController, 220, robot.elevatorController, 80, 100));
+//            steps.add(new AutoRotate(robot.driveController, 120));
+//            steps.add(new AutoDrive(robot.driveController, 48));
+//            steps.add(new AutoSpit(robot.elevatorController));
         }
 
         return new AutoManager(steps);

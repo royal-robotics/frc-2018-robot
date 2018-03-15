@@ -23,6 +23,7 @@ public class AutoSpit  extends AutoStep {
 
     @Override
     public void initialize() {
+        System.out.println("spit");
         this.startTime = System.nanoTime();
         this.elevatorController.intake.setPush();
     }
