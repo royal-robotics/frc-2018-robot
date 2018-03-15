@@ -27,6 +27,9 @@ public class AutoManager {
                 AutoStep currentAutoStep = autoSteps.get(currentStep);
                 if(currentAutoStep.isCompleted()) {
                     if(autoSteps.size() == currentStep + 1) {
+                        timer.cancel();
+                        timer.purge();
+                        timer = null;
                         return; //Auto completed
                     } else {
                         currentAutoStep = autoSteps.get(++currentStep);

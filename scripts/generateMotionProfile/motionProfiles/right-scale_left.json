@@ -1,0 +1,28 @@
+{
+  "wheelbase-width": 25.00,
+  "waypoints" : [
+    {"x": 0.0, "y": 196.0, "angle": 90.0},
+    {"x": -30.0, "y": 226.0, "angle": 180.0},
+    {"x": -220.0, "y": 262.0, "angle": 180.0}
+  ],
+  "config": {
+    "fit-method": "HERMITE_CUBIC",
+    "numSamples": 100000,
+    "dt": 0.01,
+    "max-velocity": 100.0,
+    "max-acceleration": 100.0,
+    "max-jerk": 300.0
+  },
+  "outputs": {
+    "csv": {
+      "center": true,
+      "left": true,
+      "right": true
+    },
+    "bin": {
+      "center": true,
+      "left": true,
+      "right": true
+    }
+  }
+}

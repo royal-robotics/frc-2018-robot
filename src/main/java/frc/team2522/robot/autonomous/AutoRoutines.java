@@ -110,6 +110,63 @@ public class AutoRoutines {
         return new AutoManager(steps);
     }
 
+    public static AutoManager Left_OnlyScale(Robot robot) {
+        List<AutoStep> steps = new ArrayList<>();
+
+        if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SCALE) == MatchData.OwnedSide.LEFT) {
+            steps.add(new AutoDriveAndLift(robot.driveController, "left-scale_left", robot.elevatorController, 80, 100));
+            steps.add(new AutoSpit(robot.elevatorController));
+        } else {
+            steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
+            steps.add(new AutoDriveAndLift(robot.driveController, 226, robot.elevatorController, 12, 0));
+            steps.add(new AutoRotate(robot.driveController, 93));
+//                steps.add(new AutoDrive(robot.driveController, 220));
+            steps.add(new AutoDriveAndLift(robot.driveController, 220, robot.elevatorController, 80, 100));
+            steps.add(new AutoRotate(robot.driveController, 60));
+            steps.add(new AutoDrive(robot.driveController, 45));
+//                steps.add(new AutoDriveAndLift(robot.driveController, 50, robot.elevatorController, 80, 0));
+            steps.add(new AutoSpit(robot.elevatorController));
+        }
+
+        return new AutoManager(steps);
+    }
+
+    public static AutoManager Right_OnlyScale(Robot robot) {
+        List<AutoStep> steps = new ArrayList<>();
+
+        if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SCALE) == MatchData.OwnedSide.RIGHT) {
+            steps.add(new AutoDriveAndLift(robot.driveController, "right-scale_right", robot.elevatorController, 80, 100));
+            steps.add(new AutoSpit(robot.elevatorController));
+        } else {
+            steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
+            steps.add(new AutoDriveAndLift(robot.driveController, 226, robot.elevatorController, 12, 0));
+            steps.add(new AutoRotate(robot.driveController, -93));
+//                steps.add(new AutoDrive(robot.driveController, 220));
+            steps.add(new AutoDriveAndLift(robot.driveController, 220, robot.elevatorController, 80, 100));
+            steps.add(new AutoRotate(robot.driveController, 120));
+            steps.add(new AutoDrive(robot.driveController, 45));
+//                steps.add(new AutoDriveAndLift(robot.driveController, 50, robot.elevatorController, 80, 0));
+            steps.add(new AutoSpit(robot.elevatorController));
+        }
+
+        return new AutoManager(steps);
+    }
+
+    public static AutoManager Left_SwitchOrScale(Robot robot) {
+        List<AutoStep> steps = new ArrayList<>();
+
+        if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT) {
+            steps.add(new AutoDrive(robot.driveController, 155));
+            steps.add(new AutoRotate(robot.driveController, 90));
+            steps.add(new AutoDrive(robot.driveController, 25.0));
+            steps.add(new AutoSpit(robot.elevatorController));
+        } else {
+            return Left_OnlyScale(robot);
+        }
+
+        return new AutoManager(steps);
+    }
+
     public static AutoManager Right_SwitchOrScale(Robot robot) {
         List<AutoStep> steps = new ArrayList<>();
 
@@ -119,20 +176,7 @@ public class AutoRoutines {
             steps.add(new AutoDrive(robot.driveController, 25.0));
             steps.add(new AutoSpit(robot.elevatorController));
         } else {
-            if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SCALE) == MatchData.OwnedSide.RIGHT) {
-                steps.add(new AutoDriveAndLift(robot.driveController, "right-scale_right", robot.elevatorController, 80, 100));
-                steps.add(new AutoSpit(robot.elevatorController));
-            } else {
-                steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
-                steps.add(new AutoDriveAndLift(robot.driveController, 226, robot.elevatorController, 12, 0));
-                steps.add(new AutoRotate(robot.driveController, -93));
-//                steps.add(new AutoDrive(robot.driveController, 220));
-                steps.add(new AutoDriveAndLift(robot.driveController, 220, robot.elevatorController, 80, 100));
-                steps.add(new AutoRotate(robot.driveController, 120));
-                steps.add(new AutoDrive(robot.driveController, 45));
-//                steps.add(new AutoDriveAndLift(robot.driveController, 50, robot.elevatorController, 80, 0));
-                steps.add(new AutoSpit(robot.elevatorController));
-            }
+            return Right_OnlyScale(robot);
         }
 
         return new AutoManager(steps);
