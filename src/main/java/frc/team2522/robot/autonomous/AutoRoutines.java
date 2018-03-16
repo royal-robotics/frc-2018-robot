@@ -71,7 +71,7 @@ public class AutoRoutines {
     }
 
     public static String getAutoMode() {
-        return SmartDashboard.getString("AutoRoutines/SelectedRoutine", "NoRoutine");
+        return SmartDashboard.getString("AutoRoutines/SelectedRoutine", "");
     }
 
     public static AutoManager selectAutoMode(String autoName, Robot robot) {
@@ -82,12 +82,14 @@ public class AutoRoutines {
             System.out.println("Failed to select Auto mode.");
             System.out.println(ex.getMessage());
             System.out.println(ex.fillInStackTrace());
-            return NoRoutine();
+            return NoRoutine(robot);
         }
     }
 
-    public static AutoManager NoRoutine() {
-        return new AutoManager(new ArrayList<>());
+    public static AutoManager NoRoutine(Robot robot) {
+        List<AutoStep> steps = new ArrayList<>();
+        steps.add(new AutoDrive(robot.driveController, 100));
+        return new AutoManager(steps);
     }
 
     public static AutoManager Test_MoveLiftDown(Robot robot) {
