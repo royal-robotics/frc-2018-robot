@@ -97,6 +97,8 @@ public class Robot extends IterativeRobot {
     public void robotPeriodic() {
         Controls.updateControls();
 
+        //System.out.printf("Left: %f, Right %f\n", driveController.getLeftDistance(), driveController.getRightDistance());
+
         this.driveController.robotPeriodic();
         this.elevatorController.robotPeriodic();
     }

@@ -1,7 +1,7 @@
 package frc.team2522.robot.autonomous;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2522.robot.Controls;
 import frc.team2522.robot.Robot;
 import frc.team2522.robot.autonomous.BuildingBlocks.*;
 import openrio.powerup.MatchData;
@@ -16,42 +16,8 @@ public class AutoRoutines {
     public static MatchData.OwnedSide getOwnedSide(MatchData.GameFeature feature) {
         MatchData.OwnedSide side = MatchData.getOwnedSide(feature);
 
-        if (side == MatchData.OwnedSide.UNKNOWN) {
-            DriverStation driveStation = DriverStation.getInstance();
-            DriverStation.Alliance alliance = driveStation.getAlliance();
-            int position = driveStation.getLocation();
-
-            if (alliance == DriverStation.Alliance.Red) {
-                switch (feature) {
-                    case SWITCH_NEAR:
-                        return MatchData.OwnedSide.RIGHT;
-                    case SWITCH_FAR:
-                        return MatchData.OwnedSide.LEFT;
-                    case SCALE:
-                        if (position == 1) {
-                            return MatchData.OwnedSide.RIGHT;
-                        }
-                        else {
-                            return MatchData.OwnedSide.LEFT;
-                        }
-                }
-            }
-            else {
-                switch (feature) {
-                    case SWITCH_NEAR:
-                        return MatchData.OwnedSide.LEFT;
-                    case SWITCH_FAR:
-                        return MatchData.OwnedSide.RIGHT;
-                    case SCALE:
-                        if (position == 1) {
-                            return MatchData.OwnedSide.LEFT;
-                        }
-                        else {
-                            return MatchData.OwnedSide.RIGHT;
-                        }
-                }
-            }
-        }
+        if(side == MatchData.OwnedSide.UNKNOWN)
+            return MatchData.OwnedSide.LEFT; //Side will always return left
 
         return side;
     }
@@ -70,8 +36,17 @@ public class AutoRoutines {
         SmartDashboard.putString("AutoRoutines/RoutinesList", routines.toJSONString());
     }
 
+    private static String autoModeLast = null;
     public static String getAutoMode() {
-        return SmartDashboard.getString("AutoRoutines/SelectedRoutine", "");
+        String autoMode = Controls.getManualAutoMode();
+        if(autoMode == null)
+            autoMode = SmartDashboard.getString("AutoRoutines/SelectedRoutine", "");
+
+        if(autoMode != autoModeLast)
+            System.out.println("Auto Mode: " + autoMode);
+
+        autoModeLast = autoMode;
+        return autoMode;
     }
 
     public static AutoManager selectAutoMode(String autoName, Robot robot) {
@@ -103,8 +78,10 @@ public class AutoRoutines {
     public static AutoManager Center_SwitchOnly(Robot robot) {
         List<AutoStep> steps = new ArrayList<>();
         if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.RIGHT) {
+            System.out.println("GetOwnedSide is RIGHT");
             steps.add(new AutoDrivePath(robot.driveController, "center-right_side_switch"));
         } else {
+            System.out.println("GetOwnedSide is LEFT");
             steps.add(new AutoDrivePath(robot.driveController, "center-left_side_switch"));
         }
         steps.add(new AutoSpit(robot.elevatorController));
@@ -167,7 +144,7 @@ public class AutoRoutines {
 
         if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT) {
             steps.add(new AutoDrive(robot.driveController, 155));
-            steps.add(new AutoRotate(robot.driveController, -90));
+            steps.add(new AutoRotate(robot.driveController, 90));
             steps.add(new AutoDrive(robot.driveController, 25.0));
             steps.add(new AutoSpit(robot.elevatorController));
         } else {
@@ -182,7 +159,7 @@ public class AutoRoutines {
 
         if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.RIGHT) {
             steps.add(new AutoDrive(robot.driveController, 155));
-            steps.add(new AutoRotate(robot.driveController, 90));
+            steps.add(new AutoRotate(robot.driveController, -90));
             steps.add(new AutoDrive(robot.driveController, 25.0));
             steps.add(new AutoSpit(robot.elevatorController));
         } else {

@@ -124,6 +124,20 @@ public class Controls {
             isHighGear = !isHighGear;
         }
 
+        if(setAutoLeftSwitchOrScale.isPressed()) {
+            SmartDashboard.putString("AutoRoutines/ManualSelectedRoutine", "Left_SwitchOrScale");
+            manualAutoMode = "Left_SwitchOrScale";
+        } else if(setAutoRightSwitchOrScale.isPressed()) {
+            SmartDashboard.putString("AutoRoutines/ManualSelectedRoutine", "Right_SwitchOrScale");
+            manualAutoMode = "Right_SwitchOrScale";
+        } else if(setAutoCenterSwitch.isPressed()) {
+            SmartDashboard.putString("AutoRoutines/ManualSelectedRoutine", "Center_SwitchOnly");
+            manualAutoMode = "Center_SwitchOnly";
+        } else if(setAutoReadFromDashboard.isPressed()) {
+            SmartDashboard.putString("AutoRoutines/ManualSelectedRoutine", "");
+            manualAutoMode = null;
+        }
+
         SmartDashboard.putBoolean("Controls/ClimberEnabled", inClimberMode());
     }
 
@@ -193,4 +207,14 @@ public class Controls {
 
     private static boolean debugDriveForward = false;
     private static boolean showTargets = false;
+
+
+
+    //Auto mode kludge logic because we don't trust the dashboard
+    public static IButton setAutoLeftSwitchOrScale = new POVButton(driver, 270);
+    public static IButton setAutoRightSwitchOrScale = new POVButton(driver, 90);
+    public static IButton setAutoCenterSwitch = new POVButton(driver, 0);
+    public static IButton setAutoReadFromDashboard = new POVButton(driver, 180);
+    private static String manualAutoMode = null;
+    public static String getManualAutoMode() { return manualAutoMode; }
 }
