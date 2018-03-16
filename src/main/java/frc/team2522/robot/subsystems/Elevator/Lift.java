@@ -100,7 +100,7 @@ public class Lift {
             } else if (Controls.Elevator.Lift.moveScale()) {
                 moveTo(81.0);
             } else if (Controls.Elevator.Lift.moveClimb()) {
-                moveTo(69.0);
+                moveTo(66.0);
             } else if (!isCalibrating()) {
                 stopFollower();
             }
