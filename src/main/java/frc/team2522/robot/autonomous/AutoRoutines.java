@@ -165,7 +165,7 @@ public class AutoRoutines {
 
         if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT) {
             steps.add(new AutoDrive(robot.driveController, 155));
-            steps.add(new AutoRotate(robot.driveController, 90));
+            steps.add(new AutoRotate(robot.driveController, -90));
             steps.add(new AutoDrive(robot.driveController, 25.0));
             steps.add(new AutoSpit(robot.elevatorController));
         } else {
@@ -180,7 +180,7 @@ public class AutoRoutines {
 
         if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.RIGHT) {
             steps.add(new AutoDrive(robot.driveController, 155));
-            steps.add(new AutoRotate(robot.driveController, -90));
+            steps.add(new AutoRotate(robot.driveController, 90));
             steps.add(new AutoDrive(robot.driveController, 25.0));
             steps.add(new AutoSpit(robot.elevatorController));
         } else {
