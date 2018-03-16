@@ -100,7 +100,7 @@ public class Intake {
     }
 
     public void setStop() {
-        elevatorIntakeMotor.set(ControlMode.PercentOutput, 0.0);
+        elevatorIntakeMotor.set(ControlMode.PercentOutput, -0.2);
         leftIntakeMotor.set(ControlMode.PercentOutput, 0.0);
         rightIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }
