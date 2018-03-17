@@ -30,7 +30,7 @@ public class Intake {
         this.intakeHi = intakeHi;
         this.intakeLo = intakeLo;
 
-        SmartDashboard.putNumber("Intake/Pull/carriage", 0.75);
+        //SmartDashboard.putNumber("Intake/Pull/carriage", 0.75);
         SmartDashboard.putNumber("Intake/Pull/left", 0.8);
         SmartDashboard.putNumber("Intake/Pull/right", 0.8);
 
@@ -88,7 +88,11 @@ public class Intake {
     }
 
     public void setPush() {
-        elevatorIntakeMotor.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Pull/carriage", 1.00));
+        setPush(0.75);
+    }
+
+    public void setPush(double spitPower) {
+        elevatorIntakeMotor.set(ControlMode.PercentOutput, spitPower);
         leftIntakeMotor.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Pull/left", 0.8));
         rightIntakeMotor.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Pull/right", 0.8));
     }

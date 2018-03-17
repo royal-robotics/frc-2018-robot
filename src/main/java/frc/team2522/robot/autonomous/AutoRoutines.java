@@ -1,5 +1,6 @@
 package frc.team2522.robot.autonomous;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.Controls;
 import frc.team2522.robot.Robot;
@@ -16,8 +17,17 @@ public class AutoRoutines {
     public static MatchData.OwnedSide getOwnedSide(MatchData.GameFeature feature) {
         MatchData.OwnedSide side = MatchData.getOwnedSide(feature);
 
-        if(side == MatchData.OwnedSide.UNKNOWN)
-            return MatchData.OwnedSide.LEFT; //Side will always return left
+        if(side == MatchData.OwnedSide.UNKNOWN) {
+                if(feature == MatchData.GameFeature.SCALE) {
+                    return DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue
+                            ? MatchData.OwnedSide.LEFT
+                            : MatchData.OwnedSide.RIGHT;
+                } else {
+                    return DriverStation.getInstance().getLocation() == 1
+                            ? MatchData.OwnedSide.LEFT
+                            : MatchData.OwnedSide.RIGHT;
+                }
+        }
 
         return side;
     }
@@ -123,7 +133,7 @@ public class AutoRoutines {
         } else {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
             steps.add(new AutoDriveAndLift(robot.driveController, "right-scale_left", robot.elevatorController, 12, 0));
-            steps.add(new AutoRotate(robot.driveController, 120));
+            steps.add(new AutoRotate(robot.driveController, 110));
             steps.add(new AutoLift(robot.elevatorController, 80.0));
             steps.add(new AutoDrive(robot.driveController, 30));
             steps.add(new AutoSpit(robot.elevatorController));

@@ -64,7 +64,8 @@ public class Elevator {
             intake.setPull();
         } else if (Controls.Elevator.Intake.pushCube()) {
             intake.stopRotate();
-            intake.setPush();
+            double spitPower = Controls.Elevator.Intake.pushCubeModifier() ? 0.5 : 0.75;
+            intake.setPush(spitPower);
         } else {
             intake.stopRotate();
             intake.setStop();

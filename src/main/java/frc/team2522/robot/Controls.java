@@ -53,6 +53,7 @@ public class Controls {
         public static class Intake {
             public static boolean pullCube() { return pullCube; }
             public static boolean pushCube() { return pushCube; }
+            public static boolean pushCubeModifier() { return pushCubeModifier; }
             public static boolean rotateCube() { return (pushCube() && pullCube()); }
             public static boolean armsOpen() { return armsOpen; }
             public static boolean armsClose() { return armsClose; }
@@ -95,6 +96,7 @@ public class Controls {
         armsOpen = armsOpenButton.isPressed();
         pullCube = pullCubeButton.isPressed();
         pushCube = pushCubeButton.isPressed();
+        pushCubeModifier = getPushCubeModifierButton.isPressed();
 
         moveBottom = moveBottomButton.isPressed();
         moveSwitch = moveSwitchButton.isPressed();
@@ -182,6 +184,7 @@ public class Controls {
 
     private static IButton pullCubeButton = new Axis(operator,Logitech310Axis.LeftTrigger, 0.1);
     private static IButton pushCubeButton = new Axis(operator,Logitech310Axis.RightTrigger,0.1);
+    private static IButton getPushCubeModifierButton = new Button(operator, Logitech310Button.X, IButton.ButtonType.Hold);
 
     //
     //
@@ -191,6 +194,7 @@ public class Controls {
     private static boolean isHighGear = true;
 
     private static boolean pushCube = false;
+    private static boolean pushCubeModifier = false;
     private static boolean pullCube = false;
     private static boolean armsClose = false;
     private static boolean armsOpen = false;
