@@ -133,10 +133,10 @@ public class AutoRoutines {
         } else {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
             steps.add(new AutoDriveAndLift(robot.driveController, "right-scale_left", robot.elevatorController, 12, 0));
-            steps.add(new AutoRotate(robot.driveController, 110));
-            steps.add(new AutoLift(robot.elevatorController, 80.0));
-            steps.add(new AutoDrive(robot.driveController, 30));
-            steps.add(new AutoSpit(robot.elevatorController));
+            //steps.add(new AutoRotate(robot.driveController, 110));
+            //steps.add(new AutoLift(robot.elevatorController, 80.0));
+            //steps.add(new AutoDrive(robot.driveController, 30));
+            //steps.add(new AutoSpit(robot.elevatorController));
 //            steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
 //            steps.add(new AutoDriveAndLift(robot.driveController, 226, robot.elevatorController, 12, 0));
 //            steps.add(new AutoRotate(robot.driveController, -93));
