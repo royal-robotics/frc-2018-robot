@@ -97,8 +97,6 @@ public class Robot extends IterativeRobot {
     public void robotPeriodic() {
         Controls.updateControls();
 
-        //System.out.printf("Left: %f, Right %f\n", driveController.getLeftDistance(), driveController.getRightDistance());
-
         this.driveController.robotPeriodic();
         this.elevatorController.robotPeriodic();
     }
@@ -119,8 +117,6 @@ public class Robot extends IterativeRobot {
     @Override
     public void disabledPeriodic() {
         this.driveController.disablePeriodic();
-        AutoRoutines.writeRoutinesToDashboard();
-        SmartDashboard.putString("AutoRoutines/SelectedRoutineAck", AutoRoutines.getAutoMode());
     }
 
     /**
@@ -132,7 +128,7 @@ public class Robot extends IterativeRobot {
     public void autonomousInit() {
         this.driveController.reset();
         this.elevatorController.lift.autoCalibrate();
-        auto = AutoRoutines.selectAutoMode(AutoRoutines.getAutoMode(), this);
+        auto = AutoRoutines.selectAutoMode(Controls.getAutoMode(), this);
     }
 
     /**

@@ -3,8 +3,15 @@ package frc.team2522.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.libs.*;
+import openrio.powerup.MatchData;
 
 public class Controls {
+
+    private static Joystick driver = new Joystick(0);
+    private static Joystick operator = new Joystick (1);
+    private static Joystick autoSelector = new Joystick(2);
+
+
     public enum Logitech310Button {
         A (1),
         B (2),
@@ -81,16 +88,16 @@ public class Controls {
 
 
     public static void initialize() {
-        SmartDashboard.putBoolean("Controls/Debugging", true);
-        SmartDashboard.putNumber("Controls/MoveDistance", 60.0);
+        SmartDashboard.putBoolean("Debugging", true);
+        SmartDashboard.putNumber("MoveDistance", 60.0);
     }
 
     public static double getMoveDistance() {
-        return SmartDashboard.getNumber("Controls/MoveDistance", 60.0);
+        return SmartDashboard.getNumber("MoveDistance", 60.0);
     }
 
     public static void updateControls() {
-        DebugMode = SmartDashboard.getBoolean("Controls/Debugging", true);
+        DebugMode = SmartDashboard.getBoolean("Debugging", true);
 
         armsClose = armsCloseButton.isPressed();
         armsOpen = armsOpenButton.isPressed();
@@ -126,27 +133,179 @@ public class Controls {
             isHighGear = !isHighGear;
         }
 
-        if(setAutoLeftSwitchOrScale.isPressed()) {
-            SmartDashboard.putString("AutoRoutines/ManualSelectedRoutine", "Left_SwitchOrScale");
-            manualAutoMode = "Left_SwitchOrScale";
-        } else if(setAutoRightSwitchOrScale.isPressed()) {
-            SmartDashboard.putString("AutoRoutines/ManualSelectedRoutine", "Right_SwitchOrScale");
-            manualAutoMode = "Right_SwitchOrScale";
-        } else if(setAutoCenterSwitch.isPressed()) {
-            SmartDashboard.putString("AutoRoutines/ManualSelectedRoutine", "Center_SwitchOnly");
-            manualAutoMode = "Center_SwitchOnly";
-        } else if(setAutoReadFromDashboard.isPressed()) {
-            SmartDashboard.putString("AutoRoutines/ManualSelectedRoutine", "");
-            manualAutoMode = null;
-        }
+        updateAutoMode();
 
         SmartDashboard.putBoolean("Controls/ClimberEnabled", inClimberMode());
     }
 
+    /**
+     *
+     */
+    private static String autoMode = null;
+    public static String getAutoMode() {
+        return autoMode;
+    }
+
+    /**
+     *
+     */
+    private static void updateAutoMode() {
+        String newMode;
+
+        switch(getFieldStartPosition()) {
+            case 10: {  // LEFT
+                switch (getAutoRoutineId()) {
+                    case 1: {
+                        newMode = "Left_SwitchOrScale";
+                        break;
+                    }
+                    case 2: {
+                        newMode = "Left_SwitchOnly";
+                        break;
+                    }
+                    case 3: {
+                        newMode = "Left_ScaleOnly";
+                        break;
+                    }
+                    case 10: {
+                        newMode = "DriveForward";
+                        break;
+                    }
+                    default: {
+                        newMode = "NoRoutine";
+                        break;
+                    }
+                }
+                break;
+            }
+            case 1: {   // CENTER
+                switch (getAutoRoutineId()) {
+                    case 1: {
+                        newMode = "Center_SwitchOnly";
+                        break;
+                    }
+                    default: {
+                        newMode = "NoRoutine";
+                        break;
+                    }
+                }
+                break;
+            }
+            case 2: {   // RIGHT
+                switch (getAutoRoutineId()) {
+                    case 1: {
+                        newMode = "Right_SwitchOrScale";
+                        break;
+                    }
+                    case 2: {
+                        newMode = "Right_SwitchOnly";
+                        break;
+                    }
+                    case 3: {
+                        newMode = "Right_ScaleOnly";
+                        break;
+                    }
+                    case 10: {
+                        newMode = "DriveForward";
+                        break;
+                    }
+                    default: {
+                        newMode = "NoRoutine";
+                        break;
+                    }
+                }
+                break;
+            }
+            default: {
+                newMode = "NoRoutine";
+                break;
+            }
+        }
+
+
+        if (newMode != autoMode) {
+            autoMode = newMode;
+            SmartDashboard.putString("AutoRoutine", autoMode);
+        }
+    }
+
+    /**
+     * Return the result of the robot field start position selector.
+     *
+     *  For 2018 the positions are as follows:
+     *
+     *  	1: Robot left bumper next to right side of exchange zone tape and back bumper against station wall
+     *  	2: Robot right bumper against right edge of back diamond plate and back bumper against station wall
+     *  	10: Robot left bumper against left edge of back diamond plate and back bumper against station wall
+     *
+     * @return The id of the field starting position.
+     */
+    public static int getFieldStartPosition()
+
+    {
+        int result = 0;
+
+        result += autoSelector.getRawButton(2) ? 1 : 0;
+        result += autoSelector.getRawButton(3) ? 2 : 0;
+        result += autoSelector.getRawButton(4) ? 4 : 0;
+        result += autoSelector.getRawButton(5) ? 8 : 0;
+
+        return result + 1;
+    }
+
+    /**
+     *
+     *
+     * @return
+     */
+    public static int getAutoRoutineId()
+
+    {
+        int autoValue = 0;
+
+        autoValue += autoSelector.getRawButton(13) ? 1 : 0;
+        autoValue += autoSelector.getRawButton(14) ? 2 : 0;
+        autoValue += autoSelector.getRawButton(15) ? 4 : 0;
+        autoValue += autoSelector.getRawButton(16) ? 8 : 0;
+
+        return autoValue + 1;
+    }
+
+    public static MatchData.OwnedSide getOwnedSide(MatchData.GameFeature feature) {
+        MatchData.OwnedSide side = MatchData.getOwnedSide(feature);
+
+        if(side == MatchData.OwnedSide.UNKNOWN) {
+            System.out.println("MatchData UNKNOWN setting value based on AutoSelect Switches.");
+            if(feature == MatchData.GameFeature.SCALE) {
+                side = autoSelector.getRawButton(1) ? MatchData.OwnedSide.RIGHT : MatchData.OwnedSide.LEFT;
+            } else {
+                side = autoSelector.getRawButton(12) ? MatchData.OwnedSide.RIGHT : MatchData.OwnedSide.LEFT;
+            }
+        }
+        else {
+            System.out.println("Match data returned from FMS.");
+        }
+
+        if (feature == MatchData.GameFeature.SCALE) {
+            System.out.print("SCALE is on ");
+        }
+        else {
+            System.out.print("SWITCH is on ");
+        }
+
+        if (side == MatchData.OwnedSide.LEFT) {
+            System.out.println(" LEFT.");
+        }
+        else {
+            System.out.println(" RIGHT.");
+        }
+
+        return side;
+    }
+
+
     // Driver Joystick Configuration
     //
-    private static Joystick driver = new Joystick(0);
-
     private static IButton shiftToggleButton = new Button(driver, Logitech310Button.A, IButton.ButtonType.Toggle);
     private static IButton moveLiftButton = new Button(driver,Logitech310Button.B, IButton.ButtonType.Hold);
     private static IButton showTargetsButton = new Button(driver, Logitech310Button.X, IButton.ButtonType.Hold);
@@ -164,7 +323,6 @@ public class Controls {
 
     // Operator Joystick Configuration
     //
-    private static Joystick operator = new Joystick (1);
     private static IButton armsCloseButton = new Button(operator,Logitech310Button.A, IButton.ButtonType.Hold);
     private static IButton armsOpenButton = new Button(operator,Logitech310Button.B, IButton.ButtonType.Hold);
     // X is not used
@@ -211,14 +369,4 @@ public class Controls {
 
     private static boolean debugDriveForward = false;
     private static boolean showTargets = false;
-
-
-
-    //Auto mode kludge logic because we don't trust the dashboard
-    public static IButton setAutoLeftSwitchOrScale = new POVButton(driver, 270);
-    public static IButton setAutoRightSwitchOrScale = new POVButton(driver, 90);
-    public static IButton setAutoCenterSwitch = new POVButton(driver, 0);
-    public static IButton setAutoReadFromDashboard = new POVButton(driver, 180);
-    private static String manualAutoMode = null;
-    public static String getManualAutoMode() { return manualAutoMode; }
 }

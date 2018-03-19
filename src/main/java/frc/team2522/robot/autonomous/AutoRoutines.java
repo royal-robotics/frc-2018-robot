@@ -14,23 +14,6 @@ import java.util.List;
 
 public class AutoRoutines {
 
-    public static MatchData.OwnedSide getOwnedSide(MatchData.GameFeature feature) {
-        MatchData.OwnedSide side = MatchData.getOwnedSide(feature);
-
-        if(side == MatchData.OwnedSide.UNKNOWN) {
-                if(feature == MatchData.GameFeature.SCALE) {
-                    return DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue
-                            ? MatchData.OwnedSide.LEFT
-                            : MatchData.OwnedSide.RIGHT;
-                } else {
-                    return DriverStation.getInstance().getLocation() == 1
-                            ? MatchData.OwnedSide.LEFT
-                            : MatchData.OwnedSide.RIGHT;
-                }
-        }
-
-        return side;
-    }
 
     public static void writeRoutinesToDashboard() {
         Method[] methods = AutoRoutines.class.getDeclaredMethods();
@@ -46,19 +29,6 @@ public class AutoRoutines {
         SmartDashboard.putString("AutoRoutines/RoutinesList", routines.toJSONString());
     }
 
-    private static String autoModeLast = null;
-    public static String getAutoMode() {
-        String autoMode = Controls.getManualAutoMode();
-        if(autoMode == null)
-            autoMode = SmartDashboard.getString("AutoRoutines/SelectedRoutine", "");
-
-        if(autoMode != autoModeLast)
-            System.out.println("Auto Mode: " + autoMode);
-
-        autoModeLast = autoMode;
-        return autoMode;
-    }
-
     public static AutoManager selectAutoMode(String autoName, Robot robot) {
         try {
             System.out.println("AutoName: " + autoName);
@@ -72,28 +42,24 @@ public class AutoRoutines {
     }
 
     public static AutoManager NoRoutine(Robot robot) {
+        return new AutoManager(new ArrayList<>());
+    }
+
+    public static AutoManager DriveForward(Robot robot) {
         List<AutoStep> steps = new ArrayList<>();
         steps.add(new AutoDrive(robot.driveController, 100));
         return new AutoManager(steps);
     }
 
-    public static AutoManager Test_MoveLiftDown(Robot robot) {
-        List<AutoStep> steps = new ArrayList<>();
-        steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
-        steps.add(new AutoLift(robot.elevatorController, 12));
-
-        return new AutoManager(steps);
-    }
-
     public static AutoManager Center_SwitchOnly(Robot robot) {
         List<AutoStep> steps = new ArrayList<>();
-        if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.RIGHT) {
-            System.out.println("GetOwnedSide is RIGHT");
-            steps.add(new AutoDrivePath(robot.driveController, "center-right_side_switch"));
+
+        if (Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT) {
+            steps.add(new AutoDrivePath(robot.driveController, "center-switch_left"));
         } else {
-            System.out.println("GetOwnedSide is LEFT");
-            steps.add(new AutoDrivePath(robot.driveController, "center-left_side_switch"));
+            steps.add(new AutoDrivePath(robot.driveController, "center-switch_right"));
         }
+
         steps.add(new AutoSpit(robot.elevatorController));
 
         return new AutoManager(steps);
@@ -102,7 +68,7 @@ public class AutoRoutines {
     public static AutoManager Left_OnlyScale(Robot robot) {
         List<AutoStep> steps = new ArrayList<>();
 
-        if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SCALE) == MatchData.OwnedSide.LEFT) {
+        if (Controls.getOwnedSide(MatchData.GameFeature.SCALE) == MatchData.OwnedSide.LEFT) {
             steps.add(new AutoDriveAndLift(robot.driveController, "left-scale_left", robot.elevatorController, 80, 100));
             steps.add(new AutoSpit(robot.elevatorController));
         } else {
@@ -127,8 +93,8 @@ public class AutoRoutines {
     public static AutoManager Right_OnlyScale(Robot robot) {
         List<AutoStep> steps = new ArrayList<>();
 
-        if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SCALE) == MatchData.OwnedSide.RIGHT) {
-            steps.add(new AutoDriveAndLift(robot.driveController, "right-scale_right", robot.elevatorController, 80, 100));
+        if (Controls.getOwnedSide(MatchData.GameFeature.SCALE) == MatchData.OwnedSide.RIGHT) {
+            steps.add(new AutoDriveAndLift(robot.driveController, "right-scale_right", robot.elevatorController, 76, 100));
             steps.add(new AutoSpit(robot.elevatorController));
         } else {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
@@ -152,11 +118,13 @@ public class AutoRoutines {
     public static AutoManager Left_SwitchOrScale(Robot robot) {
         List<AutoStep> steps = new ArrayList<>();
 
-        if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT) {
-            steps.add(new AutoDrive(robot.driveController, 155));
-            steps.add(new AutoRotate(robot.driveController, 90));
-            steps.add(new AutoDrive(robot.driveController, 25.0));
+        if (Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT) {
+            steps.add(new AutoDrivePath(robot.driveController, "left-switch_left"));
             steps.add(new AutoSpit(robot.elevatorController));
+//            steps.add(new AutoDrive(robot.driveController, 155));
+//            steps.add(new AutoRotate(robot.driveController, 90));
+//            steps.add(new AutoDrive(robot.driveController, 25.0));
+//            steps.add(new AutoSpit(robot.elevatorController));
         } else {
             return Left_OnlyScale(robot);
         }
@@ -167,11 +135,13 @@ public class AutoRoutines {
     public static AutoManager Right_SwitchOrScale(Robot robot) {
         List<AutoStep> steps = new ArrayList<>();
 
-        if (AutoRoutines.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.RIGHT) {
-            steps.add(new AutoDrive(robot.driveController, 155));
-            steps.add(new AutoRotate(robot.driveController, -90));
-            steps.add(new AutoDrive(robot.driveController, 25.0));
+        if (Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.RIGHT) {
+            steps.add(new AutoDrivePath(robot.driveController, "right-switch_right"));
             steps.add(new AutoSpit(robot.elevatorController));
+//            steps.add(new AutoDrive(robot.driveController, 155));
+//            steps.add(new AutoRotate(robot.driveController, -90));
+//            steps.add(new AutoDrive(robot.driveController, 25.0));
+//            steps.add(new AutoSpit(robot.elevatorController));
         } else {
             return Right_OnlyScale(robot);
         }

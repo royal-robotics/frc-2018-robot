@@ -144,7 +144,7 @@ public class Lift {
      *
      */
     public void writeToDashboard() {
-        SmartDashboard.putNumber("Lift/Position", this.getPosition());
+        SmartDashboard.putNumber("LiftPosition", this.getPosition());
     }
 
 

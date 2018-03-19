@@ -110,21 +110,21 @@ public class Intake {
     }
 
     public void setClosed() {
-        SmartDashboard.putString("Intake/State", "Closed");
+        SmartDashboard.putString("IntakeState", "Closed");
         this.armsOut = false;
         intakeHi.set(DoubleSolenoid.Value.kForward);
         intakeLo.set(DoubleSolenoid.Value.kReverse);
     }
 
     public void setPickup() {
-        SmartDashboard.putString("Intake/State", "Pickup");
+        SmartDashboard.putString("IntakeState", "Pickup");
         this.armsOut = true;
         intakeHi.set(DoubleSolenoid.Value.kReverse);
         intakeLo.set(DoubleSolenoid.Value.kReverse);
     }
 
     public void setOpen() {
-        SmartDashboard.putString("Intake/State", "Open");
+        SmartDashboard.putString("IntakeState", "Open");
         this.armsOut = true;
         intakeHi.set(DoubleSolenoid.Value.kReverse);
         intakeLo.set(DoubleSolenoid.Value.kForward);

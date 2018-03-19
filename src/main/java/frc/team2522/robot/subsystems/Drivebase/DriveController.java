@@ -158,13 +158,8 @@ public class DriveController {
 
         if (this.leftVelocity > this.maxDetectedVelocity) {
             this.maxDetectedVelocity = this.leftVelocity;
-            SmartDashboard.putNumber("DriveController/MaxVelocity", this.maxDetectedVelocity);
+            SmartDashboard.putNumber("DriveMaxVelocity", this.maxDetectedVelocity);
         }
-        SmartDashboard.putNumber("DriveController/LeftVelocity", this.leftLastVelocity);
-        SmartDashboard.putNumber("DriveController/LeftDistance", this.leftLastDistance);
-        SmartDashboard.putNumber("DriveController/RightVelocity", this.rightVelocity);
-        SmartDashboard.putNumber("DriveController/RightDistance", this.rightLastDistance);
-        SmartDashboard.putNumber("DriveController/Gyro", this.getAngle());
 
         // TODO write to log file
     }
@@ -193,14 +188,8 @@ public class DriveController {
             if (Controls.debugDriveForward()) {
                 if (this.follower == null) {
 //                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
-//                    this.drivePath("motion-profile", true);
-                    this.drivePath("center-right_side_switch", false);
+                    this.drivePath("motion-profile", false);
 //                    this.driveRotate(90.0, 50, 100, 300);
-                }
-                else if (this.follower.isFinished()) {
-//                    this.driveDistance(-Controls.getMoveDistance(), 150, 100, 300);
-//                    this.drivePath("motion-profile", true);
-//                    this.driveRotate(-90.0, 50, 100, 300);
                 }
             }
             else {
@@ -424,13 +413,17 @@ public class DriveController {
     }
 
     public void writeToDashboard() {
-        SmartDashboard.putBoolean("DriveController/PTOEnabled", this.isPTOEnabled());
-        SmartDashboard.putString("DriveController/Gear", this.gear == Gear.High ? "High" : "Low");
-        SmartDashboard.putString("DriveController/DriveType", Controls.DriveSystem.getDriveType() == DriveType.TankDrive ? "TankDrive" : "DiffDrive");
+        SmartDashboard.putBoolean("DrivePTOEnabled", this.isPTOEnabled());
+        SmartDashboard.putString("DriveGear", this.gear == Gear.High ? "High" : "Low");
+        SmartDashboard.putString("DriveDriveType", Controls.DriveSystem.getDriveType() == DriveType.TankDrive ? "TankDrive" : "DiffDrive");
 
-        SmartDashboard.putNumber("DriveController/LeftPower", this.leftPower);
-        SmartDashboard.putNumber("DriveController/RightPower", this.rightPower);
-        SmartDashboard.putNumber("DriveController/LeftVelocity", this.leftVelocity);
-        SmartDashboard.putNumber("DriveController/RightVelocity", this.rightVelocity);
+        SmartDashboard.putNumber("DriveLeftPower", this.leftPower);
+        SmartDashboard.putNumber("DriveRightPower", this.rightPower);
+
+        SmartDashboard.putNumber("DriveLeftDistance", this.getLeftDistance());
+        SmartDashboard.putNumber("DriveRightDistance", this.getRightDistance());
+
+        SmartDashboard.putNumber("DriveLeftVelocity", this.leftVelocity);
+        SmartDashboard.putNumber("DriveRightVelocity", this.rightVelocity);
     }
 }

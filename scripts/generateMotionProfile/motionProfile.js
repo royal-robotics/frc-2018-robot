@@ -22,7 +22,9 @@ fs.readdir(motionProfilePath, async function(err, files) {
     let sftp = new Client();
     try {
         await sftp.connect({
-            host: '172.22.11.2',
+// 172.22.11.2 for at compitentions?
+// 10.25.22.1 for wireless
+            host: '10.25.22.2',
             port: '22',
             username: 'lvuser',
             password: '',

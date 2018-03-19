@@ -239,7 +239,7 @@ public class TrajectoryFollower {
                         expectedAngle = Pathfinder.r2d(segment.heading);
                         angleError = Pathfinder.boundHalfDegrees(expectedAngle - actualAngle);
 
-                        angleAdj = -0.1 * angleError;
+                        angleAdj = -0.2 * angleError;
 
                         if (i == 1) {   // Right Motor
                             angleAdj = -1.0 * angleAdj;
