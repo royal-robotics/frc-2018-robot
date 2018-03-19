@@ -189,7 +189,13 @@ public class TrajectoryFollower {
      * @return
      */
     public double getPosition() {
-        return this.lastPositions[0];
+        double result = 0.0;
+
+        for(int i = 0; i < this.lastPositions.length; i++) {
+            result = result + this.lastPositions[i];
+        }
+
+        return result / ((double)this.lastPositions.length);
     }
 
     /**
