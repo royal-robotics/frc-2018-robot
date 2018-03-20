@@ -1,7 +1,6 @@
 package frc.team2522.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.autonomous.AutoManager;
 import frc.team2522.robot.autonomous.AutoRoutines;
 import frc.team2522.robot.camera.CameraPipeline;

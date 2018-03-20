@@ -20,7 +20,7 @@ public class Intake {
     DoubleSolenoid intakeLo;
 
     Timer timer = null;
-    boolean rotateMode;
+    long rotateMode;
     boolean armsOut = false;
 
     public Intake(IMotorController elevatorIntakeMotor, IMotorController leftIntakeMotor, IMotorController rightIntakeMotor, DoubleSolenoid intakeHi, DoubleSolenoid intakeLo) {
@@ -63,14 +63,14 @@ public class Intake {
             timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
                 public void run() {
-                    rotateMode = !rotateMode;
-                    if (rotateMode) {
-                        setPull();
-                    } else {
+                    rotateMode++;
+                    if (rotateMode % 4 == 0) {
                         setRotate();
+                    } else {
+                        setPull();
                     }
                 }
-            }, 0, (int) SmartDashboard.getNumber("Intake/Rotate/interval", 333));
+            }, 0, (int) SmartDashboard.getNumber("Intake/Rotate/interval", 250));
         }
     }
 
@@ -98,13 +98,13 @@ public class Intake {
     }
 
     public void setRotate() {
-        elevatorIntakeMotor.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Rotate/carriage", 0.75));
+        elevatorIntakeMotor.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Rotate/carriage", -0.5));
         leftIntakeMotor.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Rotate/left", 0.8));
         rightIntakeMotor.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Rotate/right", -0.2));
     }
 
     public void setStop() {
-        elevatorIntakeMotor.set(ControlMode.PercentOutput, -0.2);
+        elevatorIntakeMotor.set(ControlMode.PercentOutput, 0.0);
         leftIntakeMotor.set(ControlMode.PercentOutput, 0.0);
         rightIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }

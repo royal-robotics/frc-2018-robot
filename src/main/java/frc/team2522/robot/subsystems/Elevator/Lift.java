@@ -76,10 +76,8 @@ public class Lift {
                 stopFollower();
                 stopCalibration();
 
-                double power = Controls.Elevator.Lift.getLiftAxisValue();
-                power *= power > 0 ? 0.5 : 0.25;
                 this.setBreak(false);
-                this.setPower(power);
+                this.setPower(Controls.Elevator.Lift.getLiftAxisValue());
             } else if (!isCalibrating() && !isFollowing()) {
                 this.setBreak(true);
                 this.setPower(0.0);

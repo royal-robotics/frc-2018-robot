@@ -42,7 +42,7 @@ public class TrajectoryFollower {
     private IMotorController[] controllers = null;
     private double[] powerScales = null;
 
-    private ADXRS450_Gyro gyro;
+    private RoyalGyro gyro;
     private double gyroAngleOffset;
 
     PrintStream ps[] = null;
@@ -52,7 +52,7 @@ public class TrajectoryFollower {
                               Trajectory trajectory, Encoder encoder, IMotorController controller,
                               double kVf, double kAf, double kP, double kI, double kD)
     {
-        this(new String[] {name}, gyro, new Trajectory[] {trajectory}, new Encoder[] { encoder }, new double[] {reverse ? -1.0: 1.0}, new IMotorController[] { controller }, new double[] {1.0}, kVf, kAf, kP, kI, kD);
+        this(new String[] {name}, gyro == null ? null : new RoyalGyro(gyro, reverse), new Trajectory[] {trajectory}, new Encoder[] { encoder }, new double[] {reverse ? -1.0: 1.0}, new IMotorController[] { controller }, new double[] {1.0}, kVf, kAf, kP, kI, kD);
     }
 
     public TrajectoryFollower(String name, boolean reverse, ADXRS450_Gyro gyro,
@@ -60,14 +60,14 @@ public class TrajectoryFollower {
                               Trajectory rightTrajectory, Encoder rightEncoder, IMotorController rightMotor, double rightMotorScale,
                               double kVf, double kAf, double kP, double kI, double kD)
     {
-        this(new String[] {name+"-left", name+"-right"}, gyro,
+        this(new String[] {name+"-left", name+"-right"}, gyro == null ? null : new RoyalGyro(gyro, reverse),
                 new Trajectory[] {leftTrajectory, rightTrajectory},
                 new Encoder[] { leftEncoder, rightEncoder }, new double[] {reverse ? -1.0: 1.0,reverse ? -1.0: 1.0},
                 new IMotorController[] { leftMotor, rightMotor }, new double[] {1.0, -1.0},
                 kVf, kAf, kP, kI, kD);
     }
 
-    public TrajectoryFollower(String[] names,  ADXRS450_Gyro gyro, Trajectory[] trajectories, Encoder[] encoders, double[] distanceScales, IMotorController[] controllers, double[] powerScales, double kVf, double kAf, double kP, double kI, double kD) {
+    public TrajectoryFollower(String[] names,  RoyalGyro gyro, Trajectory[] trajectories, Encoder[] encoders, double[] distanceScales, IMotorController[] controllers, double[] powerScales, double kVf, double kAf, double kP, double kI, double kD) {
         this.names = names;
         this.gyro = gyro;
         this.trajectories = trajectories;
