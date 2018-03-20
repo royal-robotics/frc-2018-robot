@@ -23,7 +23,7 @@ public class AutoLift extends AutoStep {
 
     @Override
     public boolean isCompleted() {
-        if (this.follower.isFinished()) {
+        if (this.follower != null && this.follower.isFinished()) {
             this.elevatorController.lift.stopFollower();
             return true;
         }

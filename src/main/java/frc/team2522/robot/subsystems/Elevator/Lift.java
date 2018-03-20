@@ -56,7 +56,7 @@ public class Lift {
     }
 
     public void autoCalibrate() {
-        this.liftEncoder.reset(37.5);
+        this.liftEncoder.reset(25);
         this.isCalibrated = true;
     }
 
@@ -160,7 +160,7 @@ public class Lift {
             Trajectory.Config config = new Trajectory.Config(
                     Trajectory.FitMethod.HERMITE_CUBIC,
                     Trajectory.Config.SAMPLES_FAST,
-                    0.01, //10ms
+                    0.02, //10ms
                     100,
                     300.0,
                     500.0);

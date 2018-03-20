@@ -10,6 +10,7 @@ import org.json.simple.JSONArray;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class AutoRoutines {
@@ -54,12 +55,14 @@ public class AutoRoutines {
     public static AutoManager Center_SwitchOnly(Robot robot) {
         List<AutoStep> steps = new ArrayList<>();
 
-        if (Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT) {
-            steps.add(new AutoDrivePath(robot.driveController, "center-switch_left"));
-        } else {
-            steps.add(new AutoDrivePath(robot.driveController, "center-switch_right"));
-        }
+        String pathName = Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT
+                ? "center-switch_left"
+                : "center-switch_right";
+        AutoDrivePath driveToSwitchAndLift = new AutoDrivePath(robot.driveController, pathName);
+        //driveToSwitchAndLift.addChildStep(0, new AutoLift(robot.elevatorController, robot.elevatorController.lift.getPosition() + 10));
 
+        //steps.add(new AutoLift(robot.elevatorController, robot.elevatorController.lift.getPosition() + 10));
+        steps.add(driveToSwitchAndLift);
         steps.add(new AutoSpit(robot.elevatorController));
 
         return new AutoManager(steps);
@@ -79,7 +82,7 @@ public class AutoRoutines {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
 
             AutoDriveAndLift step = new AutoDriveAndLift(robot.driveController, "left-scale_right", robot.elevatorController);
-            step.AddLiftMove(0, 12);
+//            step.AddLiftMove(0, 12);
             step.AddLiftMove(360, 76);
             steps.add(step);
 
@@ -103,8 +106,8 @@ public class AutoRoutines {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
 
             AutoDriveAndLift step = new AutoDriveAndLift(robot.driveController, "right-scale_left", robot.elevatorController);
-            step.AddLiftMove(0, 12);
-//            step.AddLiftMove(360, 76);
+ //           step.AddLiftMove(0, 12);
+            step.AddLiftMove(360, 76);
             steps.add(step);
 
             steps.add(new AutoLift(robot.elevatorController, 76));

@@ -12,7 +12,7 @@ public class AutoManager {
     public int currentStep = 0;
 
     private Timer timer = new Timer();
-    private final long msPeriodic = 10;
+    private final long msPeriodic = 50;
 
     public AutoManager(List<AutoStep> autoSteps) {
         this.autoSteps = autoSteps;
