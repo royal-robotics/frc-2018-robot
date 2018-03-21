@@ -60,9 +60,26 @@ public class AutoRoutines {
                 : "center-switch_right";
         AutoDrivePath driveToSwitchAndLift = new AutoDrivePath(robot.driveController, pathName);
         //driveToSwitchAndLift.addChildStep(0, new AutoLift(robot.elevatorController, robot.elevatorController.lift.getPosition() + 10));
-
-        //steps.add(new AutoLift(robot.elevatorController, robot.elevatorController.lift.getPosition() + 10));
         steps.add(driveToSwitchAndLift);
+        steps.add(new AutoSpit(robot.elevatorController));
+
+        pathName = Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT
+                ? "center-switch_left_back_to_center"
+                : "center-switch_right_back_to_center";
+        AutoDrivePath driveBackToCenter = new AutoDrivePath(robot.driveController, pathName, true);
+        driveBackToCenter.addChildStep(10, new AutoLift(robot.elevatorController, robot.elevatorController.lift.getPosition() - 25));
+        steps.add(driveBackToCenter);
+        steps.add(new AutoSpit(robot.elevatorController));
+
+        AutoDrivePath driveForwardAndCollect = new AutoDrivePath(robot.driveController, "center-switch_forward_and_collect");
+        driveForwardAndCollect.addChildStep(0, new AutoSpit(robot.elevatorController, 1.50, -1.0));
+        steps.add(driveForwardAndCollect);
+
+        AutoDrivePath driveBackAndLift = new AutoDrivePath(robot.driveController, "center-switch_backward_and_lift", true);
+        driveBackAndLift.addChildStep(0, new AutoLift(robot.elevatorController, 40));
+        steps.add(driveBackAndLift);
+
+        steps.add(new AutoDrivePath(robot.driveController, "center-switch_forward_and_spit"));
         steps.add(new AutoSpit(robot.elevatorController));
 
         return new AutoManager(steps);
@@ -82,8 +99,7 @@ public class AutoRoutines {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
 
             AutoDriveAndLift step = new AutoDriveAndLift(robot.driveController, "left-scale_right", robot.elevatorController);
-//            step.AddLiftMove(0, 12);
-            step.AddLiftMove(360, 76);
+            step.AddLiftMove(320, 76);
             steps.add(step);
 
             steps.add(new AutoSpit(robot.elevatorController));
@@ -106,13 +122,8 @@ public class AutoRoutines {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
 
             AutoDriveAndLift step = new AutoDriveAndLift(robot.driveController, "right-scale_left", robot.elevatorController);
- //           step.AddLiftMove(0, 12);
-            step.AddLiftMove(360, 76);
+            step.AddLiftMove(320, 76);
             steps.add(step);
-
-            steps.add(new AutoLift(robot.elevatorController, 76));
-
-            steps.add(new AutoDrive(robot.driveController, 10));
 
             steps.add(new AutoSpit(robot.elevatorController));
         }

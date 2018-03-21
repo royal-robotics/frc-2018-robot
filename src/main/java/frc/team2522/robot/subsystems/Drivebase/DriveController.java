@@ -188,7 +188,7 @@ public class DriveController {
             if (Controls.debugDriveForward()) {
                 if (this.follower == null) {
 //                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
-                    this.drivePath("motion-profile", false);
+                    this.drivePath("motion-profile", true);
 //                    this.driveRotate(90.0, 50, 100, 300);
                 }
             }
@@ -277,7 +277,7 @@ public class DriveController {
         double[] motorScales = new double[] {1.0, -1.0};
 
         System.out.println("DriveDistance: " + distance + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
-        this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"}, null, trajectories, encoders, distanceScales, motors, motorScales,
+        this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"}, null, 1.0, trajectories, encoders, distanceScales, motors, motorScales,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
         this.follower.start();
 
@@ -314,7 +314,7 @@ public class DriveController {
         double[] motorScales = new double[] {1.0, -1.0};
 
         System.out.println("DriveRotate: " + angle + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
-        this.follower = new TrajectoryFollower(new String[] {"DriveRotate-left", "DriveRotate-right"}, null, trajectories, encoders, distanceScales, motors, motorScales,
+        this.follower = new TrajectoryFollower(new String[] {"DriveRotate-left", "DriveRotate-right"}, null, 1.0, trajectories, encoders, distanceScales, motors, motorScales,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
 
         this.follower.start();

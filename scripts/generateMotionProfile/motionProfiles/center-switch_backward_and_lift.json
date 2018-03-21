@@ -1,18 +1,15 @@
 {
   "wheelbase-width": 25.00,
   "waypoints" : [
-    {"x":  -17.0, "y":  19.5, "angle":  90.0},
-    {"x":  -17.0, "y": 190.0, "angle":  90.0},
-    {"x":  -50.0, "y": 235.0, "angle": 180.0},
-    {"x": -185.0, "y": 235.0, "angle": 180.0},
-    {"x": -222.0, "y": 278.0, "angle":  85.0}
+    {"x": -4.0, "y": 65.0, "angle": 270.0},
+    {"x": -4.0, "y": 30.0, "angle": 270.0}
   ],
   "config": {
     "fit-method": "HERMITE_CUBIC",
     "numSamples": 100000,
     "dt": 0.01,
-    "max-velocity": 80.0,
-    "max-acceleration": 110.0,
+    "max-velocity": 50.0,
+    "max-acceleration": 120.0,
     "max-jerk": 200.0
   },
   "outputs": {

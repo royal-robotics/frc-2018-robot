@@ -13,19 +13,25 @@ public class AutoDrivePath  extends AutoStep {
 
     private TrajectoryFollower follower;
     private boolean isCompleted = false;
+    private boolean reverse = false;
 
     DriveController driveController;
 
     String pathName;
 
     public AutoDrivePath(DriveController driveController, String pathName) {
+        this(driveController, pathName, false);
+    }
+
+    public AutoDrivePath(DriveController driveController, String pathName, boolean reverse) {
         this.driveController = driveController;
         this.pathName = pathName;
+        this.reverse = reverse;
     }
 
     @Override
     public void initialize() {
-        follower = driveController.drivePath(this.pathName, false);
+        follower = driveController.drivePath(this.pathName, this.reverse);
     }
 
     @Override

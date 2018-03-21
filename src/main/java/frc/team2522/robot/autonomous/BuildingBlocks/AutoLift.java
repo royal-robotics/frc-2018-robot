@@ -33,7 +33,7 @@ public class AutoLift extends AutoStep {
 
     @Override
     public void periodic() {
-        if (this.follower.isFinished()) {
+        if (this.follower != null && this.follower.isFinished()) {
             this.elevatorController.lift.stopFollower();
         }
     }

@@ -11,6 +11,7 @@ public class AutoSpit  extends AutoStep {
     Elevator elevatorController;
 
     double duration;
+    double power = 0.0;
 
     public AutoSpit(Elevator elevatorController) {
         this(elevatorController, 0.5);
@@ -21,11 +22,22 @@ public class AutoSpit  extends AutoStep {
         this.duration = duration;
     }
 
+    public AutoSpit(Elevator elevatorController, double duration, double power) {
+        this.elevatorController = elevatorController;
+        this.duration = duration;
+        this.power = power;
+    }
+
     @Override
     public void initialize() {
         System.out.println("spit");
         this.startTime = System.nanoTime();
-        this.elevatorController.intake.setPush();
+        if (this.power != 0.0) {
+            this.elevatorController.intake.setPush(power);
+        }
+        else {
+            this.elevatorController.intake.setPush();
+        }
     }
 
     @Override

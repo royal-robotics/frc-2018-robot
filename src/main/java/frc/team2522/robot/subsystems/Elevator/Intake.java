@@ -82,13 +82,13 @@ public class Intake {
     }
 
     public void setPull() {
-        elevatorIntakeMotor.set(ControlMode.PercentOutput, -0.75/*-SmartDashboard.getNumber("Intake/Pull/carriage", 0.75)*/);
+        elevatorIntakeMotor.set(ControlMode.PercentOutput, -1.00/*-SmartDashboard.getNumber("Intake/Pull/carriage", 0.75)*/);
         leftIntakeMotor.set(ControlMode.PercentOutput, -0.8/*-SmartDashboard.getNumber("Intake/Pull/left", 0.8)*/);
         rightIntakeMotor.set(ControlMode.PercentOutput, 0.8/*SmartDashboard.getNumber("Intake/Pull/right", 0.8)*/);
     }
 
     public void setPush() {
-        setPush(0.75);
+        setPush(1.0);
     }
 
     public void setPush(double spitPower) {

@@ -42,7 +42,9 @@ public class TrajectoryFollower {
     private IMotorController[] controllers = null;
     private double[] powerScales = null;
 
-    private RoyalGyro gyro;
+    private double angleErrorScale = 1.0;
+
+    private ADXRS450_Gyro gyro;
     private double gyroAngleOffset;
 
     PrintStream ps[] = null;
@@ -52,7 +54,7 @@ public class TrajectoryFollower {
                               Trajectory trajectory, Encoder encoder, IMotorController controller,
                               double kVf, double kAf, double kP, double kI, double kD)
     {
-        this(new String[] {name}, gyro == null ? null : new RoyalGyro(gyro, reverse), new Trajectory[] {trajectory}, new Encoder[] { encoder }, new double[] {reverse ? -1.0: 1.0}, new IMotorController[] { controller }, new double[] {1.0}, kVf, kAf, kP, kI, kD);
+        this(new String[] {name}, gyro, 1.0, new Trajectory[] {trajectory}, new Encoder[] { encoder }, new double[] {reverse ? -1.0: 1.0}, new IMotorController[] { controller }, new double[] {1.0}, kVf, kAf, kP, kI, kD);
     }
 
     public TrajectoryFollower(String name, boolean reverse, ADXRS450_Gyro gyro,
@@ -60,16 +62,19 @@ public class TrajectoryFollower {
                               Trajectory rightTrajectory, Encoder rightEncoder, IMotorController rightMotor, double rightMotorScale,
                               double kVf, double kAf, double kP, double kI, double kD)
     {
-        this(new String[] {name+"-left", name+"-right"}, gyro == null ? null : new RoyalGyro(gyro, reverse),
+        this(new String[] {name+"-left", name+"-right"}, gyro, 1.0,
                 new Trajectory[] {leftTrajectory, rightTrajectory},
-                new Encoder[] { leftEncoder, rightEncoder }, new double[] {reverse ? -1.0: 1.0,reverse ? -1.0: 1.0},
-                new IMotorController[] { leftMotor, rightMotor }, new double[] {1.0, -1.0},
+                reverse ? new Encoder[] { rightEncoder, leftEncoder } : new Encoder[] { leftEncoder, rightEncoder },
+                new double[] {reverse ? -1.0: 1.0,reverse ? -1.0: 1.0},
+                reverse ? new IMotorController[] { rightMotor, leftMotor } :  new IMotorController[] { leftMotor, rightMotor },
+                reverse ? new double[] {-1.0, 1.0} : new double[] {1.0, -1.0},
                 kVf, kAf, kP, kI, kD);
     }
 
-    public TrajectoryFollower(String[] names,  RoyalGyro gyro, Trajectory[] trajectories, Encoder[] encoders, double[] distanceScales, IMotorController[] controllers, double[] powerScales, double kVf, double kAf, double kP, double kI, double kD) {
+    public TrajectoryFollower(String[] names,  ADXRS450_Gyro gyro, double angleErrorScale, Trajectory[] trajectories, Encoder[] encoders, double[] distanceScales, IMotorController[] controllers, double[] powerScales, double kVf, double kAf, double kP, double kI, double kD) {
         this.names = names;
         this.gyro = gyro;
+        this.angleErrorScale = angleErrorScale;
         this.trajectories = trajectories;
         this.encoders = encoders;
         this.distanceScales = distanceScales;
@@ -245,7 +250,7 @@ public class TrajectoryFollower {
                         expectedAngle = Pathfinder.r2d(segment.heading);
                         angleError = Pathfinder.boundHalfDegrees(expectedAngle - actualAngle);
 
-                        angleAdj = -0.2 * angleError;
+                        angleAdj = -0.2 * this.angleErrorScale * angleError;
 
                         if (i == 1) {   // Right Motor
                             angleAdj = -1.0 * angleAdj;
