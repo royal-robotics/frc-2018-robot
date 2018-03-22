@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.IMotorController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.Controls;
 import frc.team2522.robot.libs.RoyalEncoder;
@@ -160,7 +159,7 @@ public class Lift {
             Trajectory.Config config = new Trajectory.Config(
                     Trajectory.FitMethod.HERMITE_CUBIC,
                     Trajectory.Config.SAMPLES_FAST,
-                    0.02, //10ms
+                    0.01, //10ms
                     100,
                     300.0,
                     500.0);
@@ -169,6 +168,7 @@ public class Lift {
             System.out.println("Generated LiftMove path from " + this.getPosition() + " to " + moveTo + " ETA: " + (trajectory.length() * 0.01));
 
             follower = new TrajectoryFollower("LiftMove", this.getPosition() > moveTo, null, trajectory,this.liftEncoder, this.liftMotor, .04, 0.0, 0.8, 0.0, 0.0);
+
             this.setBreak(false);
             follower.start();
 

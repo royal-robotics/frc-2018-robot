@@ -102,7 +102,7 @@ public class TrajectoryFollower {
         this.ps = new PrintStream[trajectories.length];
 
         if (this.gyro != null) {
-            this.gyroAngleOffset = Pathfinder.r2d(trajectories[0].get(0).heading) - this.gyro.getAngle();
+            this.gyroAngleOffset = Pathfinder.r2d(trajectories[0].get(0).heading) + this.gyro.getAngle();
         }
 
         for(int i = 0; i < this.trajectories.length; i++) {
@@ -143,20 +143,22 @@ public class TrajectoryFollower {
     }
 
     public void stop() {
-        if(this.timer != null)
-            this.timer.cancel();
+        synchronized (this) {
+            if (this.timer != null)
+                this.timer.cancel();
 
-        this.timer = null;
-        for(int i = 0; i < controllers.length; i++) {
-            controllers[i].set(ControlMode.PercentOutput, 0.0);
+            this.timer = null;
+            for (int i = 0; i < controllers.length; i++) {
+                controllers[i].set(ControlMode.PercentOutput, 0.0);
 
-            if (this.ps[i] != null) {
-                this.ps[i].close();
-                this.ps[i] = null;
+                if (this.ps[i] != null) {
+                    this.ps[i].close();
+                    this.ps[i] = null;
+                }
             }
-        }
 
-        this.isFinished = true;
+            this.isFinished = true;
+        }
     }
 
     /**
@@ -185,6 +187,7 @@ public class TrajectoryFollower {
         if (this.gyro == null) {
             return 0.0;
         }
+
         return -this.gyro.getAngle() + this.gyroAngleOffset;
     }
 
@@ -250,7 +253,7 @@ public class TrajectoryFollower {
                         expectedAngle = Pathfinder.r2d(segment.heading);
                         angleError = Pathfinder.boundHalfDegrees(expectedAngle - actualAngle);
 
-                        angleAdj = -0.2 * this.angleErrorScale * angleError;
+                        angleAdj = -0.15 * this.angleErrorScale * angleError;
 
                         if (i == 1) {   // Right Motor
                             angleAdj = -1.0 * angleAdj;
