@@ -164,10 +164,6 @@ public class Controls {
                         break;
                     }
                     case 2: {
-                        newMode = "Left_SwitchOnly";
-                        break;
-                    }
-                    case 3: {
                         newMode = "Left_ScaleOnly";
                         break;
                     }
@@ -202,10 +198,6 @@ public class Controls {
                         break;
                     }
                     case 2: {
-                        newMode = "Right_SwitchOnly";
-                        break;
-                    }
-                    case 3: {
                         newMode = "Right_ScaleOnly";
                         break;
                     }
