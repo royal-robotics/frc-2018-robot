@@ -34,7 +34,7 @@ public class AutoLift extends AutoStep {
             return true;
 
         double time = (double)(System.nanoTime() - startTime) / 1000000000.0;
-        if(time > 3.0) {
+        if(time > 2.0) {
             System.out.println("Auto Lift timeout! :(");
             stop();
         }

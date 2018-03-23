@@ -65,31 +65,27 @@ public class AutoRoutines {
         pathName = Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT
                 ? "center-switch_left_back_to_center"
                 : "center-switch_right_back_to_center";
-        AutoDrivePath driveBackToCenter = new AutoDrivePath(robot.driveController, pathName, true);
-        driveBackToCenter.addChildStep(10, new AutoLift(robot.elevatorController, 0));
-        steps.add(driveBackToCenter);
+        steps.add(new AutoDrivePath(robot.driveController, pathName, true));
+        steps.add(new AutoLift(robot.elevatorController, 3));
 
         AutoDrivePath driveForwardAndCollect = new AutoDrivePath(robot.driveController, "center-switch_forward_and_collect");
         driveForwardAndCollect.addChildStep(0, new AutoSpit(robot.elevatorController, 1.50, -1.0));
         steps.add(driveForwardAndCollect);
 
-        AutoDrivePath driveBackAndLift = new AutoDrivePath(robot.driveController, "center-switch_backward_and_lift", true);
-        driveBackAndLift.addChildStep(0, new AutoLift(robot.elevatorController, 40));
-        steps.add(driveBackAndLift);
+        steps.add(new AutoDrivePath(robot.driveController, "center-switch_backward_and_lift", true));
+        steps.add(new AutoLift(robot.elevatorController, 30));
 
         pathName = Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT
                 ? "center-switch_left_forward_and_spit"
                 : "center-switch_right_forward_and_spit";
-        AutoDrivePath driveToSwitchFromCenter = new AutoDrivePath(robot.driveController, pathName);
-        driveToSwitchFromCenter.addChildStep(100, new AutoSpit(robot.elevatorController));
-        steps.add(driveToSwitchFromCenter);
+        steps.add(new AutoDrivePath(robot.driveController, pathName));
+        steps.add(new AutoSpit(robot.elevatorController));
 
-        pathName = Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT
-                ? "center-switch_left_back_to_45"
-                : "center-switch_right_back_to_45";
-        AutoDrivePath driveBackTo45 = new AutoDrivePath(robot.driveController, pathName, true);
-        driveBackTo45.addChildStep(10, new AutoLift(robot.elevatorController, 0));
-        steps.add(driveBackTo45);
+//        pathName = Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT
+//                ? "center-switch_left_back_to_45"
+//                : "center-switch_right_back_to_45";
+//        steps.add(new AutoDrivePath(robot.driveController, pathName, true));
+//        steps.add(new AutoLift(robot.elevatorController, 3));
 
 //        pathName = Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT
 //                ? "center-switch_left_forward45_and_collect"
