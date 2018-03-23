@@ -55,7 +55,7 @@ public class Lift {
     }
 
     public void autoCalibrate() {
-        this.liftEncoder.reset(25);
+        this.liftEncoder.reset(23.5);
         this.isCalibrated = true;
     }
 

@@ -3,28 +3,47 @@ package frc.team2522.robot.autonomous.BuildingBlocks;
 import frc.team2522.robot.autonomous.AutoStep;
 import frc.team2522.robot.libs.TrajectoryFollower;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
+import frc.team2522.robot.subsystems.Elevator.Lift;
 import jaci.pathfinder.Pathfinder;
 
 public class AutoLift extends AutoStep {
-    Elevator elevatorController;
+    Lift lift;
 
     double height;
-    TrajectoryFollower follower;
 
     public AutoLift(Elevator elevatorController, double height) {
-        this.elevatorController = elevatorController;
+        this.lift = elevatorController.lift;
         this.height = height;
     }
 
+    boolean isDone = false;
+    boolean moveUp = true;
+    long startTime = 0;
+
     @Override
     public void initialize() {
-        this.follower = this.elevatorController.lift.moveTo(this.height);
+        startTime = System.nanoTime();
+        double startPosition = this.lift.getPosition();
+        moveUp = height > startPosition;
+        move(moveUp ? 0.5 : -0.25);
     }
 
     @Override
     public boolean isCompleted() {
-        if (this.follower != null && this.follower.isFinished()) {
-            this.elevatorController.lift.stopFollower();
+        if(isDone)
+            return true;
+
+        double time = (double)(System.nanoTime() - startTime) / 1000000000.0;
+        if(time > 3.0) {
+            System.out.println("Auto Lift timeout! :(");
+            stop();
+        }
+
+        double position = this.lift.getPosition();
+        if((moveUp && (position > height))
+            || (!moveUp && (position < height))) {
+            stop();
+            isDone = true;
             return true;
         }
 
@@ -33,9 +52,18 @@ public class AutoLift extends AutoStep {
 
     @Override
     public void periodic() {
-        if (this.follower != null && this.follower.isFinished()) {
-            this.elevatorController.lift.stopFollower();
-        }
+
+    }
+
+    private void stop() {
+        this.lift.setBreak(true);
+        this.lift.setPower(0);
+        isDone = true;
+    }
+
+    private void move(double power) {
+        this.lift.setBreak(false);
+        this.lift.setPower(power);
     }
 
 }
