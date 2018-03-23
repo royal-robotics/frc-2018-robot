@@ -55,7 +55,8 @@ public class AutoLift extends AutoStep {
 
     }
 
-    private void stop() {
+    @Override
+    public void stop() {
         this.lift.setBreak(true);
         this.lift.setPower(0);
         isDone = true;

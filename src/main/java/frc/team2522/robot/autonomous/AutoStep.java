@@ -33,4 +33,6 @@ public abstract class AutoStep {
                 childTasks.get(i).periodic();
         }
     }
+
+    public void stop() { }
 }

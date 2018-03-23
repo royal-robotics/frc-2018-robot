@@ -41,4 +41,11 @@ public class AutoManager {
             }
         }, 0, msPeriodic);
     }
+
+    public void stop() {
+        for(AutoStep step : autoSteps) {
+            //TODO: once child steps move to base AutoStep this should stop the child steps
+            step.stop();
+        }
+    }
 }
