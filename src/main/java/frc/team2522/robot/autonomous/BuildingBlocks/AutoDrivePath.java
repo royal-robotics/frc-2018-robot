@@ -19,6 +19,8 @@ public class AutoDrivePath  extends AutoStep {
 
     String pathName;
 
+    double distance;
+
     public AutoDrivePath(DriveController driveController, String pathName) {
         this(driveController, pathName, false);
     }
@@ -29,9 +31,22 @@ public class AutoDrivePath  extends AutoStep {
         this.reverse = reverse;
     }
 
+    public AutoDrivePath(DriveController driveController, double distance)
+    {
+        this.driveController = driveController;
+        this.pathName = null;
+        this.reverse = false;
+        this.distance = distance;
+    }
+
     @Override
     public void initialize() {
-        follower = driveController.drivePath(this.pathName, this.reverse);
+        if (this.pathName != null) {
+            follower = driveController.drivePath(this.pathName, this.reverse);
+        }else{
+            follower = driveController.driveDistance(this.distance,100,120,200);
+        }
+
     }
 
     @Override

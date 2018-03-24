@@ -2,6 +2,7 @@ package frc.team2522.robot.camera;
 
 import edu.wpi.cscore.*;
 
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -13,12 +14,13 @@ public class CameraPipeline {
     //Setup image pipe
     static CameraPipeline _self;
     CvSink cameraStream;
+    FlipFilter flipFilter;
     BlurFilter blurFilter;
     ThresholdFilter thresholdFilter;
 
     public static void initialize() {
         try {
-            _self = new CameraPipeline();
+           _self = new CameraPipeline();
         } catch (Exception e) {
             _self = null;
         }
@@ -27,12 +29,16 @@ public class CameraPipeline {
     private CameraPipeline() {
         try {
             cameraStream = createCameraStream();
+
+            // Temp filter used to flip camera image, should be removed when the camera is flipped
+            flipFilter = new FlipFilter(cameraStream);
+
             blurFilter = new BlurFilter(cameraStream);
             thresholdFilter = new ThresholdFilter(blurFilter);
         } catch (Exception e) {
             System.out.println("Camera Exception: " + e.getMessage() + ", " + e.getStackTrace());
         }
-        
+
         SmartDashboard.putString("Camera/Filter", "raw");
         new Thread(() -> {
             CvSource outputStream = createOutputStream();
@@ -57,7 +63,8 @@ public class CameraPipeline {
         else if(filter.equals("threshold"))
             return thresholdFilter;
         else //"raw"
-            return cameraStream;
+            return flipFilter;
+            //return cameraStream;
     }
 
     private CvSink createCameraStream() {

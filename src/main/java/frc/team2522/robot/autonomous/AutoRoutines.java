@@ -136,6 +136,24 @@ public class AutoRoutines {
             steps.add(step);
 
             steps.add(new AutoSpit(robot.elevatorController));
+//
+//            steps.add(new AutoDrive(robot.driveController, -25));
+//
+//            steps.add(new AutoRotate(robot.driveController,255));
+//
+//            steps.add(new AutoLift(robot.elevatorController, 2));
+//
+//            AutoDrivePath driveForwardPickUp = new AutoDrivePath(robot.driveController, 26);
+//            driveForwardPickUp.addChildStep(5, new AutoSpit(robot.elevatorController,.75,-1));
+//            steps.add(driveForwardPickUp);
+//
+//            steps.add(new AutoLift(robot.elevatorController, 73));
+//
+//            steps.add(new AutoRotate(robot.driveController, -190));
+//
+//            steps.add(new AutoDrive(robot.driveController, 60));
+//
+//            steps.add(new AutoSpit(robot.elevatorController));
         }
         else {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
