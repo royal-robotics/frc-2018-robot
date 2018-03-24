@@ -109,7 +109,7 @@ public class AutoRoutines {
 
         if (Controls.getOwnedSide(MatchData.GameFeature.SCALE) == MatchData.OwnedSide.LEFT) {
             AutoDriveAndLift step = new AutoDriveAndLift(robot.driveController, "left-scale_left", robot.elevatorController);
-            step.AddLiftMove(100, 76);
+            step.AddLiftMove(100, 73);
             steps.add(step);
 
             steps.add(new AutoSpit(robot.elevatorController));
@@ -118,7 +118,7 @@ public class AutoRoutines {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
 
             AutoDriveAndLift step = new AutoDriveAndLift(robot.driveController, "left-scale_right", robot.elevatorController);
-            step.AddLiftMove(320, 76);
+            step.AddLiftMove(320, 73);
             steps.add(step);
 
             steps.add(new AutoSpit(robot.elevatorController));
@@ -132,7 +132,7 @@ public class AutoRoutines {
 
         if (Controls.getOwnedSide(MatchData.GameFeature.SCALE) == MatchData.OwnedSide.RIGHT) {
             AutoDriveAndLift step = new AutoDriveAndLift(robot.driveController, "right-scale_right", robot.elevatorController);
-            step.AddLiftMove(100, 76);
+            step.AddLiftMove(100, 73);
             steps.add(step);
 
             steps.add(new AutoSpit(robot.elevatorController));
@@ -141,7 +141,7 @@ public class AutoRoutines {
             steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
 
             AutoDriveAndLift step = new AutoDriveAndLift(robot.driveController, "right-scale_left", robot.elevatorController);
-            step.AddLiftMove(320, 76);
+            step.AddLiftMove(320, 73);
             steps.add(step);
 
             steps.add(new AutoSpit(robot.elevatorController));
