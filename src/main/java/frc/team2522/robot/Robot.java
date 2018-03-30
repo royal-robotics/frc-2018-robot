@@ -1,5 +1,7 @@
 package frc.team2522.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.autonomous.AutoManager;
@@ -27,11 +29,11 @@ public class Robot extends IterativeRobot {
     private TalonSRX liftMotor1 = new TalonSRX(2);
     private VictorSPX liftMotor2 = new VictorSPX(3);
     private VictorSPX liftMotor3 = new VictorSPX(4);
-    private VictorSPX leftIntakeMotor = new VictorSPX(5);
+    //private VictorSPX leftIntakeMotor = new VictorSPX(5);
     private TalonSRX rightDriveMotor1 = new TalonSRX(6);
     private VictorSPX rightDriveMotor2 = new VictorSPX(7);
-    private TalonSRX carriageIntakeMotor = new TalonSRX(8);
-    private VictorSPX rightIntakeMotor = new VictorSPX(9);
+    private TalonSRX carriageIntakeArm = new TalonSRX(8);
+    private VictorSPX carriageIntakeMotor = new VictorSPX(9);
 
     // Digital I/O Usage
     //
@@ -88,7 +90,7 @@ public class Robot extends IterativeRobot {
         //
         liftMotor2.follow(liftMotor1);
         liftMotor3.follow(liftMotor1);
-        Intake intake = new Intake(carriageIntakeMotor, leftIntakeMotor, rightIntakeMotor, intakeHi, intakeLo);
+        Intake intake = new Intake(carriageIntakeMotor, carriageIntakeArm);
         Lift   lift = new Lift(intake, liftMotor1, elevatorLiftEncoder, elevatorLiftHallEffectSensor, liftBrake, liftRatchet);
         this.elevatorController = new Elevator(intake, lift);
     }
@@ -159,6 +161,16 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         driveController.teleopPeriodic();
         elevatorController.teleopPeriodic();
+
+        if (Controls.Elevator.Intake.armsClose()) {
+            this.carriageIntakeArm.set(ControlMode.Position, 2270);
+        }
+        else if (Controls.Elevator.Intake.armsOpen()) {
+            this.carriageIntakeArm.set(ControlMode.Position, 3470);
+        }
+        else {
+            this.carriageIntakeArm.set(ControlMode.PercentOutput, 0);
+        }
     }
 
 }

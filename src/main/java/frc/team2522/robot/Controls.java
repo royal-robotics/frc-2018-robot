@@ -321,7 +321,7 @@ public class Controls {
     //
     private static IButton armsCloseButton = new Button(operator,Logitech310Button.A, IButton.ButtonType.Hold);
     private static IButton armsOpenButton = new Button(operator,Logitech310Button.B, IButton.ButtonType.Hold);
-    // X is not used
+    private static IButton getPushCubeModifierButton = new Button(operator, Logitech310Button.X, IButton.ButtonType.Hold);
     private static IButton calibrateButton = new Button(operator,Logitech310Button.Y, IButton.ButtonType.Toggle);
 
     private static IButton toggleClimberStateButton = new MultiButton(operator,
@@ -338,7 +338,6 @@ public class Controls {
 
     private static IButton pullCubeButton = new Axis(operator,Logitech310Axis.LeftTrigger, 0.1);
     private static IButton pushCubeButton = new Axis(operator,Logitech310Axis.RightTrigger,0.1);
-    private static IButton getPushCubeModifierButton = new Button(operator, Logitech310Button.X, IButton.ButtonType.Hold);
 
     //
     //

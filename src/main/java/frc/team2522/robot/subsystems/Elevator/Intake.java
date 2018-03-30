@@ -1,47 +1,27 @@
 package frc.team2522.robot.subsystems.Elevator;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.IMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.team2522.robot.*;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Intake {
     IMotorController elevatorIntakeMotor;
-    IMotorController leftIntakeMotor;
-    IMotorController rightIntakeMotor;
-
-    DoubleSolenoid intakeHi;
-    DoubleSolenoid intakeLo;
+    TalonSRX intakeAngleMotor;
 
     Timer timer = null;
     long rotateMode;
-    boolean armsOut = false;
+    boolean intakeOut = false;
 
-    public Intake(IMotorController elevatorIntakeMotor, IMotorController leftIntakeMotor, IMotorController rightIntakeMotor, DoubleSolenoid intakeHi, DoubleSolenoid intakeLo) {
+    public Intake(IMotorController elevatorIntakeMotor, TalonSRX intakeAngleMotor) {
         this.elevatorIntakeMotor = elevatorIntakeMotor;
-        this.leftIntakeMotor = leftIntakeMotor;
-        this.rightIntakeMotor = rightIntakeMotor;
-        this.intakeHi = intakeHi;
-        this.intakeLo = intakeLo;
+        this.intakeAngleMotor = intakeAngleMotor;
 
-        //SmartDashboard.putNumber("Intake/Pull/carriage", 0.75);
-        SmartDashboard.putNumber("Intake/Pull/left", 0.8);
-        SmartDashboard.putNumber("Intake/Pull/right", 0.8);
-
-        SmartDashboard.putNumber("Intake/Rotate/carriage", 0.75);
-        SmartDashboard.putNumber("Intake/Rotate/left", 0.8);
-        SmartDashboard.putNumber("Intake/Rotate/right", -0.2);
-
-        SmartDashboard.putNumber("Intake/Rotate/interval", 333);
-//        SmartDashboard.putBoolean("Intake/Position/Pickup", false);
-//        SmartDashboard.putBoolean("Intake/Position/In", false);
-//        SmartDashboard.putBoolean("Intake/Position/Out", false);
+        this.initEncoder();
     }
 
     /**
@@ -51,6 +31,53 @@ public class Intake {
 
     }
 
+    public void initEncoder() {
+        this.intakeAngleMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
+
+        this.intakeAngleMotor.configForwardSoftLimitThreshold(3470, 10);
+        this.intakeAngleMotor.configForwardSoftLimitEnable(true, 10);
+
+        this.intakeAngleMotor.configReverseSoftLimitThreshold(2270, 10);
+        this.intakeAngleMotor.configReverseSoftLimitEnable(true, 10);
+
+        this.intakeAngleMotor.config_kF(0, 0.0, 10);
+        this.intakeAngleMotor.config_kP(0, 10.0, 10);
+        this.intakeAngleMotor.config_kI(0, 0.0, 10);
+        this.intakeAngleMotor.config_kD(0, 0.0, 10);
+
+        // Get the absolute pulse width position
+        int pulseWidth = intakeAngleMotor.getSensorCollection().getPulseWidthPosition();
+
+        intakeAngleMotor.setSensorPhase(true);
+        intakeAngleMotor.setInverted(true);
+
+
+        final boolean kDiscontinuityPresent = false;
+        final int kBookEnd_0 = 2270; /* 200 deg OUT Position */
+        final int kBookEnd_1 = 3432; /* 301 deg UP Position*/
+
+        // If there is a discontinuity in our measured range, subtract one half rotation to remove it
+        //
+        if (kDiscontinuityPresent) {
+            // Calculate the center
+            int newCenter;
+            newCenter = (kBookEnd_0 + kBookEnd_1) / 2;
+            newCenter &= 0xFFF;
+
+            // Apply the offset so the discontinuity is in the unused portion of the sensor
+            //
+            pulseWidth -= newCenter;
+        }
+
+        // Mask out the bottom 12 bits to normalize to [0,4095],
+        // or in other words, to stay within [0,360) degrees
+        //
+        pulseWidth = pulseWidth & 0xFFF;
+
+        // ave it to quadrature
+        this.intakeAngleMotor.getSensorCollection().setQuadraturePosition(pulseWidth, 10);
+    }
+
     /**
      *
      */
@@ -58,33 +85,8 @@ public class Intake {
 
     }
 
-    public void startRotate() {
-        if (timer == null) {
-            timer = new Timer();
-            timer.scheduleAtFixedRate(new TimerTask() {
-                public void run() {
-                    rotateMode++;
-                    if (rotateMode % 4 == 0) {
-                        setRotate();
-                    } else {
-                        setPull();
-                    }
-                }
-            }, 0, (int) SmartDashboard.getNumber("Intake/Rotate/interval", 250));
-        }
-    }
-
-    public void stopRotate() {
-        if(timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-    }
-
     public void setPull() {
-        elevatorIntakeMotor.set(ControlMode.PercentOutput, -1.00/*-SmartDashboard.getNumber("Intake/Pull/carriage", 0.75)*/);
-        leftIntakeMotor.set(ControlMode.PercentOutput, -0.8/*-SmartDashboard.getNumber("Intake/Pull/left", 0.8)*/);
-        rightIntakeMotor.set(ControlMode.PercentOutput, 0.8/*SmartDashboard.getNumber("Intake/Pull/right", 0.8)*/);
+        elevatorIntakeMotor.set(ControlMode.PercentOutput, -1.00);
     }
 
     public void setPush() {
@@ -93,45 +95,48 @@ public class Intake {
 
     public void setPush(double spitPower) {
         elevatorIntakeMotor.set(ControlMode.PercentOutput, spitPower);
-        leftIntakeMotor.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Pull/left", 0.8));
-        rightIntakeMotor.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Pull/right", 0.8));
-    }
-
-    public void setRotate() {
-        elevatorIntakeMotor.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Rotate/carriage", -0.5));
-        leftIntakeMotor.set(ControlMode.PercentOutput, -SmartDashboard.getNumber("Intake/Rotate/left", 0.8));
-        rightIntakeMotor.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Intake/Rotate/right", -0.2));
     }
 
     public void setStop() {
         elevatorIntakeMotor.set(ControlMode.PercentOutput, 0.0);
-        leftIntakeMotor.set(ControlMode.PercentOutput, 0.0);
-        rightIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }
 
-    public void setClosed() {
-        SmartDashboard.putString("IntakeState", "Closed");
-        this.armsOut = false;
-        intakeHi.set(DoubleSolenoid.Value.kForward);
-        intakeLo.set(DoubleSolenoid.Value.kReverse);
+    public void setUp() {
+        SmartDashboard.putString("IntakeState", "Up");
+        this.intakeOut = false;
     }
 
-    public void setPickup() {
-        SmartDashboard.putString("IntakeState", "Pickup");
-        this.armsOut = true;
-        intakeHi.set(DoubleSolenoid.Value.kReverse);
-        intakeLo.set(DoubleSolenoid.Value.kReverse);
+    public void setOut() {
+        SmartDashboard.putString("IntakeState", "Out");
+        this.intakeOut = true;
     }
 
-    public void setOpen() {
-        SmartDashboard.putString("IntakeState", "Open");
-        this.armsOut = true;
-        intakeHi.set(DoubleSolenoid.Value.kReverse);
-        intakeLo.set(DoubleSolenoid.Value.kForward);
+    public boolean getIntakeOut() {
+        return this.intakeOut;
     }
 
-    public boolean getArmsOut() {
-        return this.armsOut;
+    public double getIntakeAngle() {
+        int selSenPos = this.intakeAngleMotor.getSelectedSensorPosition(0);
+        double deg = selSenPos * 360.0 / 4096.0;
+
+        /* truncate to 0.1 res */
+        deg *= 10.0;
+        deg = Math.round(deg);
+        deg /= 10.0;
+
+        return deg;
+    }
+
+    private int pos = 0;
+
+    public void writeToDashboard() {
+        SmartDashboard.putNumber("IntakeEncoder", this.intakeAngleMotor.getSelectedSensorPosition(0));
+        SmartDashboard.putNumber("IntakeAngle", this.getIntakeAngle());
+
+        if (pos != this.intakeAngleMotor.getSelectedSensorPosition(0)) {
+            pos = this.intakeAngleMotor.getSelectedSensorPosition(0);
+            System.out.println("IntakeEncoder="+pos);
+        }
     }
 
 }

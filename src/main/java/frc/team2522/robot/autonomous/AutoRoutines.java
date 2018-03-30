@@ -115,8 +115,6 @@ public class AutoRoutines {
             steps.add(new AutoSpit(robot.elevatorController));
         }
         else {
-            steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
-
             AutoDriveAndLift step = new AutoDriveAndLift(robot.driveController, "left-scale_right", robot.elevatorController);
             step.AddLiftMove(320, 73);
             steps.add(step);
@@ -156,8 +154,6 @@ public class AutoRoutines {
 //            steps.add(new AutoSpit(robot.elevatorController));
         }
         else {
-            steps.add(new AutoIntakeArms(robot.elevatorController, AutoIntakeArms.ArmPosition.pickup));
-
             AutoDriveAndLift step = new AutoDriveAndLift(robot.driveController, "right-scale_left", robot.elevatorController);
             step.AddLiftMove(320, 73);
             steps.add(step);

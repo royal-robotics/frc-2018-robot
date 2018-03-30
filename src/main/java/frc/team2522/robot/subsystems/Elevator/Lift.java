@@ -66,7 +66,6 @@ public class Lift {
             this.setBreak(false);
             this.setPower(0.0);
             this.setRatchet(true);
-            this.intake.setClosed();
         }
         else {
             this.setRatchet(false);
@@ -205,7 +204,6 @@ public class Lift {
                     double dt = (double)(System.nanoTime() - calibrationStartTime) / 1000000000.0;
 
                     if (dt > upTime) {
-                        intake.setOpen();
                         setPower(-0.10);
                     }
 
