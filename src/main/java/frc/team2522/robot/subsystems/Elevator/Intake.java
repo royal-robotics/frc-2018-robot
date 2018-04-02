@@ -4,22 +4,29 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.IMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import java.util.Timer;
-import java.util.TimerTask;
+import frc.team2522.robot.Controls;
 
 public class Intake {
     IMotorController elevatorIntakeMotor;
-    TalonSRX intakeAngleMotor;
+    TalonSRX carriageIntakeArm;
+    DigitalInput intakeArmUpSwitch;
+    DigitalInput intakeArmDownSwitch;
 
-    Timer timer = null;
-    long rotateMode;
-    boolean intakeOut = false;
+    final double kArmPowerMaxUp = 0.75;
+    final double kArmPowerMaxDown = 0.50;
 
-    public Intake(IMotorController elevatorIntakeMotor, TalonSRX intakeAngleMotor) {
+    public final int kBackEncoderPosition = 3840;   // 138 degrees back
+    public final int kUpEncoderPosition = 3590;    // 95 degrees up
+    public final int kOutEncoderPosition = 2470;    // 0 degrees out
+
+
+    public Intake(IMotorController elevatorIntakeMotor, TalonSRX intakeAngleMotor, DigitalInput intakeArmUpSwitch, DigitalInput intakeArmDownSwitch) {
         this.elevatorIntakeMotor = elevatorIntakeMotor;
-        this.intakeAngleMotor = intakeAngleMotor;
+        this.carriageIntakeArm = intakeAngleMotor;
+        this.intakeArmUpSwitch = intakeArmUpSwitch;
+        this.intakeArmDownSwitch = intakeArmDownSwitch;
 
         this.initEncoder();
     }
@@ -32,32 +39,31 @@ public class Intake {
     }
 
     public void initEncoder() {
-        this.intakeAngleMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
+        this.carriageIntakeArm.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 
-        this.intakeAngleMotor.configForwardSoftLimitThreshold(3470, 10);
-        this.intakeAngleMotor.configForwardSoftLimitEnable(true, 10);
+        this.carriageIntakeArm.configForwardSoftLimitThreshold(kUpEncoderPosition, 10);
+        this.carriageIntakeArm.configForwardSoftLimitEnable(false, 10);
 
-        this.intakeAngleMotor.configReverseSoftLimitThreshold(2270, 10);
-        this.intakeAngleMotor.configReverseSoftLimitEnable(true, 10);
+        this.carriageIntakeArm.configReverseSoftLimitThreshold(kOutEncoderPosition, 10);
+        this.carriageIntakeArm.configReverseSoftLimitEnable(false, 10);
 
-        this.intakeAngleMotor.config_kF(0, 0.0, 10);
-        this.intakeAngleMotor.config_kP(0, 10.0, 10);
-        this.intakeAngleMotor.config_kI(0, 0.0, 10);
-        this.intakeAngleMotor.config_kD(0, 0.0, 10);
+        this.carriageIntakeArm.config_kF(0, 0.0, 10);
+        this.carriageIntakeArm.config_kP(0, 10.0, 10);
+        this.carriageIntakeArm.config_kI(0, 0.0, 10);
+        this.carriageIntakeArm.config_kD(0, 0.0, 10);
 
         // Get the absolute pulse width position
-        int pulseWidth = intakeAngleMotor.getSensorCollection().getPulseWidthPosition();
+        int pulseWidth = carriageIntakeArm.getSensorCollection().getPulseWidthPosition();
 
-        intakeAngleMotor.setSensorPhase(true);
-        intakeAngleMotor.setInverted(true);
+        carriageIntakeArm.setSensorPhase(false);
+        carriageIntakeArm.setInverted(false);
 
-
-        final boolean kDiscontinuityPresent = false;
-        final int kBookEnd_0 = 2270; /* 200 deg OUT Position */
-        final int kBookEnd_1 = 3432; /* 301 deg UP Position*/
 
         // If there is a discontinuity in our measured range, subtract one half rotation to remove it
         //
+        final boolean kDiscontinuityPresent = false;
+        final int kBookEnd_0 = kOutEncoderPosition; /* OUT Position */
+        final int kBookEnd_1 = kUpEncoderPosition; /* UP Position*/
         if (kDiscontinuityPresent) {
             // Calculate the center
             int newCenter;
@@ -75,7 +81,7 @@ public class Intake {
         pulseWidth = pulseWidth & 0xFFF;
 
         // ave it to quadrature
-        this.intakeAngleMotor.getSensorCollection().setQuadraturePosition(pulseWidth, 10);
+        this.carriageIntakeArm.getSensorCollection().setQuadraturePosition(pulseWidth, 10);
     }
 
     /**
@@ -83,6 +89,32 @@ public class Intake {
      */
     public void teleopPeriodic() {
 
+        double armAxisValue = Controls.Elevator.Intake.getArmAxisValue();
+        if (armAxisValue > 0.0) {
+            this.moveArm(armAxisValue * kArmPowerMaxUp);
+        }
+        else if (armAxisValue < 0.0) {
+            this.moveArm(armAxisValue * kArmPowerMaxDown);
+        }
+        else{
+            this.moveArm(0);
+        }
+
+        if (Controls.Elevator.Intake.pushCube()) {
+            this.setPush(0.75);
+        }
+        else if (Controls.Elevator.Intake.pushCubeSoft()) {
+            this.setPush(0.40);
+        }
+        else if (Controls.Elevator.Intake.pushCubeHard()) {
+            this.setPush(1.0);
+        }
+        else if (Controls.Elevator.Intake.pullCube()) {
+            this.setPull();
+        }
+        else {
+            this.setStop();
+        }
     }
 
     public void setPull() {
@@ -90,33 +122,52 @@ public class Intake {
     }
 
     public void setPush() {
-        setPush(1.0);
+        setPush(0.75);
     }
 
-    public void setPush(double spitPower) {
-        elevatorIntakeMotor.set(ControlMode.PercentOutput, spitPower);
+    public void setPush(double power) {
+        elevatorIntakeMotor.set(ControlMode.PercentOutput, power);
     }
 
     public void setStop() {
         elevatorIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }
 
-    public void setUp() {
-        SmartDashboard.putString("IntakeState", "Up");
-        this.intakeOut = false;
+    public boolean isArmUp() {
+        return !this.intakeArmUpSwitch.get();
     }
 
-    public void setOut() {
-        SmartDashboard.putString("IntakeState", "Out");
-        this.intakeOut = true;
+    public boolean isArmDown() {
+        return !this.intakeArmDownSwitch.get();
     }
 
-    public boolean getIntakeOut() {
-        return this.intakeOut;
+    public void moveArmUp() {
+        this.moveArm(kArmPowerMaxUp);
+    }
+
+    public void moveArmDown() {
+        this.moveArm(-kArmPowerMaxDown);
+    }
+
+    public void moveArm(double power) {
+        if (power > 0.0 && !this.isArmUp()) {
+            this.carriageIntakeArm.set(ControlMode.PercentOutput, power);
+        }
+        else if (power < 0.0 && !this.isArmDown()) {
+            this.carriageIntakeArm.set(ControlMode.PercentOutput, power);
+        }
+        else
+        {
+            this.carriageIntakeArm.set(ControlMode.PercentOutput, 0.0);
+        }
+    }
+
+    public void setIntakeOut() {
+        this.setIntakeAngle(0);
     }
 
     public double getIntakeAngle() {
-        int selSenPos = this.intakeAngleMotor.getSelectedSensorPosition(0);
+        int selSenPos = getIntakeArmRaw() - kOutEncoderPosition;
         double deg = selSenPos * 360.0 / 4096.0;
 
         /* truncate to 0.1 res */
@@ -127,16 +178,30 @@ public class Intake {
         return deg;
     }
 
-    private int pos = 0;
+    public void setIntakeAngle(double angle) {
+        int pos = (int)Math.round((angle * 4096.0) / 360.0) + kOutEncoderPosition;
+        this.setIntakeArmTargetRaw(pos);
+    }
+
+    public void setIntakeNeutral() {
+        this.carriageIntakeArm.set(ControlMode.PercentOutput, 0);
+    }
+    private int getIntakeArmRaw() {
+        return this.carriageIntakeArm.getSelectedSensorPosition(0);
+    }
+
+    private void setIntakeArmTargetRaw(int value) {
+        this.carriageIntakeArm.set(ControlMode.Position, value);
+    }
 
     public void writeToDashboard() {
-        SmartDashboard.putNumber("IntakeEncoder", this.intakeAngleMotor.getSelectedSensorPosition(0));
+        SmartDashboard.putNumber("IntakeEncoder", this.getIntakeArmRaw());
         SmartDashboard.putNumber("IntakeAngle", this.getIntakeAngle());
 
-        if (pos != this.intakeAngleMotor.getSelectedSensorPosition(0)) {
-            pos = this.intakeAngleMotor.getSelectedSensorPosition(0);
-            System.out.println("IntakeEncoder="+pos);
-        }
+        SmartDashboard.putString("IntakeState", "" + this.getIntakeAngle());
+
+        SmartDashboard.putBoolean("IntakeUpSwitch", this.intakeArmUpSwitch.get());
+        SmartDashboard.putBoolean("IntakeDownSwitch", this.intakeArmDownSwitch.get());
     }
 
 }

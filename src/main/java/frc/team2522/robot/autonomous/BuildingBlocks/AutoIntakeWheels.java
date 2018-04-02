@@ -3,7 +3,7 @@ package frc.team2522.robot.autonomous.BuildingBlocks;
 import frc.team2522.robot.autonomous.AutoStep;
 import frc.team2522.robot.subsystems.Elevator.Elevator;
 
-public class AutoSpit  extends AutoStep {
+public class AutoIntakeWheels extends AutoStep {
 
     private long startTime;
     private boolean isCompleted = false;
@@ -13,16 +13,16 @@ public class AutoSpit  extends AutoStep {
     double duration;
     double power = 0.0;
 
-    public AutoSpit(Elevator elevatorController) {
+    public AutoIntakeWheels(Elevator elevatorController) {
         this(elevatorController, 0.5);
     }
 
-    public AutoSpit(Elevator elevatorController, double duration) {
+    public AutoIntakeWheels(Elevator elevatorController, double duration) {
         this.elevatorController = elevatorController;
         this.duration = duration;
     }
 
-    public AutoSpit(Elevator elevatorController, double duration, double power) {
+    public AutoIntakeWheels(Elevator elevatorController, double duration, double power) {
         this.elevatorController = elevatorController;
         this.duration = duration;
         this.power = power;
@@ -30,7 +30,7 @@ public class AutoSpit  extends AutoStep {
 
     @Override
     public void initialize() {
-        System.out.println("spit");
+        System.out.println("AutoIntake");
         this.startTime = System.nanoTime();
         if (this.power != 0.0) {
             this.elevatorController.intake.setPush(power);

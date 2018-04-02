@@ -23,18 +23,6 @@ public class Elevator {
         intake.teleopPeriodic();
         lift.teleopPeriodic();
 
-        if(Controls.Elevator.Intake.armsClose()) {
-            intake.setStop();
-        }
-
-        if (Controls.Elevator.Intake.pullCube()) {
-            intake.setPull();
-        } else if (Controls.Elevator.Intake.pushCube()) {
-            double spitPower = Controls.Elevator.Intake.pushCubeModifier() ? 0.5 : 0.75;
-            intake.setPush(spitPower);
-        } else {
-            intake.setStop();
-        }
     }
 
     public void robotPeriodic() {

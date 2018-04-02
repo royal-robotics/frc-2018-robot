@@ -60,10 +60,11 @@ public class Controls {
         public static class Intake {
             public static boolean pullCube() { return pullCube; }
             public static boolean pushCube() { return pushCube; }
-            public static boolean pushCubeModifier() { return pushCubeModifier; }
-            public static boolean rotateCube() { return (pushCube() && pullCube()); }
-            public static boolean armsOpen() { return armsOpen; }
-            public static boolean armsClose() { return armsClose; }
+            public static boolean pushCubeSoft() { return pushCubeSoft; }
+            public static boolean pushCubeHard() { return pushCubeHard; }
+            public static boolean armUp() { return armUp; }
+            public static boolean armOut() { return armOut; }
+            public static double getArmAxisValue() { return -armAxis.getValue();}
         }
 
         public static class Lift {
@@ -103,11 +104,11 @@ public class Controls {
     public static void updateControls() {
         DebugMode = SmartDashboard.getBoolean("Debugging", true);
 
-        armsClose = armsCloseButton.isPressed();
-        armsOpen = armsOpenButton.isPressed();
+        armUp = armUpButton.isPressed();
         pullCube = pullCubeButton.isPressed();
         pushCube = pushCubeButton.isPressed();
-        pushCubeModifier = getPushCubeModifierButton.isPressed();
+        pushCubeSoft = pushCubeSoftButton.isPressed();
+        pushCubeHard = pushCubeHardButton.isPressed();
 
         moveBottom = moveBottomButton.isPressed();
         moveSwitch = moveSwitchButton.isPressed();
@@ -319,9 +320,9 @@ public class Controls {
 
     // Operator Joystick Configuration
     //
-    private static IButton armsCloseButton = new Button(operator,Logitech310Button.A, IButton.ButtonType.Hold);
-    private static IButton armsOpenButton = new Button(operator,Logitech310Button.B, IButton.ButtonType.Hold);
-    private static IButton getPushCubeModifierButton = new Button(operator, Logitech310Button.X, IButton.ButtonType.Hold);
+    private static IButton armUpButton = new Button(operator,Logitech310Button.A, IButton.ButtonType.Hold);
+    private static IButton pushCubeHardButton = new Button(operator, Logitech310Button.B, IButton.ButtonType.Hold);
+    private static IButton pushCubeSoftButton = new Button(operator, Logitech310Button.X, IButton.ButtonType.Hold);
     private static IButton calibrateButton = new Button(operator,Logitech310Button.Y, IButton.ButtonType.Toggle);
 
     private static IButton toggleClimberStateButton = new MultiButton(operator,
@@ -335,6 +336,7 @@ public class Controls {
     public static IButton moveClimbButton = new POVButton(operator, 270);
 
     public static Axis liftAxis = new Axis(operator, Logitech310Axis.LeftStickY, 0.1);
+    public static Axis armAxis = new Axis(operator, Logitech310Axis.RightStickY, 0.1);
 
     private static IButton pullCubeButton = new Axis(operator,Logitech310Axis.LeftTrigger, 0.1);
     private static IButton pushCubeButton = new Axis(operator,Logitech310Axis.RightTrigger,0.1);
@@ -347,10 +349,11 @@ public class Controls {
     private static boolean isHighGear = true;
 
     private static boolean pushCube = false;
-    private static boolean pushCubeModifier = false;
+    private static boolean pushCubeSoft = false;
+    private static boolean pushCubeHard = false;
     private static boolean pullCube = false;
-    private static boolean armsClose = false;
-    private static boolean armsOpen = false;
+    private static boolean armOut = false;
+    private static boolean armUp = false;
 
     private static boolean moveScale = false;
     private static boolean moveSwitch = false;

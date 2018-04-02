@@ -187,8 +187,8 @@ public class DriveController {
 
             if (Controls.debugDriveForward()) {
                 if (this.follower == null) {
-//                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
-                    this.drivePath("motion-profile", true);
+                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
+//                    this.drivePath("motion-profile", false);
 //                    this.driveRotate(90.0, 50, 100, 300);
                 }
             }
@@ -240,8 +240,8 @@ public class DriveController {
         System.out.println("DrivePath: " + pathName + " ETA: " + ((double)leftTrajectory.length() * leftTrajectory.get(0).dt) + " seconds.");
 
         this.follower = new TrajectoryFollower(pathName, reverse, this.gyro,
-                Pathfinder.readFromFile(leftFile), leftEncoder, leftMotor, 1.0,
-                Pathfinder.readFromFile(rightFile), rightEncoder, rightMotor, -1.0,
+                Pathfinder.readFromFile(leftFile), leftEncoder, leftMotor,
+                Pathfinder.readFromFile(rightFile), rightEncoder, rightMotor,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
 
         this.follower.start();
@@ -295,7 +295,8 @@ public class DriveController {
                 maxAcceleration,
                 maxJerk);
 
-        double distance = 80.0 * (angle / 360.0);
+        final double kFullRotationDistance = 80.0;
+        double distance = kFullRotationDistance * (angle / 360.0);
 
         final Waypoint[] points = new Waypoint[]{
                 new Waypoint(0, 0, Pathfinder.d2r(0)),
@@ -305,7 +306,15 @@ public class DriveController {
         long startGeneration = System.nanoTime();
         Trajectory trajectory = Pathfinder.generate(points, config);
         TankModifier modifier = new TankModifier(trajectory).modify(kWheelbaseWidth);
-        Trajectory[] trajectories = new Trajectory[]{modifier.getLeftTrajectory(), modifier.getRightTrajectory()};
+        Trajectory leftTrajectory = modifier.getRightTrajectory();
+        Trajectory rightTrajectory = modifier.getRightTrajectory();
+        double headingScale = angle > 0.0 ? -1.0 : 1.0;
+        for(int i = 0; i < leftTrajectory.length(); i++) {
+            double heading = headingScale * Pathfinder.d2r((leftTrajectory.get(i).position * 360.0) / kFullRotationDistance);
+            leftTrajectory.get(i).heading = heading;
+            rightTrajectory.get(i).heading = heading;
+        }
+        Trajectory[] trajectories = new Trajectory[]{leftTrajectory, rightTrajectory};
         System.out.println("DriveRotate Path Generation Time: " + ((double)(System.nanoTime() - startGeneration) / 1000000000.0) + " seconds.");
 
         Encoder[] encoders = new Encoder[]{this.leftEncoder, this.rightEncoder};

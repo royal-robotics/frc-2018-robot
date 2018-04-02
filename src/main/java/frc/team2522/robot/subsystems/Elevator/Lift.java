@@ -33,7 +33,7 @@ public class Lift {
 
     Timer moveToTimer = null;
 
-    public Lift(Intake intake, IMotorController liftMotor, RoyalEncoder liftEncoder, DigitalInput liftSensor, DoubleSolenoid liftBrake, DoubleSolenoid liftRatchet) {
+    public Lift(Intake intake, IMotorController liftMotor, RoyalEncoder liftEncoder, DoubleSolenoid liftBrake, DoubleSolenoid liftRatchet) {
         this.intake = intake;
         this.liftMotor = liftMotor;
         this.liftEncoder = liftEncoder;
@@ -55,7 +55,7 @@ public class Lift {
     }
 
     public void autoCalibrate() {
-        this.liftEncoder.reset(23.5);
+        this.liftEncoder.reset(23.0);
         this.isCalibrated = true;
     }
 
@@ -92,11 +92,11 @@ public class Lift {
             if (Controls.Elevator.Lift.moveBottom()) {
                 moveTo(0.0);
             } else if (Controls.Elevator.Lift.moveSwitch()) {
-                moveTo(40.0);
+                moveTo(23.5);
             } else if (Controls.Elevator.Lift.moveScale()) {
-                moveTo(81.0);
+                moveTo(73.0);
             } else if (Controls.Elevator.Lift.moveClimb()) {
-                moveTo(66.0);
+                moveTo(65.0);   // needs to arrive at 63.0
             } else if (!isCalibrating()) {
                 stopFollower();
             }
@@ -166,7 +166,11 @@ public class Lift {
             Trajectory trajectory = Pathfinder.generate(points, config);
             System.out.println("Generated LiftMove path from " + this.getPosition() + " to " + moveTo + " ETA: " + (trajectory.length() * 0.01));
 
-            follower = new TrajectoryFollower("LiftMove", this.getPosition() > moveTo, null, trajectory,this.liftEncoder, this.liftMotor, .04, 0.0, 0.8, 0.0, 0.0);
+            double velocityFeed = .04;
+            if (this.getPosition() >= moveTo) {
+                velocityFeed = 0.02;
+            }
+            follower = new TrajectoryFollower("LiftMove", this.getPosition() > moveTo, null, trajectory,this.liftEncoder, this.liftMotor, velocityFeed, 0.0, 0.8, 0.0, 0.0);
 
             this.setBreak(false);
             follower.start();
@@ -175,7 +179,8 @@ public class Lift {
             this.moveToTimer.scheduleAtFixedRate(new TimerTask() {
                 public void run() {
                     if (follower.isFinished()) {
-                        stopFollower();
+                        setBreak(true);
+                        setPower(0.0);
                     }
                 }
             }, 0, 10);

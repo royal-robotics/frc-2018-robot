@@ -58,8 +58,8 @@ public class TrajectoryFollower {
     }
 
     public TrajectoryFollower(String name, boolean reverse, ADXRS450_Gyro gyro,
-                              Trajectory leftTrajectory, Encoder leftEncoder, IMotorController leftMotor, double leftMotorScale,
-                              Trajectory rightTrajectory, Encoder rightEncoder, IMotorController rightMotor, double rightMotorScale,
+                              Trajectory leftTrajectory, Encoder leftEncoder, IMotorController leftMotor,
+                              Trajectory rightTrajectory, Encoder rightEncoder, IMotorController rightMotor,
                               double kVf, double kAf, double kP, double kI, double kD)
     {
         this(new String[] {name+"-left", name+"-right"}, gyro, 1.0,
@@ -253,7 +253,7 @@ public class TrajectoryFollower {
                         expectedAngle = Pathfinder.r2d(segment.heading);
                         angleError = Pathfinder.boundHalfDegrees(expectedAngle - actualAngle);
 
-                        angleAdj = -0.35 * this.angleErrorScale * angleError;
+                        angleAdj = -0.25 * this.angleErrorScale * angleError;
 
                         if (i == 1) {   // Right Motor
                             angleAdj = -1.0 * angleAdj;

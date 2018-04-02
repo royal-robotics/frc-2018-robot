@@ -37,7 +37,8 @@ public class Robot extends IterativeRobot {
 
     // Digital I/O Usage
     //
-    private DigitalInput elevatorLiftHallEffectSensor = new DigitalInput(0);
+    private DigitalInput carriageArmUpSwitch = new DigitalInput(0);
+    private DigitalInput carriageArmDownSwitch = new DigitalInput(1);
 
     private Encoder leftDriveEncoder = new Encoder(10,11, true);        // ENC0
     private Encoder rightDriveEncoder = new Encoder(12,13, false);      // ENC1
@@ -90,8 +91,8 @@ public class Robot extends IterativeRobot {
         //
         liftMotor2.follow(liftMotor1);
         liftMotor3.follow(liftMotor1);
-        Intake intake = new Intake(carriageIntakeMotor, carriageIntakeArm);
-        Lift   lift = new Lift(intake, liftMotor1, elevatorLiftEncoder, elevatorLiftHallEffectSensor, liftBrake, liftRatchet);
+        Intake intake = new Intake(carriageIntakeMotor, carriageIntakeArm, carriageArmUpSwitch,carriageArmDownSwitch);
+        Lift   lift = new Lift(intake, liftMotor1, elevatorLiftEncoder, liftBrake, liftRatchet);
         this.elevatorController = new Elevator(intake, lift);
     }
 
@@ -161,16 +162,6 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
         driveController.teleopPeriodic();
         elevatorController.teleopPeriodic();
-
-        if (Controls.Elevator.Intake.armsClose()) {
-            this.carriageIntakeArm.set(ControlMode.Position, 2270);
-        }
-        else if (Controls.Elevator.Intake.armsOpen()) {
-            this.carriageIntakeArm.set(ControlMode.Position, 3470);
-        }
-        else {
-            this.carriageIntakeArm.set(ControlMode.PercentOutput, 0);
-        }
     }
 
 }

@@ -44,7 +44,7 @@ public class AutoDrivePath  extends AutoStep {
         if (this.pathName != null) {
             follower = driveController.drivePath(this.pathName, this.reverse);
         }else{
-            follower = driveController.driveDistance(this.distance,100,120,200);
+            follower = driveController.driveDistance(this.distance,150,100,300);
         }
 
     }
@@ -78,8 +78,9 @@ public class AutoDrivePath  extends AutoStep {
 
     private boolean childStepsCompleted() {
         for(AbstractMap.SimpleEntry<Double, AutoStep> step : childSteps) {
-            if(!step.getValue().isCompleted())
+            if(!step.getValue().isCompleted()) {
                 return false;
+            }
         }
 
         return true;

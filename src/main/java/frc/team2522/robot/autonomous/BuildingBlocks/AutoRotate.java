@@ -18,7 +18,7 @@ public class AutoRotate extends AutoStep {
 
     @Override
     public void initialize() {
-        follower = driveController.driveRotate(angle, 100, 150, 300);
+        follower = driveController.driveRotate(angle, 80, 120, 200);
     }
 
 
