@@ -69,7 +69,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void robotInit() {
-        CameraPipeline.initialize();
+//        CameraPipeline.initialize();
         Controls.initialize();
 
         // Setup Drivebase subsystem.
@@ -113,6 +113,9 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void disabledInit() {
+        if (this.auto != null) {
+            this.auto.stop();
+        }
     }
 
     /**
@@ -132,7 +135,7 @@ public class Robot extends IterativeRobot {
     public void autonomousInit() {
         this.driveController.reset();
         this.elevatorController.lift.autoCalibrate();
-        auto = AutoRoutines.selectAutoMode(Controls.getAutoMode(), this);
+        this.auto = AutoRoutines.selectAutoMode(Controls.getAutoMode(), this);
     }
 
     /**
@@ -149,6 +152,10 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void teleopInit() {
+        if (this.auto != null) {
+            this.auto.stop();
+        }
+
         this.elevatorController.lift.stopFollower();    // just in case the lift is moving during auto switchover
         this.elevatorController.lift.setBreak(true);
 

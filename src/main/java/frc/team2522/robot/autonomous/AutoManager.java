@@ -1,9 +1,5 @@
 package frc.team2522.robot.autonomous;
 
-import frc.team2522.robot.Robot;
-import frc.team2522.robot.autonomous.BuildingBlocks.AutoDrive;
-import frc.team2522.robot.autonomous.BuildingBlocks.AutoRotate;
-
 import java.util.*;
 
 // Auto manager / top level step

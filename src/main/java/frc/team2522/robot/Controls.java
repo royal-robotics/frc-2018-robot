@@ -139,8 +139,6 @@ public class Controls {
         }
 
         updateAutoMode();
-
-        SmartDashboard.putBoolean("Controls/ClimberEnabled", inClimberMode());
     }
 
     /**
@@ -161,11 +159,23 @@ public class Controls {
             case 10: {  // LEFT
                 switch (getAutoRoutineId()) {
                     case 1: {
-                        newMode = "Left_SwitchOrScale";
+                        newMode = "Left_ScaleOnly";
                         break;
                     }
                     case 2: {
-                        newMode = "Left_ScaleOnly";
+                        newMode = "Left_NearScale";
+                        break;
+                    }
+                    case 3: {
+                        newMode = "Left_SwitchOnly";
+                        break;
+                    }
+                    case 4: {
+                        newMode = "Left_SwitchOrScale";
+                        break;
+                    }
+                    case 5: {
+                        newMode = "Left_SwitchOrNearScale";
                         break;
                     }
                     case 10: {
@@ -195,11 +205,23 @@ public class Controls {
             case 2: {   // RIGHT
                 switch (getAutoRoutineId()) {
                     case 1: {
-                        newMode = "Right_SwitchOrScale";
+                        newMode = "Right_ScaleOnly";
                         break;
                     }
                     case 2: {
-                        newMode = "Right_ScaleOnly";
+                        newMode = "Right_NearScale";
+                        break;
+                    }
+                    case 3: {
+                        newMode = "Right_SwitchOnly";
+                        break;
+                    }
+                    case 4: {
+                        newMode = "Right_SwitchOrScale";
+                        break;
+                    }
+                    case 5: {
+                        newMode = "Right_SwitchOrNearScale";
                         break;
                     }
                     case 10: {
