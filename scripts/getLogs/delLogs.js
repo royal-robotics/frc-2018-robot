@@ -5,7 +5,7 @@ var toString = require('stream-to-string');
 
 let sftp = new Client();
 sftp.connect({
-    host: '10.25.22.2',
+    host: 'roborio-2522-frc.local',
     port: '22',
     username: 'lvuser',
     password: '',

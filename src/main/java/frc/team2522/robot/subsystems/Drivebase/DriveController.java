@@ -187,8 +187,8 @@ public class DriveController {
 
             if (Controls.debugDriveForward()) {
                 if (this.follower == null) {
-                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
-//                    this.drivePath("motion-profile", false);
+//                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
+                    this.drivePath("motion-profile", false);
 //                    this.driveRotate(90.0, 50, 100, 300);
                 }
             }
@@ -239,7 +239,7 @@ public class DriveController {
 
         System.out.println("DrivePath: " + pathName + " ETA: " + ((double)leftTrajectory.length() * leftTrajectory.get(0).dt) + " seconds.");
 
-        this.follower = new TrajectoryFollower(pathName, reverse, this.gyro,
+        this.follower = new TrajectoryFollower(pathName, reverse, null,
                 Pathfinder.readFromFile(leftFile), leftEncoder, leftMotor,
                 Pathfinder.readFromFile(rightFile), rightEncoder, rightMotor,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);

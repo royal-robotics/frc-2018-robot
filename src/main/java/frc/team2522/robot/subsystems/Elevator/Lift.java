@@ -96,7 +96,7 @@ public class Lift {
             } else if (Controls.Elevator.Lift.moveScale()) {
                 moveTo(73.0);
             } else if (Controls.Elevator.Lift.moveClimb()) {
-                moveTo(65.0);   // needs to arrive at 63.0
+                moveTo(63.0);   // needs to arrive at 62
             } else if (!isCalibrating()) {
                 stopFollower();
             }

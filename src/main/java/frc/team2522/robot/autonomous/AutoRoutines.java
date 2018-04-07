@@ -168,7 +168,7 @@ public class AutoRoutines {
 
             steps.add(new AutoDrivePath(robot.driveController, -25));
 
-            steps.add(new AutoLift(robot.elevatorController, 1.5));
+            steps.add(new AutoLift(robot.elevatorController, .75));
 
             steps.add(new AutoRotate(robot.driveController,230));
 
@@ -206,13 +206,13 @@ public class AutoRoutines {
 
             steps.add(new AutoRotate(robot.driveController,-110));
 
-            steps.add(new AutoDrivePath(robot.driveController, 35));
+            steps.add(new AutoDrivePath(robot.driveController, 38));
 
             steps.add(new AutoIntakeWheels(robot.elevatorController));
 
             steps.add(new AutoDrivePath(robot.driveController, -26));
 
-            steps.add(new AutoLift(robot.elevatorController, 1.5));
+            steps.add(new AutoLift(robot.elevatorController, 0.75));
 
             steps.add(new AutoRotate(robot.driveController,+210));
 
@@ -238,13 +238,13 @@ public class AutoRoutines {
 
             steps.add(new AutoRotate(robot.driveController,110));
 
-            steps.add(new AutoDrivePath(robot.driveController, 35));
+            steps.add(new AutoDrivePath(robot.driveController, 38));
 
             steps.add(new AutoIntakeWheels(robot.elevatorController));
 
             steps.add(new AutoDrivePath(robot.driveController, -26));
 
-            steps.add(new AutoLift(robot.elevatorController, 1.5));
+            steps.add(new AutoLift(robot.elevatorController, 0.75));
 
             steps.add(new AutoRotate(robot.driveController,-210));
 

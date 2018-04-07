@@ -118,7 +118,7 @@ public class Intake {
     }
 
     public void setPull() {
-        elevatorIntakeMotor.set(ControlMode.PercentOutput, -1.00);
+        elevatorIntakeMotor.set(ControlMode.PercentOutput, -0.75);
     }
 
     public void setPush() {
