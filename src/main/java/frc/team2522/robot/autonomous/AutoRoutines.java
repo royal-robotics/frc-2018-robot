@@ -58,7 +58,7 @@ public class AutoRoutines {
                 : "center-switch_right";
         AutoDrivePath driveToSwitchFromStart = new AutoDrivePath(robot.driveController, pathName);
         driveToSwitchFromStart.addChildStep(0, new AutoIntakeArm(robot.elevatorController));
-        driveToSwitchFromStart.addChildStep(120, new AutoIntakeWheels(robot.elevatorController));
+        driveToSwitchFromStart.addChildStep(115, new AutoIntakeWheels(robot.elevatorController));
         steps.add(driveToSwitchFromStart);
 
         pathName = Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT
@@ -78,7 +78,7 @@ public class AutoRoutines {
                 ? "center-switch_left_forward_and_spit"
                 : "center-switch_right_forward_and_spit";
         AutoDrivePath driveToSwitchWithSecondCube = new AutoDrivePath(robot.driveController, pathName);
-        driveToSwitchWithSecondCube.addChildStep(90, new AutoIntakeWheels(robot.elevatorController));
+        driveToSwitchWithSecondCube.addChildStep(89, new AutoIntakeWheels(robot.elevatorController));
         steps.add(driveToSwitchWithSecondCube);
 
         return new AutoManager(steps);

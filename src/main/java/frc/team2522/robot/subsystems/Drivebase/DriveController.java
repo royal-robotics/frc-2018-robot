@@ -24,13 +24,13 @@ public class DriveController {
     // TODO: calculate these values
     //
     public static final double kWheelbaseWidth = 25.0;
-    public static final double kHighGearMaxVelocity = 160.0;    // inches / second
+    public static final double kHighGearMaxVelocity = 180.0;    // inches / second
     public static final double kHighGearDistancePerPulse = 0.3429 * 6.0 * Math.PI / 256.0;
     public static final double kLowGearMaxVelocity = 90.0;     // inches / second
     public static final double kLowGearDistancePerPulse = 0.1667 * 6.0 * Math.PI / 256.0;
 
     public static final double kUpdateFrequency = 0.01;  // 100 times per second
-    public static final double kProportionalFactor = 0.4;
+    public static final double kProportionalFactor = 0.75;
     public static final double kIntegralFactor = 0.0;
     public static final double kDifferentialFactor = 0.0;
 
@@ -113,6 +113,7 @@ public class DriveController {
         this.leftEncoder.reset();
         this.rightEncoder.reset();
         this.maxDetectedVelocity = 0.0;
+        SmartDashboard.putNumber("DriveMaxVelocity", this.maxDetectedVelocity);
 
         if (this.gyro != null) {
             this.gyro.reset();
@@ -239,7 +240,7 @@ public class DriveController {
 
         System.out.println("DrivePath: " + pathName + " ETA: " + ((double)leftTrajectory.length() * leftTrajectory.get(0).dt) + " seconds.");
 
-        this.follower = new TrajectoryFollower(pathName, reverse, null,
+        this.follower = new TrajectoryFollower(pathName, reverse, this.gyro,
                 Pathfinder.readFromFile(leftFile), leftEncoder, leftMotor,
                 Pathfinder.readFromFile(rightFile), rightEncoder, rightMotor,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);

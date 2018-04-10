@@ -3,7 +3,7 @@
   "waypoints" : [
     {"x": -17.0, "y":  19.5, "angle": 90.0},
     {"x": -17.0, "y": 170.0, "angle": 90.0},
-    {"x": -52.0, "y": 278.0, "angle": 90.0}
+    {"x": -48.0, "y": 278.0, "angle": 90.0}
   ],
   "config": {
     "fit-method": "HERMITE_CUBIC",
@@ -11,7 +11,7 @@
     "dt": 0.01,
     "max-velocity": 80.0,
     "max-acceleration": 120.0,
-    "max-jerk": 200.0
+    "max-jerk": 300.0
   },
   "outputs": {
     "csv": {

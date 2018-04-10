@@ -24,7 +24,7 @@ fs.readdir(motionProfilePath, async function(err, files) {
         await sftp.connect({
 // 172.22.11.2 for at compitentions?
 // 10.25.22.1 for wireless
-            host: '172.22.11.2',
+            host: 'roborio-2522-frc.local',
             port: '22',
             username: 'lvuser',
             password: '',
