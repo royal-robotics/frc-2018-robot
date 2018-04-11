@@ -34,7 +34,6 @@ public class TrajectoryFollower {
     private double[] lastPositions;
     private double[] lastPowers;
     private double[] lastErrors;
-    private double[] angleDistAdj;
 
     private String[] names;
     private Trajectory[] trajectories = null;
@@ -43,10 +42,9 @@ public class TrajectoryFollower {
     private IMotorController[] controllers = null;
     private double[] powerScales = null;
 
-    private double angleErrorScale = 1.0;
-
     private ADXRS450_Gyro gyro;
     private double gyroAngleOffset;
+    private double[] angleAdjs;
 
     PrintStream ps[] = null;
 
@@ -55,7 +53,11 @@ public class TrajectoryFollower {
                               Trajectory trajectory, Encoder encoder, IMotorController controller,
                               double kVf, double kAf, double kP, double kI, double kD)
     {
-        this(new String[] {name}, gyro, 1.0, new Trajectory[] {trajectory}, new Encoder[] { encoder }, new double[] {reverse ? -1.0: 1.0}, new IMotorController[] { controller }, new double[] {1.0}, kVf, kAf, kP, kI, kD);
+        this(new String[] {name},
+                gyro, new Trajectory[] {trajectory},
+                new Encoder[] { encoder }, new double[] {reverse ? -1.0: 1.0},
+                new IMotorController[] { controller }, new double[] {reverse ? -1.0: 1.0},
+                kVf, kAf, kP, kI, kD);
     }
 
     public TrajectoryFollower(String name, boolean reverse, ADXRS450_Gyro gyro,
@@ -63,19 +65,19 @@ public class TrajectoryFollower {
                               Trajectory rightTrajectory, Encoder rightEncoder, IMotorController rightMotor,
                               double kVf, double kAf, double kP, double kI, double kD)
     {
-        this(new String[] {name+"-left", name+"-right"}, gyro, 1.0,
+        this(new String[] {name+"-left", name+"-right"}, gyro,
                 new Trajectory[] {leftTrajectory, rightTrajectory},
                 reverse ? new Encoder[] { rightEncoder, leftEncoder } : new Encoder[] { leftEncoder, rightEncoder },
                 new double[] {reverse ? -1.0: 1.0,reverse ? -1.0: 1.0},
                 reverse ? new IMotorController[] { rightMotor, leftMotor } :  new IMotorController[] { leftMotor, rightMotor },
-                reverse ? new double[] {-1.0, 1.0} : new double[] {1.0, -1.0},
+                new double[] {reverse ? -1.0: 1.0,reverse ? -1.0: 1.0},
                 kVf, kAf, kP, kI, kD);
     }
 
-    public TrajectoryFollower(String[] names,  ADXRS450_Gyro gyro, double angleErrorScale, Trajectory[] trajectories, Encoder[] encoders, double[] distanceScales, IMotorController[] controllers, double[] powerScales, double kVf, double kAf, double kP, double kI, double kD) {
+    public TrajectoryFollower(String[] names,  ADXRS450_Gyro gyro, Trajectory[] trajectories, Encoder[] encoders, double[] distanceScales, IMotorController[] controllers, double[] powerScales, double kVf, double kAf, double kP, double kI, double kD) {
         this.names = names;
         this.gyro = gyro;
-        this.angleErrorScale = angleErrorScale;
+        this.angleAdjs = new double[trajectories.length];
         this.trajectories = trajectories;
         this.encoders = encoders;
         this.distanceScales = distanceScales;
@@ -103,7 +105,6 @@ public class TrajectoryFollower {
         this.lastPositions = new double[trajectories.length];
         this.lastPowers = new double[trajectories.length];
         this.lastErrors = new double[trajectories.length];
-        this.angleDistAdj = new double[trajectories.length];
         this.ps = new PrintStream[trajectories.length];
 
         if (this.gyro != null) {
@@ -115,7 +116,7 @@ public class TrajectoryFollower {
             this.lastPositions[i] = 0.0;
             this.lastPowers[i] = 0.0;
             this.lastErrors[i] = 0.0;
-            this.angleDistAdj[i] = 0.0;
+            this.angleAdjs[i] = 0.0;
 
             File f = new File("/home/lvuser/" + this.names[i]+ "_0.csv");
             for(int j = 0;f.exists();j++)
@@ -127,7 +128,7 @@ public class TrajectoryFollower {
             {
                 this.ps[i] = new PrintStream(f);
                 System.out.println("Created LogFile: " + f.getName());
-                this.ps[i].println("Time,Index,Expected Velocity,Expected Distance,Actual Distance,Distance Error,Expected Angle, Actual Angle,Angle Error,Power,DistanceAdj,AngleAdj");
+                this.ps[i].println("Time,Index,ExpectedVelocity,ExpectedPosition,ActualPosition,PositionAdj,ExpectedAngle,ActualAngle,AngleError,AnglePosAdj,TotalPosAdj,PowerAdj,Power");
             }
             catch(IOException e)
             {
@@ -209,7 +210,7 @@ public class TrajectoryFollower {
         double result = 0.0;
 
         for(int i = 0; i < this.lastPositions.length; i++) {
-            result = result + this.lastPositions[i];
+            result = result + (this.lastPositions[i] * this.distanceScales[i]);
         }
 
         return result / ((double)this.lastPositions.length);
@@ -229,9 +230,12 @@ public class TrajectoryFollower {
      *
      */
     public void followPath() {
+        final double kInchesPerRotation = 25.0 * Math.PI; // TODO: This should use a passed in value for wheel base width instead of hard coding
+
         double time = this.getTime();
 
         if (! this.isFinished) {
+            //  Assume 0 is left and 1 is right
             for(int i = 0; i < this.trajectories.length; i++) {
                 double power = 0.0;
                 double position = (this.encoders[i].getDistance() - this.startPositions[i]) * this.distanceScales[i];
@@ -241,54 +245,48 @@ public class TrajectoryFollower {
                 if (segmentIndex < this.trajectories[i].length()) {
                     Trajectory.Segment segment = this.trajectories[i].get(segmentIndex);
 
-                    // Calculate angle error adjustment if we have a gyro.
+                    // Calculate position error adjustment plus the on going angle adjustment
                     //
-                    // Assume motors[0] is left and motors[1] is right
+                    double positionError = (segment.position - position);// + this.angleAdjs[i];
+
+                    // Calculate angle error adjustment if we have a gyro.
                     //
                     double expectedAngle = Pathfinder.r2d(segment.heading);;
                     double actualAngle = 0.0;
                     double angleError = 0.0;
-                    double angleAdj = 0.0;
 
                     if (this.gyro != null) {
                         actualAngle = this.getAngle();
                         expectedAngle = Pathfinder.r2d(segment.heading);
                         angleError = Pathfinder.boundHalfDegrees(expectedAngle - actualAngle);
 
-                        final double kInchesPerRotation = 80.0;
-
-                        angleAdj = this.angleErrorScale * angleError * (kInchesPerRotation / 360.0);
-                        //angleAdj = -0.25 * this.angleErrorScale * angleError;
-
-                        if (i == 0) {
-                            this.angleDistAdj[i] = angleAdj;
+                        double angleAdj = angleError * (kInchesPerRotation / 360.0);
+                        if (i == 0) {   // left wheel
+                            angleAdj =  -angleAdj;
                         }
-                        else {
-                            this.angleDistAdj[i] = -1.0 * angleAdj;
+                        else {          // right wheel
+                            angleAdj = angleAdj;
                         }
+
+                        positionError += angleAdj;
+                        this.angleAdjs[i] = angleAdj;   // This is the new straight for this wheel.
                     }
 
-                    // Calculate distance error adjustment
-                    //
-                    double distanceError = segment.position - (position + this.angleDistAdj[i]);
-                    double distanceAdj =
-                            this.distanceProportional * distanceError +
-                            this.distanceDerivative * ((distanceError - this.lastErrors[i]) / (time - this.startTime));
+                    double powerAdj = this.distanceProportional * positionError +
+                                      this.distanceDerivative * ((positionError - this.lastErrors[i]) / (time - this.startTime));
 
                     power = this.velocityFeed * segment.velocity +
                             this.accelerationFeed * segment.acceleration +
-                            distanceAdj;
-
-                    power = power * this.distanceScales[i];
+                            powerAdj;
 
                     if (this.ps[i] != null) {
-                        this.ps[i].println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+","+distanceError+"," + expectedAngle+","+actualAngle+","+angleError+","+power+","+distanceAdj+","+angleAdj);
+                        this.ps[i].println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+"," + (positionError - angleAdjs[i]) + "," + expectedAngle+","+actualAngle+","+angleError+","+angleAdjs[i]+","+positionError+","+powerAdj+","+power);
                     }
 
                     this.lastTime = time;
                     this.lastPositions[i] = position;
                     this.lastPowers[i] = power;
-                    this.lastErrors[i] = distanceError;
+                    this.lastErrors[i] = positionError;
                 } else {
                     this.isFinished = true;
                 }

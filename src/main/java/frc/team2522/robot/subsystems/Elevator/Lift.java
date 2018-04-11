@@ -170,7 +170,9 @@ public class Lift {
             if (this.getPosition() >= moveTo) {
                 velocityFeed = 0.02;
             }
-            follower = new TrajectoryFollower("LiftMove", this.getPosition() > moveTo, null, trajectory,this.liftEncoder, this.liftMotor, velocityFeed, 0.0, 0.8, 0.0, 0.0);
+            follower = new TrajectoryFollower("LiftMove", this.getPosition() > moveTo,
+                    null, trajectory, this.liftEncoder, this.liftMotor,
+                    velocityFeed, 0.0, 0.8, 0.0, 0.0);
 
             this.setBreak(false);
             follower.start();

@@ -3,7 +3,7 @@
   "waypoints" : [
     {"x": -17.0, "y":  19.5, "angle":  90.0},
     {"x":   5.0, "y":  90.0, "angle":  90.0},
-    {"x": -36.0, "y": 168.0, "angle": 180.0}
+    {"x": -37.0, "y": 168.0, "angle": 180.0}
   ],
   "config": {
     "fit-method": "HERMITE_CUBIC",

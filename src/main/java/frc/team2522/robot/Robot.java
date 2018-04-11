@@ -69,7 +69,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void robotInit() {
-//        CameraPipeline.initialize();
+        //CameraPipeline.initialize();
         Controls.initialize();
 
         // Setup Drivebase subsystem.
@@ -79,7 +79,9 @@ public class Robot extends IterativeRobot {
         leftDriveMotor2.setNeutralMode(NeutralMode.Brake);
 
         rightDriveMotor1.setNeutralMode(NeutralMode.Brake);
+        rightDriveMotor1.setInverted(true);
         rightDriveMotor2.setNeutralMode(NeutralMode.Brake);
+        rightDriveMotor2.setInverted(true);
         rightDriveMotor2.follow(rightDriveMotor1);
 
         leftDriveEncoder.setReverseDirection(true);
@@ -89,6 +91,8 @@ public class Robot extends IterativeRobot {
 
         // Setup Elevator subsystem
         //
+        carriageIntakeMotor.setNeutralMode(NeutralMode.Brake);
+
         liftMotor2.follow(liftMotor1);
         liftMotor3.follow(liftMotor1);
         Intake intake = new Intake(carriageIntakeMotor, carriageIntakeArm, carriageArmUpSwitch,carriageArmDownSwitch);

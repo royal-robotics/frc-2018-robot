@@ -24,5 +24,6 @@ sftp.connect({
     process.exit();
 }).catch((err) => {
     console.log("failed to connect to roborio!");
+    console.log(err);
     process.exit();
 });

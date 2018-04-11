@@ -30,7 +30,7 @@ public class DriveController {
     public static final double kLowGearDistancePerPulse = 0.1667 * 6.0 * Math.PI / 256.0;
 
     public static final double kUpdateFrequency = 0.01;  // 100 times per second
-    public static final double kProportionalFactor = 0.75;
+    public static final double kProportionalFactor = 0.4;
     public static final double kIntegralFactor = 0.0;
     public static final double kDifferentialFactor = 0.0;
 
@@ -190,7 +190,7 @@ public class DriveController {
                 if (this.follower == null) {
 //                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
                     this.drivePath("motion-profile", false);
-//                    this.driveRotate(90.0, 50, 100, 300);
+//                    this.driveRotate(-90.0, 80, 120, 250);
                 }
             }
             else {
@@ -241,8 +241,8 @@ public class DriveController {
         System.out.println("DrivePath: " + pathName + " ETA: " + ((double)leftTrajectory.length() * leftTrajectory.get(0).dt) + " seconds.");
 
         this.follower = new TrajectoryFollower(pathName, reverse, this.gyro,
-                Pathfinder.readFromFile(leftFile), leftEncoder, leftMotor,
-                Pathfinder.readFromFile(rightFile), rightEncoder, rightMotor,
+                leftTrajectory, leftEncoder, leftMotor,
+                rightTrajectory, rightEncoder, rightMotor,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
 
         this.follower.start();
@@ -275,10 +275,11 @@ public class DriveController {
         Encoder[] encoders = new Encoder[]{this.leftEncoder, this.rightEncoder};
         double[] distanceScales = new double[] {(distance < 0.0)?-1.0:1.0, (distance < 0.0)?-1.0:1.0};
         IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
-        double[] motorScales = new double[] {1.0, -1.0};
+        double[] motorScales = new double[] {(distance < 0.0)?-1.0:1.0, (distance < 0.0)?-1.0:1.0};
 
         System.out.println("DriveDistance: " + distance + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
-        this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"}, null, 1.0, trajectories, encoders, distanceScales, motors, motorScales,
+        this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"},
+                null, trajectories, encoders, distanceScales, motors, motorScales,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
         this.follower.start();
 
@@ -296,7 +297,7 @@ public class DriveController {
                 maxAcceleration,
                 maxJerk);
 
-        final double kFullRotationDistance = 80.0;
+        final double kFullRotationDistance = 95.0;
         double distance = kFullRotationDistance * (angle / 360.0);
 
         final Waypoint[] points = new Waypoint[]{
@@ -319,12 +320,13 @@ public class DriveController {
         System.out.println("DriveRotate Path Generation Time: " + ((double)(System.nanoTime() - startGeneration) / 1000000000.0) + " seconds.");
 
         Encoder[] encoders = new Encoder[]{this.leftEncoder, this.rightEncoder};
-        double[] distanceScales = new double[] {(distance < 0.0)?-1.0:1.0, (distance < 0.0)?1.0:-1.0};
+        double[] distanceScales = new double[] {(angle < 0.0)?-1.0:1.0, (angle > 0.0)?-1.0:1.0};
         IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
-        double[] motorScales = new double[] {1.0, -1.0};
+        double[] motorScales = new double[] {(angle < 0.0)?-1.0:1.0, (angle > 0.0)?-1.0:1.0};
 
         System.out.println("DriveRotate: " + angle + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
-        this.follower = new TrajectoryFollower(new String[] {"DriveRotate-left", "DriveRotate-right"}, null, 1.0, trajectories, encoders, distanceScales, motors, motorScales,
+        this.follower = new TrajectoryFollower(new String[] {"DriveRotate-left", "DriveRotate-right"},
+                this.gyro, trajectories, encoders, distanceScales, motors, motorScales,
                 1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
 
         this.follower.start();
@@ -350,7 +352,7 @@ public class DriveController {
      * @param rightPower
      */
     public void drive(double leftPower, double rightPower) {
-        this.tankDrive.set(DriveMode.PercentOutput, leftPower, -rightPower);
+        this.tankDrive.set(DriveMode.PercentOutput, leftPower, rightPower);
 
         this.leftPower = leftPower;
         this.rightPower = rightPower;
