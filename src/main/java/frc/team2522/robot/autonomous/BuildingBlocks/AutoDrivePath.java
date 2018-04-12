@@ -1,7 +1,7 @@
 package frc.team2522.robot.autonomous.BuildingBlocks;
 
 import frc.team2522.robot.autonomous.AutoStep;
-import frc.team2522.robot.libs.TrajectoryFollower;
+import frc.team2522.robot.libs.ITrajectoryFollower;
 import frc.team2522.robot.subsystems.Drivebase.DriveController;
 
 import java.util.AbstractMap;
@@ -11,7 +11,7 @@ import java.util.Queue;
 
 public class AutoDrivePath  extends AutoStep {
 
-    private TrajectoryFollower follower;
+    private ITrajectoryFollower follower;
     private boolean isCompleted = false;
     private boolean reverse = false;
 

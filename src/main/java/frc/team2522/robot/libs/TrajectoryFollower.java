@@ -13,7 +13,7 @@ import java.io.PrintStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class TrajectoryFollower {
+public class TrajectoryFollower implements ITrajectoryFollower {
 
     private Timer timer;
     private long startTime;
@@ -44,7 +44,6 @@ public class TrajectoryFollower {
 
     private ADXRS450_Gyro gyro;
     private double gyroAngleOffset;
-    private double[] angleAdjs;
 
     PrintStream ps[] = null;
 
@@ -77,7 +76,6 @@ public class TrajectoryFollower {
     public TrajectoryFollower(String[] names,  ADXRS450_Gyro gyro, Trajectory[] trajectories, Encoder[] encoders, double[] distanceScales, IMotorController[] controllers, double[] powerScales, double kVf, double kAf, double kP, double kI, double kD) {
         this.names = names;
         this.gyro = gyro;
-        this.angleAdjs = new double[trajectories.length];
         this.trajectories = trajectories;
         this.encoders = encoders;
         this.distanceScales = distanceScales;
@@ -116,7 +114,6 @@ public class TrajectoryFollower {
             this.lastPositions[i] = 0.0;
             this.lastPowers[i] = 0.0;
             this.lastErrors[i] = 0.0;
-            this.angleAdjs[i] = 0.0;
 
             File f = new File("/home/lvuser/" + this.names[i]+ "_0.csv");
             for(int j = 0;f.exists();j++)
@@ -128,7 +125,7 @@ public class TrajectoryFollower {
             {
                 this.ps[i] = new PrintStream(f);
                 System.out.println("Created LogFile: " + f.getName());
-                this.ps[i].println("Time,Index,ExpectedVelocity,ExpectedPosition,ActualPosition,PositionAdj,ExpectedAngle,ActualAngle,AngleError,AnglePosAdj,TotalPosAdj,PowerAdj,Power");
+                this.ps[i].println("Time,Index,ExpectedVelocity,ExpectedPosition,ActualPosition,PositionAdj,ExpectedAngle,ActualAngle,AngleError,AngleErrorAdj,AnglePosAdj,TotalPosAdj,PowerAdj,Power");
             }
             catch(IOException e)
             {
@@ -167,9 +164,16 @@ public class TrajectoryFollower {
                 }
             }
 
+            this.isRunning = false;
             this.isFinished = true;
         }
     }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isRunning() { return this.isRunning; }
 
     /**
      * Returns true after the follower has completed.
@@ -230,37 +234,55 @@ public class TrajectoryFollower {
      *
      */
     public void followPath() {
-        final double kInchesPerRotation = 25.0 * Math.PI; // TODO: This should use a passed in value for wheel base width instead of hard coding
+        final double kWheelBaseWidth = 25.0;    // TODO: this value should be passed in to the follower.
+        final double kInchesPerDegree = (kWheelBaseWidth * Math.PI) / 360.0;
 
         double time = this.getTime();
 
-        if (! this.isFinished) {
-            //  Assume 0 is left and 1 is right
-            for(int i = 0; i < this.trajectories.length; i++) {
-                double power = 0.0;
-                double position = (this.encoders[i].getDistance() - this.startPositions[i]) * this.distanceScales[i];
+        if (! this.isFinished)
+        {
+            int segmentIndex = (int) Math.round(time / this.trajectoryInterval);
 
-                int segmentIndex = (int) Math.round(time / this.trajectoryInterval);
+            if (segmentIndex < this.trajectories[0].length())
+            {
+                // Calculate angle error adjustment if we have a gyro.
+                //
+                double expectedAngle = 0.0;;
+                double actualAngle = 0.0;
+                double angleError = 0.0;
+                double angleErrorAdj = 0.0;
 
-                if (segmentIndex < this.trajectories[i].length()) {
+                if ((this.gyro != null) && (this.trajectories.length == 2)) {
+                    Trajectory.Segment leftSeg = this.trajectories[0].get(segmentIndex);
+                    Trajectory.Segment rightSeg = this.trajectories[1].get(segmentIndex);
+
+                    expectedAngle = Pathfinder.r2d(leftSeg.heading);
+                    actualAngle = this.getAngle();
+                    angleError = Pathfinder.boundHalfDegrees(expectedAngle - actualAngle);
+
+                    // Calculate the angle induced by the left and right wheel position errors so it can be subtracted from the gyro observed error.
+                    //
+                    double leftPosError = leftSeg.position - ((this.encoders[0].getDistance() - this.startPositions[0]) * this.distanceScales[0]);
+                    double rightPosError = rightSeg.position - ((this.encoders[1].getDistance() - this.startPositions[1]) * this.distanceScales[1]);
+                    angleErrorAdj = Pathfinder.r2d(Math.asin((leftPosError - rightPosError) / kWheelBaseWidth));
+                }
+
+                //  Assume 0 is left and 1 is right
+                for(int i = 0; i < this.trajectories.length; i++) {
+                    double power = 0.0;
+                    double angleAdj = 0.0;
+                    double position = (this.encoders[i].getDistance() - this.startPositions[i]) * this.distanceScales[i];
+
                     Trajectory.Segment segment = this.trajectories[i].get(segmentIndex);
 
                     // Calculate position error adjustment plus the on going angle adjustment
                     //
-                    double positionError = (segment.position - position);// + this.angleAdjs[i];
+                    double positionError = (segment.position - position);
 
                     // Calculate angle error adjustment if we have a gyro.
                     //
-                    double expectedAngle = Pathfinder.r2d(segment.heading);;
-                    double actualAngle = 0.0;
-                    double angleError = 0.0;
-
-                    if (this.gyro != null) {
-                        actualAngle = this.getAngle();
-                        expectedAngle = Pathfinder.r2d(segment.heading);
-                        angleError = Pathfinder.boundHalfDegrees(expectedAngle - actualAngle);
-
-                        double angleAdj = angleError * (kInchesPerRotation / 360.0);
+                    if ((this.gyro != null) && (this.trajectories.length == 2)) {
+                        angleAdj = (angleError - angleErrorAdj) * kInchesPerDegree;
                         if (i == 0) {   // left wheel
                             angleAdj =  -angleAdj;
                         }
@@ -269,7 +291,6 @@ public class TrajectoryFollower {
                         }
 
                         positionError += angleAdj;
-                        this.angleAdjs[i] = angleAdj;   // This is the new straight for this wheel.
                     }
 
                     double powerAdj = this.distanceProportional * positionError +
@@ -280,18 +301,24 @@ public class TrajectoryFollower {
                             powerAdj;
 
                     if (this.ps[i] != null) {
-                        this.ps[i].println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+"," + (positionError - angleAdjs[i]) + "," + expectedAngle+","+actualAngle+","+angleError+","+angleAdjs[i]+","+positionError+","+powerAdj+","+power);
+                        this.ps[i].println(time+","+segmentIndex+","+segment.velocity+","+segment.position+","+position+"," + (positionError - angleAdj) + "," + expectedAngle+","+actualAngle+","+angleError+","+angleErrorAdj+","+angleAdj+","+positionError+","+powerAdj+","+power);
                     }
 
                     this.lastTime = time;
                     this.lastPositions[i] = position;
                     this.lastPowers[i] = power;
                     this.lastErrors[i] = positionError;
-                } else {
-                    this.isFinished = true;
-                }
 
-                this.controllers[i].set(ControlMode.PercentOutput, power * this.powerScales[i]);
+                    this.controllers[i].set(ControlMode.PercentOutput, power * this.powerScales[i]);
+                }
+            }
+            else {
+                this.isFinished = true;
+            }
+        }
+        else {
+            for(int i = 0; i < this.controllers.length; i++) {
+                this.controllers[i].set(ControlMode.PercentOutput, 0.0);
             }
         }
     }

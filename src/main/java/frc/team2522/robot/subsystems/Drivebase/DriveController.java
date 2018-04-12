@@ -30,7 +30,7 @@ public class DriveController {
     public static final double kLowGearDistancePerPulse = 0.1667 * 6.0 * Math.PI / 256.0;
 
     public static final double kUpdateFrequency = 0.01;  // 100 times per second
-    public static final double kProportionalFactor = 0.4;
+    public static final double kProportionalFactor = 0.2;
     public static final double kIntegralFactor = 0.0;
     public static final double kDifferentialFactor = 0.0;
 
@@ -73,7 +73,7 @@ public class DriveController {
     private double rightLastVelocity = 0.0;
 
     private double maxDetectedVelocity = 0.0;
-    private TrajectoryFollower follower = null;
+    private ITrajectoryFollower follower = null;
 
 
     public DriveController(IMotorController leftDriveMotor, Encoder leftDriveEncoder, IMotorController rightDriveMotor, Encoder rightDriveEncoder, ADXRS450_Gyro gyro, DoubleSolenoid shifter, DoubleSolenoid pto) {
@@ -189,8 +189,8 @@ public class DriveController {
             if (Controls.debugDriveForward()) {
                 if (this.follower == null) {
 //                    this.driveDistance(Controls.getMoveDistance(), 150, 100, 300);
-                    this.drivePath("motion-profile", false);
-//                    this.driveRotate(-90.0, 80, 120, 250);
+                    this.drivePath("center-switch_right", false);
+//                    this.driveRotate(90.0, 80, 120, 250);
                 }
             }
             else {
@@ -217,7 +217,7 @@ public class DriveController {
         }
     }
 
-    public TrajectoryFollower drivePath(String pathName, boolean reverse) {
+    public ITrajectoryFollower drivePath(String pathName, boolean reverse) {
         this.stopFollowing();
 
         final String pathDirectory = "/home/lvuser/";
@@ -243,14 +243,14 @@ public class DriveController {
         this.follower = new TrajectoryFollower(pathName, reverse, this.gyro,
                 leftTrajectory, leftEncoder, leftMotor,
                 rightTrajectory, rightEncoder, rightMotor,
-                1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
+                2.5 / this.maxVelocity, 0.0, 0.2, kIntegralFactor, kDifferentialFactor);
 
         this.follower.start();
 
         return this.follower;
     }
 
-    public TrajectoryFollower driveDistance(double distance, double maxVelocity, double maxAcceleration, double maxJerk) {
+    public ITrajectoryFollower driveDistance(double distance, double maxVelocity, double maxAcceleration, double maxJerk) {
         this.stopFollowing();
 
         final Trajectory.Config config = new Trajectory.Config(
@@ -280,55 +280,19 @@ public class DriveController {
         System.out.println("DriveDistance: " + distance + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
         this.follower = new TrajectoryFollower(new String[] {"DriveDistance-left", "DriveDistance-right"},
                 null, trajectories, encoders, distanceScales, motors, motorScales,
-                1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
+                1.25 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
         this.follower.start();
 
         return this.follower;
     }
 
-    public TrajectoryFollower driveRotate(double angle, double maxVelocity, double maxAcceleration, double maxJerk) {
+    public ITrajectoryFollower driveRotate(double angle, double maxVelocity, double maxAcceleration, double maxJerk) {
         this.stopFollowing();
 
-        final Trajectory.Config config = new Trajectory.Config(
-                Trajectory.FitMethod.HERMITE_CUBIC,
-                Trajectory.Config.SAMPLES_FAST,
-                kUpdateFrequency,
-                maxVelocity,
-                maxAcceleration,
-                maxJerk);
-
-        final double kFullRotationDistance = 95.0;
-        double distance = kFullRotationDistance * (angle / 360.0);
-
-        final Waypoint[] points = new Waypoint[]{
-                new Waypoint(0, 0, Pathfinder.d2r(0)),
-                new Waypoint(Math.abs(distance), 0, Pathfinder.d2r(0)),
-        };
-
-        long startGeneration = System.nanoTime();
-        Trajectory trajectory = Pathfinder.generate(points, config);
-        TankModifier modifier = new TankModifier(trajectory).modify(kWheelbaseWidth);
-        Trajectory leftTrajectory = modifier.getRightTrajectory();
-        Trajectory rightTrajectory = modifier.getRightTrajectory();
-        double headingScale = angle > 0.0 ? -1.0 : 1.0;
-        for(int i = 0; i < leftTrajectory.length(); i++) {
-            double heading = headingScale * Pathfinder.d2r((leftTrajectory.get(i).position * 360.0) / kFullRotationDistance);
-            leftTrajectory.get(i).heading = heading;
-            rightTrajectory.get(i).heading = heading;
-        }
-        Trajectory[] trajectories = new Trajectory[]{leftTrajectory, rightTrajectory};
-        System.out.println("DriveRotate Path Generation Time: " + ((double)(System.nanoTime() - startGeneration) / 1000000000.0) + " seconds.");
-
-        Encoder[] encoders = new Encoder[]{this.leftEncoder, this.rightEncoder};
-        double[] distanceScales = new double[] {(angle < 0.0)?-1.0:1.0, (angle > 0.0)?-1.0:1.0};
-        IMotorController[] motors = new IMotorController[]{this.leftMotor, this.rightMotor};
-        double[] motorScales = new double[] {(angle < 0.0)?-1.0:1.0, (angle > 0.0)?-1.0:1.0};
-
-        System.out.println("DriveRotate: " + angle + " ETA: " + ((double)trajectories[0].length() * kUpdateFrequency) + " seconds.");
-        this.follower = new TrajectoryFollower(new String[] {"DriveRotate-left", "DriveRotate-right"},
-                this.gyro, trajectories, encoders, distanceScales, motors, motorScales,
-                1.0 / this.maxVelocity, 0.0, kProportionalFactor, kIntegralFactor, kDifferentialFactor);
-
+        this.follower = new RotateFollower("DriveRotate", angle, kWheelbaseWidth, kUpdateFrequency,
+                                            this.gyro, this.leftEncoder, this.leftMotor, this.rightEncoder, this.rightMotor,
+                                            maxVelocity, maxAcceleration, maxJerk,
+                                           4.0 / this.maxVelocity, 0.0, 0.7, kIntegralFactor, kDifferentialFactor);
         this.follower.start();
         return this.follower;
     }

@@ -178,6 +178,10 @@ public class Controls {
                         newMode = "Left_SwitchOrNearScale";
                         break;
                     }
+                    case 6: {
+                        newMode = "Left_NearScaleOutside";
+                        break;
+                    }
                     case 10: {
                         newMode = "DriveForward";
                         break;
@@ -222,6 +226,10 @@ public class Controls {
                     }
                     case 5: {
                         newMode = "Right_SwitchOrNearScale";
+                        break;
+                    }
+                    case 6: {
+                        newMode = "Right_NearScaleOutside";
                         break;
                     }
                     case 10: {
