@@ -71,8 +71,11 @@ public class AutoDrivePath  extends AutoStep {
 
     private void triggerChildSteps() {
         for(AbstractMap.SimpleEntry<Double, AutoStep> step : childSteps) {
-            if(!step.getValue().isStarted() && follower.getPosition() >= step.getKey())
-                step.getValue().start();
+            if (follower != null) {
+                if (!step.getValue().isStarted() && follower.getPosition() >= step.getKey()) {
+                    step.getValue().start();
+                }
+            }
         }
     }
 

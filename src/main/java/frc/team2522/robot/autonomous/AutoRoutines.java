@@ -88,11 +88,57 @@ public class AutoRoutines {
         List<AutoStep> steps = new ArrayList<>();
 
         if (Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.LEFT) {
-            AutoDrivePath driveToNearSwitch = new AutoDrivePath(robot.driveController, "left-switch_left");
+// Spline drive method
+//
+//            AutoDrivePath driveToNearSwitch = new AutoDrivePath(robot.driveController, "left-switch_left");
+//            driveToNearSwitch.addChildStep(0, new AutoIntakeArm(robot.elevatorController));
+//            steps.add(driveToNearSwitch);
+//
+//            steps.add(new AutoIntakeWheels(robot.elevatorController));
+//
+//            steps.add(new AutoRotate(robot.driveController, 100));
+//
+//            steps.add(new AutoDrivePath(robot.driveController,-80));
+//
+//            steps.add(new AutoRotate(robot.driveController, -30));
+//
+//            steps.add(new AutoLift(robot.elevatorController, 0.75));
+//
+//            AutoDrivePath driveForwardAndCollect = new AutoDrivePath(robot.driveController, 30);
+//            driveForwardAndCollect.addChildStep(0, new AutoIntakeWheels(robot.elevatorController, 1.0, -1.0));
+//            steps.add(driveForwardAndCollect);
+//
+//            steps.add(new AutoLift(robot.elevatorController, 24));
+//
+//            steps.add(new AutoIntakeWheels(robot.elevatorController));
+
+
+            AutoDrivePath driveToNearSwitch = new AutoDrivePath(robot.driveController, 148);
             driveToNearSwitch.addChildStep(0, new AutoIntakeArm(robot.elevatorController));
             steps.add(driveToNearSwitch);
 
+            steps.add(new AutoRotate(robot.driveController, 90));
+
+            steps.add(new AutoDrivePath(robot.driveController, 21));
+
             steps.add(new AutoIntakeWheels(robot.elevatorController));
+
+            steps.add(new AutoRotate(robot.driveController, 90));
+
+            AutoDrivePath driveBackwardsAndLower = new AutoDrivePath(robot.driveController, -80);
+            driveBackwardsAndLower.addChildStep(0, new AutoLift(robot.elevatorController, 0.75));
+            steps.add(driveBackwardsAndLower);
+
+            steps.add(new AutoRotate(robot.driveController, -35));
+
+            AutoDrivePath driveForwardAndCollect = new AutoDrivePath(robot.driveController, 30);
+            driveForwardAndCollect.addChildStep(0, new AutoIntakeWheels(robot.elevatorController, 1.0, -1.0));
+            steps.add(driveForwardAndCollect);
+
+            steps.add(new AutoLift(robot.elevatorController, 24));
+
+            steps.add(new AutoIntakeWheels(robot.elevatorController));
+
         } else {
             return DriveForward(robot);
         }
@@ -104,9 +150,33 @@ public class AutoRoutines {
         List<AutoStep> steps = new ArrayList<>();
 
         if (Controls.getOwnedSide(MatchData.GameFeature.SWITCH_NEAR) == MatchData.OwnedSide.RIGHT) {
-            AutoDrivePath driveToNearSwitch = new AutoDrivePath(robot.driveController, "right-switch_right");
+//            AutoDrivePath driveToNearSwitch = new AutoDrivePath(robot.driveController, "right-switch_right");
+//            driveToNearSwitch.addChildStep(0, new AutoIntakeArm(robot.elevatorController));
+//            steps.add(driveToNearSwitch);
+
+            AutoDrivePath driveToNearSwitch = new AutoDrivePath(robot.driveController, 148);
             driveToNearSwitch.addChildStep(0, new AutoIntakeArm(robot.elevatorController));
             steps.add(driveToNearSwitch);
+
+            steps.add(new AutoRotate(robot.driveController, -90));
+
+            steps.add(new AutoDrivePath(robot.driveController, 21));
+
+            steps.add(new AutoIntakeWheels(robot.elevatorController));
+
+            steps.add(new AutoRotate(robot.driveController, -90));
+
+            AutoDrivePath driveBackwardsAndLower = new AutoDrivePath(robot.driveController, -80);
+            driveBackwardsAndLower.addChildStep(0, new AutoLift(robot.elevatorController, 0.75));
+            steps.add(driveBackwardsAndLower);
+
+            steps.add(new AutoRotate(robot.driveController, 35));
+
+            AutoDrivePath driveForwardAndCollect = new AutoDrivePath(robot.driveController, 30);
+            driveForwardAndCollect.addChildStep(0, new AutoIntakeWheels(robot.elevatorController, 1.0, -1.0));
+            steps.add(driveForwardAndCollect);
+
+            steps.add(new AutoLift(robot.elevatorController, 24));
 
             steps.add(new AutoIntakeWheels(robot.elevatorController));
         } else {
