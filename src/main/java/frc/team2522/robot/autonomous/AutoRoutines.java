@@ -131,7 +131,7 @@ public class AutoRoutines {
 
             steps.add(new AutoRotate(robot.driveController, -35));
 
-            AutoDrivePath driveForwardAndCollect = new AutoDrivePath(robot.driveController, 30);
+            AutoDrivePath driveForwardAndCollect = new AutoDrivePath(robot.driveController, 32);
             driveForwardAndCollect.addChildStep(0, new AutoIntakeWheels(robot.elevatorController, 1.0, -1.0));
             steps.add(driveForwardAndCollect);
 
@@ -172,7 +172,7 @@ public class AutoRoutines {
 
             steps.add(new AutoRotate(robot.driveController, 35));
 
-            AutoDrivePath driveForwardAndCollect = new AutoDrivePath(robot.driveController, 30);
+            AutoDrivePath driveForwardAndCollect = new AutoDrivePath(robot.driveController, 32);
             driveForwardAndCollect.addChildStep(0, new AutoIntakeWheels(robot.elevatorController, 1.0, -1.0));
             steps.add(driveForwardAndCollect);
 
