@@ -56,4 +56,9 @@ public class AutoIntakeWheels extends AutoStep {
             this.elevatorController.intake.setStop();
         }
     }
+
+    public void stop(){
+        this.startTime = 0;
+        this.elevatorController.intake.setStop();
+    }
 }

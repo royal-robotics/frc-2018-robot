@@ -24,10 +24,21 @@ public class AutoRotate extends AutoStep {
 
     @Override
     public boolean isCompleted() {
-        return follower.isFinished();
+        if (this.follower != null) {
+            return follower.isFinished();
+        }
+
+        return true;
     }
 
     @Override
     public void periodic() {
+    }
+
+    public void stop(){
+        if (follower != null)  {
+            follower.stop();
+            follower = null;
+        }
     }
 }

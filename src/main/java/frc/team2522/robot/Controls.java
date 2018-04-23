@@ -70,7 +70,7 @@ public class Controls {
         public static class Lift {
             public static double getLiftAxisValue() {
                 double power = -liftAxis.getValue();
-                power *= power > 0 ? 0.6 : 0.3;
+                power *= power > 0 ? 0.7 : 0.3;
                 return power;
             }
             public static boolean getLiftAxisOn() { return liftAxis.isPressed(); }

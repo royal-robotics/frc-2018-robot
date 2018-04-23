@@ -44,14 +44,18 @@ public class AutoDrivePath  extends AutoStep {
         if (this.pathName != null) {
             follower = driveController.drivePath(this.pathName, this.reverse);
         }else{
-            follower = driveController.driveDistance(this.distance,150,100,300);
+            follower = driveController.driveDistance(this.distance,180,140,300);
         }
 
     }
 
     @Override
     public boolean isCompleted() {
-        return childStepsCompleted() && follower.isFinished();
+        if (this.follower != null) {
+            return childStepsCompleted() && follower.isFinished();
+        }
+
+        return true;
     }
 
     @Override
@@ -91,5 +95,17 @@ public class AutoDrivePath  extends AutoStep {
 
     public void addChildStep(double positionTrigger, AutoStep step) {
         childSteps.add(new AbstractMap.SimpleEntry<Double, AutoStep>(positionTrigger, step));
+    }
+
+    public void stop(){
+
+        for(AbstractMap.SimpleEntry<Double, AutoStep> step : childSteps) {
+            step.getValue().stop();
+        }
+
+        if (follower != null)  {
+            follower.stop();
+            follower = null;
+        }
     }
 }

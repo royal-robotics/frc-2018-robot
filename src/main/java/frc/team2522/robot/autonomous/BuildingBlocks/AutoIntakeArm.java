@@ -30,23 +30,31 @@ public class AutoIntakeArm extends AutoStep {
 
     @Override
     public boolean isCompleted() {
-        if (this.moveUp) {
-            this.isDone = this.elevatorController.intake.isArmUp();
-        }
-        else {
-            this.isDone = this.elevatorController.intake.isArmDown();
-        }
+        //if (!this.isDone) {
+            if (this.moveUp) {
+                this.isDone = this.elevatorController.intake.isArmUp();
+            } else {
+                this.isDone = this.elevatorController.intake.isArmDown();
+            }
+        //}
 
         return isDone;
     }
 
     @Override
     public void periodic() {
-        if (this.moveUp) {
-            this.elevatorController.intake.moveArmUp();
+        if (!this.isDone) {
+            if (this.moveUp) {
+                this.elevatorController.intake.moveArmUp();
+            } else {
+                this.elevatorController.intake.moveArmDown();
+            }
         }
-        else {
-            this.elevatorController.intake.moveArmDown();
-        }
+    }
+
+    @Override
+    public void stop() {
+        this.isDone = true;
+        this.elevatorController.intake.moveArm(0.0);
     }
 }

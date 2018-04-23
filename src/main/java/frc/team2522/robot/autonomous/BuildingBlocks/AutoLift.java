@@ -28,12 +28,14 @@ public class AutoLift extends AutoStep {
         moveUp = height > startPosition;
         this.isStarted = true;
 
+        System.out.println("Auto Lift Move From:" + startPosition + " To: " + this.height);
         this.move(moveUp ? 0.65 : -0.25);
     }
 
     @Override
     public boolean isCompleted() {
         if(isDone) {
+            this.stop();
             return true;
         }
 
@@ -42,6 +44,7 @@ public class AutoLift extends AutoStep {
             if (time > 2.0) {
                 System.out.println("Auto Lift timeout! :(");
                 stop();
+                isDone = true;
             }
 
             double position = this.lift.getPosition();

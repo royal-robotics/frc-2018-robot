@@ -290,7 +290,7 @@ public class TrajectoryFollower implements ITrajectoryFollower {
                             angleAdj = angleAdj;
                         }
 
-                        positionError += angleAdj;
+                        positionError += angleAdj * 0.75;
                     }
 
                     double powerAdj = this.distanceProportional * positionError +
