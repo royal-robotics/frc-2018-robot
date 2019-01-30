@@ -2,10 +2,7 @@
 
 plugins {
     id "java"
-    id "eclipse"
-    id "idea"
-    id "jaci.openrio.gradle.GradleRIO" version "2018.01.11"
-   // id "com.moowork.node" version "1.2.0"
+    id "edu.wpi.first.GradleRIO" version "2019.2.1"
 }
 
 repositories {
@@ -21,13 +18,14 @@ def ROBOT_CLASS = "frc.team2522.robot.Robot"
 
 deploy {
     targets {
-        target("roborio", jaci.openrio.gradle.frc.RoboRIO) {
+        roboRIO("roborio") {
             team = TEAM
         }
     }
     artifacts {
-       artifact('frcJava', jaci.openrio.gradle.frc.FRCJavaArtifact) {
+       frcJavaArtifact('frcJava') {
            targets << "roborio"
+		   debug = frc.getDebugOrDefault(false)
        }
     }
 }
@@ -36,6 +34,9 @@ deploy {
 // and NavX.
 dependencies {
     compile wpilib()
+	compile vendor.java()
+	nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
+    nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
     compile pathfinder()
     compile ctre()
     compile navx()
