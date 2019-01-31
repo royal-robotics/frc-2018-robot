@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: opencv-320.jar
-Main-Class: VisionTest.Main
-

@@ -1,7 +1,5 @@
 package frc.team2522.robot.subsystems.Drivebase;
 
-import com.ctre.phoenix.drive.DriveMode;
-import com.ctre.phoenix.mechanical.Gearbox;
 import com.ctre.phoenix.motorcontrol.IMotorController;
 
 import edu.wpi.first.wpilibj.*;
@@ -40,11 +38,9 @@ public class DriveController {
     }
 
     private IMotorController leftMotor;
-    private Gearbox leftMotors;
     private Encoder leftEncoder;
 
     private IMotorController rightMotor;
-    private Gearbox rightMotors;
     private Encoder rightEncoder;
 
     private ADXRS450_Gyro gyro;
@@ -78,11 +74,9 @@ public class DriveController {
 
     public DriveController(IMotorController leftDriveMotor, Encoder leftDriveEncoder, IMotorController rightDriveMotor, Encoder rightDriveEncoder, ADXRS450_Gyro gyro, DoubleSolenoid shifter, DoubleSolenoid pto) {
         this.leftMotor = leftDriveMotor;
-        this.leftMotors = new Gearbox(leftDriveMotor);
         this.leftEncoder = leftDriveEncoder;
 
         this.rightMotor = rightDriveMotor;
-        this.rightMotors = new Gearbox(rightDriveMotor);
         this.rightEncoder = rightDriveEncoder;
 
         this.gyro = gyro;
@@ -91,7 +85,7 @@ public class DriveController {
         this.pto = pto;
 
         this.driveType = DriveType.DiffDrive;
-        this.tankDrive = new TankDrive(leftMotors, rightMotors);
+        this.tankDrive = new TankDrive(leftMotor, rightMotor);
 
         this.reset();
 
@@ -316,7 +310,7 @@ public class DriveController {
      * @param rightPower
      */
     public void drive(double leftPower, double rightPower) {
-        this.tankDrive.set(DriveMode.PercentOutput, leftPower, rightPower);
+        this.tankDrive.set(leftPower, rightPower);
 
         this.leftPower = leftPower;
         this.rightPower = rightPower;
