@@ -1,34 +1,29 @@
 package frc.team2522.robot.libs;
 
-import com.ctre.phoenix.drive.DriveMode;
-import com.ctre.phoenix.mechanical.Gearbox;
+import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 public class TankDrive {
-    private Gearbox _left;
-    private Gearbox _right;
+    private IMotorController _left;
+    private IMotorController _right;
 
-    public TankDrive(Gearbox left, Gearbox right) {
+    public TankDrive(IMotorController left, IMotorController right) {
         _left = left;
         _right = right;
     }
 
 
-    public void set(DriveMode driveMode, double left, double right)
+    public void set(ControlMode controlMode, double left, double right)
     {
-        switch (driveMode) {
-            case Voltage:
-                _left.enableVoltageCompensation(true);
-                _right.enableVoltageCompensation(true);
-                _left.set(ControlMode.PercentOutput, left);
-                _right.set(ControlMode.PercentOutput, right);
-                break;
+        switch (controlMode) {
             case PercentOutput:
                 _left.enableVoltageCompensation(false);
                 _right.enableVoltageCompensation(false);
                 _left.set(ControlMode.PercentOutput, left);
                 _right.set(ControlMode.PercentOutput, right);
                 break;
+            default:
+                throw new RuntimeException("What is ControlMode???");
         }
     }
 }

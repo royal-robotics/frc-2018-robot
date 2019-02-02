@@ -4,8 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.team2522.robot.autonomous.AutoManager;
-import frc.team2522.robot.autonomous.AutoRoutines;
 import frc.team2522.robot.camera.CameraPipeline;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -65,8 +63,6 @@ public class Robot extends IterativeRobot {
     public DriveController driveController;
     public Elevator elevatorController;
 
-    AutoManager auto;
-
     @Override
     public void robotInit() {
         //CameraPipeline.initialize();
@@ -111,42 +107,11 @@ public class Robot extends IterativeRobot {
     }
 
     /**
-     * Initialization code for disabled mode.
-     *
-     * <p>This code will be called every time the robot enters disabled mode.
-     */
-    @Override
-    public void disabledInit() {
-        if (this.auto != null) {
-            this.auto.stop();
-        }
-    }
-
-    /**
      * Periodic code for disabled mode should go here.
      */
     @Override
     public void disabledPeriodic() {
         this.driveController.disablePeriodic();
-    }
-
-    /**
-     * Initialization code for autonomous mode.
-     *
-     * <p>This code will be called every time the robot enters autonomous mode.
-     */
-    @Override
-    public void autonomousInit() {
-        this.driveController.reset();
-        this.elevatorController.lift.autoCalibrate();
-        this.auto = AutoRoutines.selectAutoMode(Controls.getAutoMode(), this);
-    }
-
-    /**
-     * Periodic code for autonomous mode should go here.
-     */
-    public void autonomousPeriodic() {
-        this.driveController.autonomousPeriodic();
     }
 
     /**
@@ -156,10 +121,6 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void teleopInit() {
-        if (this.auto != null) {
-            this.auto.stop();
-        }
-
         this.elevatorController.lift.stopFollower();    // just in case the lift is moving during auto switchover
         this.elevatorController.lift.setBreak(true);
 
@@ -174,5 +135,4 @@ public class Robot extends IterativeRobot {
         driveController.teleopPeriodic();
         elevatorController.teleopPeriodic();
     }
-
 }

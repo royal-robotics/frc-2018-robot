@@ -217,7 +217,7 @@ public class Lift {
                     if(dt > 1.0) {
                         liftEncoder.reset();
                         isCalibrated = true;
-                        System.out.println("Calibrate Time: " + dt + " Calibrate Current: " + liftMotor.getOutputCurrent());
+                        //System.out.println("Calibrate Time: " + dt + " Calibrate Current: " + liftMotor.getOutputCurrent());
                         stopCalibration();
                     }
                 }

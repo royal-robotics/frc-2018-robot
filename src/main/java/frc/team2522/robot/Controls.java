@@ -3,7 +3,6 @@ package frc.team2522.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2522.robot.libs.*;
-import openrio.powerup.MatchData;
 
 public class Controls {
 
@@ -297,39 +296,6 @@ public class Controls {
 
         return autoValue + 1;
     }
-
-    public static MatchData.OwnedSide getOwnedSide(MatchData.GameFeature feature) {
-        MatchData.OwnedSide side = MatchData.getOwnedSide(feature);
-
-        if(side == MatchData.OwnedSide.UNKNOWN) {
-            System.out.println("MatchData UNKNOWN setting value based on AutoSelect Switches.");
-            if(feature == MatchData.GameFeature.SCALE) {
-                side = autoSelector.getRawButton(1) ? MatchData.OwnedSide.RIGHT : MatchData.OwnedSide.LEFT;
-            } else {
-                side = autoSelector.getRawButton(12) ? MatchData.OwnedSide.RIGHT : MatchData.OwnedSide.LEFT;
-            }
-        }
-        else {
-            System.out.println("Match data returned from FMS.");
-        }
-
-        if (feature == MatchData.GameFeature.SCALE) {
-            System.out.print("SCALE is on ");
-        }
-        else {
-            System.out.print("SWITCH is on ");
-        }
-
-        if (side == MatchData.OwnedSide.LEFT) {
-            System.out.println(" LEFT.");
-        }
-        else {
-            System.out.println(" RIGHT.");
-        }
-
-        return side;
-    }
-
 
     // Driver Joystick Configuration
     //
